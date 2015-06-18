@@ -1,13 +1,13 @@
-package main.java.ru.MonitoringMoney.george;
+package main.java.ru.MonitoringMoney.george.types;
 
 
-public enum User {
+public enum UsersDefault {
     GEORGE("Жорик"),
     DASHA("Даша");
 
     private String name;
 
-    User(String name) {
+    UsersDefault(String name) {
         this.name = name;
     }
 

@@ -1,7 +1,7 @@
-package main.java.ru.MonitoringMoney.george;
+package main.java.ru.MonitoringMoney.george.types;
 
 
-public enum PayType {
+public enum PayTypeDefault {
     buz("Транспорт"),
     taxi("Такси"),
     cinema("Кино"),
@@ -16,7 +16,7 @@ public enum PayType {
 
     private String name;
 
-    PayType(String name) {
+    PayTypeDefault(String name) {
         this.name = name;
     }
 

@@ -1,7 +1,7 @@
-package main.java.ru.MonitoringMoney.george;
+package main.java.ru.MonitoringMoney.george.types;
 
 
-public enum Importance {
+public enum ImportanceTypeDefault {
     veryImportant("Необходимо"),
     important("Нужно"),
     medium("Полезное"),
@@ -10,7 +10,7 @@ public enum Importance {
 
     private String name;
 
-    Importance(String name) {
+    ImportanceTypeDefault(String name) {
         this.name = name;
     }
 

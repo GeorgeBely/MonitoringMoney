@@ -1,6 +1,6 @@
-package main.java.ru.MonitoringMoney.george;
+package main.java.ru.MonitoringMoney.george.frame;
 
-import javax.swing.*;
+
 import java.awt.*;
 
 public class MainFrameThread extends Thread {
@@ -10,8 +10,6 @@ public class MainFrameThread extends Thread {
         EventQueue.invokeLater(() -> {
             try {
                 frame = new MainFrame();
-                frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-                frame.setVisible(true);
             } catch (Exception e) {
                 e.printStackTrace();
             }

@@ -1,4 +1,8 @@
-package main.java.ru.MonitoringMoney.george;
+package main.java.ru.MonitoringMoney.george.frame;
+
+import main.java.ru.MonitoringMoney.george.helpers.ApplicationHelper;
+import main.java.ru.MonitoringMoney.george.main.MonitoringMoney;
+import main.java.ru.MonitoringMoney.george.PayObject;
 
 import javax.swing.*;
 import java.awt.*;
@@ -12,45 +16,51 @@ class MainFrame extends JFrame implements Serializable {
     private static final int HEIGHT = 225;
     private static final String TERM_INPUT_DEFAULT_TEXT = "Поиск по подстроке";
     public static final DateFormat formatDate = DateFormat.getDateInstance(DateFormat.SHORT);
+
+
     JComboBox importanceSelect;
+
+
     public MainFrame() {
         Toolkit kit = Toolkit.getDefaultToolkit();
         Dimension screenSize = kit.getScreenSize();
         setLocation(screenSize.width / 2 - WIDTH / 2, screenSize.height / 2 - HEIGHT / 2);
         setSize(WIDTH, HEIGHT);
         setResizable(false);
-//        setIconImage(kit.getImage("C :\\Workspace\\MassageAgent\\src\\ru\\MassageAgent.png"));
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        setVisible(true);
 
         JPanel panel = new JPanel(){{
             setFocusable(true);
             setLayout(null);
-            setBackground(Color.GREEN);
         }};
         add(panel);
 
-        JTextArea text = new JTextArea();
-        for (PayObject pay : MonitoringMoney.payObjects) {
-            text.append(pay.toString());
-            text.append("\n");
-        }
-        text.setBounds(250, 5, 245, 190);
-        text.setLineWrap(true);
+        JTextArea text = new JTextArea() {{
+            setBounds(250, 5, 245, 190);
+            setLineWrap(true);
+            for (PayObject pay : ApplicationHelper.getInstance().payObjects) {
+                append(pay.toString());
+                append("\n");
+            }
+        }};
         panel.add(text);
 
-        JTextField termInput = new JTextField();
-        termInput.setBounds(5, 5, 240, 30);
-        termInput.setText(TERM_INPUT_DEFAULT_TEXT);
-        termInput.setDisabledTextColor(Color.LIGHT_GRAY);
-        termInput.setSelectedTextColor(Color.LIGHT_GRAY);
-        termInput.setSelectionColor(Color.LIGHT_GRAY);
-//        termInput.setFont(new Font(TERM_INPUT_DEFAULT_TEXT,Font.ITALIC,12));
+        JTextField termInput = new JTextField() {{
+            setBounds(5, 5, 240, 30);
+            setText(TERM_INPUT_DEFAULT_TEXT);
+            setDisabledTextColor(Color.LIGHT_GRAY);
+            setSelectedTextColor(Color.LIGHT_GRAY);
+            setSelectionColor(Color.LIGHT_GRAY);
+//            setFont(new Font(TERM_INPUT_DEFAULT_TEXT,Font.ITALIC,12));
+        }};
         panel.add(termInput);
 
-        importanceSelect = new JComboBox(Importance.values());
+        importanceSelect = new JComboBox(ApplicationHelper.getInstance().importanceTypes.toArray());
         importanceSelect.setBounds(5, 40, 240, 30);
         panel.add(importanceSelect);
 
-        JComboBox payTypeSelect = new JComboBox(PayType.values());
+        JComboBox payTypeSelect = new JComboBox(ApplicationHelper.getInstance().payTypes.toArray());
         payTypeSelect.setBounds(5, 75, 240, 30);
         panel.add(payTypeSelect);
 

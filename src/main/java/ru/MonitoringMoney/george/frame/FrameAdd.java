@@ -1,11 +1,13 @@
-package main.java.ru.MonitoringMoney.george;
+package main.java.ru.MonitoringMoney.george.frame;
 
+
+import main.java.ru.MonitoringMoney.george.*;
+import main.java.ru.MonitoringMoney.george.helpers.ApplicationHelper;
+import main.java.ru.MonitoringMoney.george.types.*;
 
 import javax.swing.*;
 import java.awt.*;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.util.Date;
 
 public class FrameAdd extends JFrame{
@@ -19,14 +21,13 @@ public class FrameAdd extends JFrame{
         setSize(WIDTH, HEIGHT);
         setResizable(false);
 
-        JPanel panel = new JPanel(){{
+        JPanel panel = new JPanel() {{
             setFocusable(true);
             setLayout(null);
-            setBackground(Color.GREEN);
         }};
         add(panel);
 
-        final JComboBox importanceSelect = new JComboBox(Importance.values());
+        final JComboBox importanceSelect = new JComboBox(ApplicationHelper.getInstance().importanceTypes.toArray());
         importanceSelect.setBounds(5, 5, 200, 30);
         panel.add(importanceSelect);
 
@@ -34,7 +35,7 @@ public class FrameAdd extends JFrame{
         importanceButton.setBounds(210, 5, 30, 30);
         panel.add(importanceButton);
 
-        final JComboBox payTypeSelect = new JComboBox(PayType.values());
+        final JComboBox payTypeSelect = new JComboBox(ApplicationHelper.getInstance().payTypes.toArray());
         payTypeSelect.setBounds(5, 40, 200, 30);
         panel.add(payTypeSelect);
 
@@ -73,9 +74,9 @@ public class FrameAdd extends JFrame{
         purchased.setBounds(200, 195, 20, 20);
         panel.add(purchased);
 
-        final JComboBox userSelect = new JComboBox(User.values());
+        final JComboBox userSelect = new JComboBox(ApplicationHelper.getInstance().users.toArray());
         userSelect.setBounds(5, 220, 200, 30);
-        userSelect.setSelectedItem(User.GEORGE);
+        userSelect.setSelectedItem(UsersDefault.GEORGE);
         panel.add(userSelect);
 
         JButton okButton = new JButton("Добавить");
@@ -90,18 +91,17 @@ public class FrameAdd extends JFrame{
 
         okButton.addActionListener(e -> {
             PayObject pay = new PayObject();
-            pay.date = (Date) date.getValue();
-            pay.description = description.getText();
-            pay.importance = (Importance) importanceSelect.getSelectedItem();
-            pay.type = (PayType) userSelect.getSelectedItem();
-            pay.price = Integer.parseInt(price.getText().replaceAll("[^0-9]]", ""));
-            pay.purchased = purchased.isBorderPaintedFlat();
-            pay.user = (User) userSelect.getSelectedItem();
-            MonitoringMoney.payObjects.add(pay);
+            pay.setDate((Date) date.getValue());
+            pay.setDescription(description.getText());
+            pay.setImportance((ImportanceType) importanceSelect.getSelectedItem());
+            pay.setPayType((PayType) payTypeSelect.getSelectedItem());
+            pay.setPrice(Integer.parseInt(price.getText().replaceAll("[^0-9]]", "")));
+            pay.setPurchased(purchased.isBorderPaintedFlat());
+            pay.setUser((Users) userSelect.getSelectedItem());
+            ApplicationHelper.getInstance().payObjects.add(pay);
 
             try {
-                ObjectOutputStream bin = new ObjectOutputStream(new FileOutputStream(MonitoringMoney.buyFile));
-                bin.writeObject(MonitoringMoney.payObjects);
+                ApplicationHelper.writeData();
             } catch (IOException e1) {
                 e1.printStackTrace();
             }
