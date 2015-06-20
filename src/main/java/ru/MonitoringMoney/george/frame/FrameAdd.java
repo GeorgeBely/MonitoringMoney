@@ -4,10 +4,12 @@ package main.java.ru.MonitoringMoney.george.frame;
 import main.java.ru.MonitoringMoney.george.*;
 import main.java.ru.MonitoringMoney.george.helpers.ApplicationHelper;
 import main.java.ru.MonitoringMoney.george.types.*;
+import org.apache.commons.lang.time.DateUtils;
 
 import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.Date;
 
 public class FrameAdd extends JFrame{
@@ -15,8 +17,7 @@ public class FrameAdd extends JFrame{
     private static final int HEIGHT = 320;
 
     public FrameAdd() {
-        Toolkit kit = Toolkit.getDefaultToolkit();
-        Dimension screenSize = kit.getScreenSize();
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         setLocation(screenSize.width / 2 - WIDTH / 2, screenSize.height / 2 - HEIGHT / 2);
         setSize(WIDTH, HEIGHT);
         setResizable(false);
@@ -55,16 +56,23 @@ public class FrameAdd extends JFrame{
         labelFromDate.setBounds(5, 100, 140, 20);
         panel.add(labelFromDate);
 
-//        formatDate.setLenient(false);
-        final JFormattedTextField date = new JFormattedTextField(MainFrame.formatDate) {{
+//        FORMAT_DATE.setLenient(false);
+        final JFormattedTextField date = new JFormattedTextField(ApplicationHelper.FORMAT_DATE) {{
             setBounds(145, 100, 90, 20);
             setValue(new Date());
         }};
         panel.add(date);
 
-        final JTextArea description = new JTextArea();
-        description.setBounds(5, 130, 240, 60);
-        panel.add(description);
+        JTextArea textDescription = new JTextArea() {{
+            setLineWrap(true);
+            setWrapStyleWord(true);
+        }};
+
+        JScrollPane textScrollPane = new JScrollPane() {{
+            setViewportView(textDescription);
+            setBounds(5, 130, 240, 60);
+        }};
+        panel.add(textScrollPane);
 
         JLabel purchasedLabel = new JLabel("Покупка осуществленна");
         purchasedLabel.setBounds(5, 195, 180, 20);
@@ -91,12 +99,12 @@ public class FrameAdd extends JFrame{
 
         okButton.addActionListener(e -> {
             PayObject pay = new PayObject();
-            pay.setDate((Date) date.getValue());
-            pay.setDescription(description.getText());
+            pay.setDate(DateUtils.truncate((Date) date.getValue(), Calendar.DATE));
+            pay.setDescription(textDescription.getText());
             pay.setImportance((ImportanceType) importanceSelect.getSelectedItem());
             pay.setPayType((PayType) payTypeSelect.getSelectedItem());
             pay.setPrice(Integer.parseInt(price.getText().replaceAll("[^0-9]]", "")));
-            pay.setPurchased(purchased.isBorderPaintedFlat());
+            pay.setPurchased(purchased.isSelected());
             pay.setUser((Users) userSelect.getSelectedItem());
             ApplicationHelper.getInstance().payObjects.add(pay);
 

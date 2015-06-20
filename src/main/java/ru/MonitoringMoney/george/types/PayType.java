@@ -17,7 +17,7 @@ public class PayType implements Serializable {
     }
 
     public PayType(PayTypeDefault typeDefault) {
-        code = typeDefault.toString();
+        code = typeDefault.toString().toLowerCase();
         name = typeDefault.getName();
     }
 

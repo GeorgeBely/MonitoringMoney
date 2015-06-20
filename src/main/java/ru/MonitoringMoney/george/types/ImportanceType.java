@@ -1,6 +1,7 @@
 package main.java.ru.MonitoringMoney.george.types;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  *
@@ -18,7 +19,7 @@ public class ImportanceType implements Serializable {
     }
 
     public ImportanceType(ImportanceTypeDefault typeDefault) {
-        code = typeDefault.toString();
+        code = typeDefault.toString().toLowerCase();
         name = typeDefault.getName();
     }
 
@@ -40,5 +41,14 @@ public class ImportanceType implements Serializable {
 
     public String toString() {
         return name;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass())
+            return false;
+
+        ImportanceType that = (ImportanceType) o;
+        return this == o || (Objects.equals(that.getCode(), code) && Objects.equals(that.getName(), name));
     }
 }

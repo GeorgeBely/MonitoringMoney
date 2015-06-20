@@ -2,6 +2,7 @@ package main.java.ru.MonitoringMoney.george.types;
 
 
 public enum UsersDefault {
+    EMPTY(""),
     GEORGE("Жорик"),
     DASHA("Даша");
 
@@ -19,8 +20,4 @@ public enum UsersDefault {
         this.name = name;
     }
 
-
-    public String toString() {
-        return name;
-    }
 }

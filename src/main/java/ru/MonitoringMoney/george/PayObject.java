@@ -1,5 +1,6 @@
 package main.java.ru.MonitoringMoney.george;
 
+import main.java.ru.MonitoringMoney.george.helpers.ApplicationHelper;
 import main.java.ru.MonitoringMoney.george.types.*;
 
 import java.io.Serializable;
@@ -30,9 +31,9 @@ public class PayObject implements Serializable {
         if (importance != null)
             builder.append(importance.getName()).append(" ");
         if (date != null)
-            builder.append(date.toString()).append(" ");
+            builder.append(ApplicationHelper.FORMAT_DATE.format(date)).append(" ");
         if (description != null)
-            builder.append(description);
+            builder.append("\n").append(description);
         return builder.toString();
     }
 

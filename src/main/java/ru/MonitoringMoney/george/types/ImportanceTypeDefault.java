@@ -2,11 +2,12 @@ package main.java.ru.MonitoringMoney.george.types;
 
 
 public enum ImportanceTypeDefault {
-    veryImportant("Необходимо"),
-    important("Нужно"),
-    medium("Полезное"),
-    low("Хочется"),
-    veryLow("Бесполезное");
+    EMPTY(""),
+    VERY_IMPORTANT("Необходимо"),
+    IMPORTANT("Нужно"),
+    MEDIUM("Полезное"),
+    LOW("Хочется"),
+    VERY_LOW("Бесполезное");
 
     private String name;
 
@@ -20,10 +21,5 @@ public enum ImportanceTypeDefault {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-
-    public String toString() {
-        return name;
     }
 }

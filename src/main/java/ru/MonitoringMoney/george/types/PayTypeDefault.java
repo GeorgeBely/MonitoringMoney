@@ -2,16 +2,20 @@ package main.java.ru.MonitoringMoney.george.types;
 
 
 public enum PayTypeDefault {
-    buz("Транспорт"),
-    taxi("Такси"),
-    cinema("Кино"),
-    theater("Театр"),
-    cafe("Кафе"),
-    diningRoom("Столовая"),
-    iceWater("Холодные напитки"),
-    chocolate("Шоколад"),
-    coffee("Кофе"),
-    frenchGifts("Французкие подарочки");
+    EMPTY(""),
+    BUZ("Транспорт"),
+    TAXI("Такси"),
+    CINEMA("Кино"),
+    THEATER("Театр"),
+    CAFE("Кафе"),
+    DINING_ROOM("Столовая"),
+    FAST_FOOD("Фаст вуд"),
+    ICE_WATER("Холодные напитки"),
+    CHOCOLATE("Шоколад"),
+    COFFEE("Кофе"),
+    DELICACY("Вкусности"),
+    FRENCH_GIFTS("Французкие подарочки"),
+    DUTY("Пошлина");
 
 
     private String name;
@@ -28,9 +32,4 @@ public enum PayTypeDefault {
         this.name = name;
     }
 
-
-    @Override
-    public String toString() {
-        return name;
-    }
 }

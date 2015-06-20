@@ -18,7 +18,7 @@ public class Users implements Serializable {
     }
 
     public Users(UsersDefault typeDefault) {
-        code = typeDefault.toString();
+        code = typeDefault.toString().toLowerCase();
         name = typeDefault.getName();
     }
 

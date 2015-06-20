@@ -1,24 +1,44 @@
 package main.java.ru.MonitoringMoney.george.frame;
 
 import main.java.ru.MonitoringMoney.george.helpers.ApplicationHelper;
-import main.java.ru.MonitoringMoney.george.main.MonitoringMoney;
-import main.java.ru.MonitoringMoney.george.PayObject;
+import main.java.ru.MonitoringMoney.george.types.ImportanceType;
+import main.java.ru.MonitoringMoney.george.types.PayType;
+import main.java.ru.MonitoringMoney.george.types.Users;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.DateUtils;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.Serializable;
-import java.text.DateFormat;
+import java.util.Calendar;
 import java.util.Date;
 
 class MainFrame extends JFrame implements Serializable {
 
+    /** Ширина фрейма */
     private static final int WIDTH = 500;
-    private static final int HEIGHT = 225;
+
+    /** Высота фрейма */
+    private static final int HEIGHT = 260;
+
     private static final String TERM_INPUT_DEFAULT_TEXT = "Поиск по подстроке";
-    public static final DateFormat formatDate = DateFormat.getDateInstance(DateFormat.SHORT);
 
+    private static final String PREFIX_LABEL_SUM_PRICE = "Потрачено на сумму: ";
 
-    JComboBox importanceSelect;
+    private JTextArea text;
+    private JTextField termInput;
+    private JComboBox importanceSelect;
+    private JComboBox payTypeSelect;
+    private JTextField priceFromText;
+    private JTextField priceToText;
+    private JFormattedTextField dateFromText;
+    private JFormattedTextField dateToText;
+    private JComboBox userSelect;
+    private JLabel labelSumPrice;
 
 
     public MainFrame() {
@@ -36,74 +56,135 @@ class MainFrame extends JFrame implements Serializable {
         }};
         add(panel);
 
-        JTextArea text = new JTextArea() {{
-            setBounds(250, 5, 245, 190);
+        text = new JTextArea() {{
             setLineWrap(true);
-            for (PayObject pay : ApplicationHelper.getInstance().payObjects) {
-                append(pay.toString());
-                append("\n");
-            }
+            setWrapStyleWord(true);
         }};
-        panel.add(text);
+        JScrollPane textScrollPane = new JScrollPane() {{
+            setViewportView(text);
+            setBounds(250, 5, 245, 190);
+        }};
+        panel.add(textScrollPane);
 
-        JTextField termInput = new JTextField() {{
+        termInput = new JTextField() {{
             setBounds(5, 5, 240, 30);
             setText(TERM_INPUT_DEFAULT_TEXT);
             setDisabledTextColor(Color.LIGHT_GRAY);
             setSelectedTextColor(Color.LIGHT_GRAY);
             setSelectionColor(Color.LIGHT_GRAY);
-//            setFont(new Font(TERM_INPUT_DEFAULT_TEXT,Font.ITALIC,12));
+            addMouseListener(new MouseListener() {
+                public void mouseReleased(MouseEvent e) {}
+                public void mouseExited(MouseEvent e) {}
+                public void mouseEntered(MouseEvent e) {}
+                public void mouseClicked(MouseEvent e) {}
+                public void mousePressed(MouseEvent e) {
+                    if (TERM_INPUT_DEFAULT_TEXT.equals(getText())) {
+                        setText("");
+                    }
+                }
+            });
+            addKeyListener(new KeyListener() {
+                public void keyPressed(KeyEvent e) {}
+                public void keyReleased(KeyEvent e) {
+                    refreshText();
+                }
+                public void keyTyped(KeyEvent e) {}
+            });
         }};
         panel.add(termInput);
 
-        importanceSelect = new JComboBox(ApplicationHelper.getInstance().importanceTypes.toArray());
-        importanceSelect.setBounds(5, 40, 240, 30);
+        importanceSelect = new JComboBox<Object>(ApplicationHelper.getInstance().importanceTypes.toArray()) {{
+            setBounds(5, 40, 240, 30);
+            addActionListener(e -> refreshText());
+        }};
         panel.add(importanceSelect);
 
-        JComboBox payTypeSelect = new JComboBox(ApplicationHelper.getInstance().payTypes.toArray());
-        payTypeSelect.setBounds(5, 75, 240, 30);
+        payTypeSelect = new JComboBox<Object>(ApplicationHelper.getInstance().payTypes.toArray()) {{
+            setBounds(5, 75, 240, 30);
+            addActionListener(e -> refreshText());
+        }};
         panel.add(payTypeSelect);
 
         JLabel priceFromLabel = new JLabel("Цена от");
         priceFromLabel.setBounds(5, 110, 60, 20);
         panel.add(priceFromLabel);
 
-        JTextField priceFrom = new JTextField();
-        priceFrom.setBounds(65, 110, 75, 20);
-        panel.add(priceFrom);
+        priceFromText = new JTextField() {{
+            setBounds(65, 110, 75, 20);
+            addKeyListener(new KeyListener() {
+                public void keyPressed(KeyEvent e) {}
+                public void keyReleased(KeyEvent e) {
+                    refreshText();
+                }
+                public void keyTyped(KeyEvent e) {}
+            });
+        }};
+        panel.add(priceFromText);
 
         JLabel priceToLabel = new JLabel("до");
         priceToLabel.setBounds(145, 110, 20, 20);
         panel.add(priceToLabel);
 
-        JTextField priceTo = new JTextField();
-        priceTo.setBounds(170, 110, 75, 20);
-        panel.add(priceTo);
+        priceToText = new JTextField() {{
+            setBounds(170, 110, 75, 20);
+
+            addKeyListener(new KeyListener() {
+                public void keyPressed(KeyEvent e) {}
+                public void keyReleased(KeyEvent e) {
+                    refreshText();
+                }
+                public void keyTyped(KeyEvent e) {}
+            });
+        }};
+        panel.add(priceToText);
 
         JLabel labelFromDate = new JLabel("В период c");
         labelFromDate.setBounds(5, 135, 80, 20);
         panel.add(labelFromDate);
 
-//        formatDate.setLenient(false);
-
-        JFormattedTextField dateFrom = new JFormattedTextField(formatDate) {{
+        dateFromText = new JFormattedTextField(ApplicationHelper.FORMAT_DATE) {{
             setBounds(85, 135, 65, 20);
             setValue(new Date());
+            addKeyListener(new KeyListener() {
+                public void keyPressed(KeyEvent e) {}
+                public void keyReleased(KeyEvent e) {
+                    refreshText();
+                }
+                public void keyTyped(KeyEvent e) {}
+            });
         }};
-        panel.add(dateFrom);
+        panel.add(dateFromText);
 
         JLabel labelDateTo = new JLabel("по");
         labelDateTo.setBounds(155, 135, 20, 20);
         panel.add(labelDateTo);
 
-        JFormattedTextField dateTo = new JFormattedTextField(formatDate) {{
+        dateToText = new JFormattedTextField(ApplicationHelper.FORMAT_DATE) {{
             setBounds(180, 135, 65, 20);
             setValue(new Date());
+            addKeyListener(new KeyListener() {
+                public void keyPressed(KeyEvent e) {}
+                public void keyReleased(KeyEvent e) {
+                    refreshText();
+                }
+                public void keyTyped(KeyEvent e) {}
+            });
         }};
-        panel.add(dateTo);
+        panel.add(dateToText);
+
+        userSelect = new JComboBox<Object>(ApplicationHelper.getInstance().users.toArray()) {{
+            setBounds(5, 160, 240, 30);
+            addActionListener(e -> refreshText());
+        }};
+        panel.add(userSelect);
+
+        labelSumPrice = new JLabel() {{
+            setBounds(250, 195, 240, 20);
+        }};
+        panel.add(labelSumPrice);
 
         JButton buttonAdd = new JButton("Добавить покупку");
-        buttonAdd.setBounds(5, 160, 240, 30);
+        buttonAdd.setBounds(5, 195, 240, 30);
         panel.add(buttonAdd);
 
         buttonAdd.addActionListener(e -> EventQueue.invokeLater(() -> {
@@ -111,6 +192,34 @@ class MainFrame extends JFrame implements Serializable {
             frame.toFront();
             frame.setVisible(true);
         }));
-
+        refreshText();
     }
+
+
+    private void refreshText() {
+        Integer priceFrom = null;
+        Integer priceTo = null;
+        Date dateFrom;
+        Date dateTo;
+        String term = null;
+        if (!TERM_INPUT_DEFAULT_TEXT.equals(termInput.getText()) && StringUtils.isNotBlank(termInput.getText()))
+            term = termInput.getText();
+        dateFrom = DateUtils.truncate((Date) dateFromText.getValue(), Calendar.DATE);
+        dateTo = DateUtils.truncate((Date) dateToText.getValue(), Calendar.DATE);
+        dateTo.setDate(dateTo.getDate() + 1);
+        try {
+            if (StringUtils.isNotBlank(priceFromText.getText()))
+                priceFrom = Integer.parseInt(priceFromText.getText());
+            if (StringUtils.isNotBlank(priceToText.getText()))
+                priceTo = Integer.parseInt(priceToText.getText());
+        } catch (Exception ignore) {}
+        text.setText(ApplicationHelper.getInstance().getTextPayObjects(term, dateFrom, dateTo, priceFrom,
+                priceTo, (ImportanceType) importanceSelect.getSelectedItem(), (PayType) payTypeSelect.getSelectedItem(),
+                (Users) userSelect.getSelectedItem(), true));
+
+        labelSumPrice.setText(PREFIX_LABEL_SUM_PRICE + " "  + ApplicationHelper.getInstance().getSumPrice(term, dateFrom, dateTo, priceFrom,
+                priceTo, (ImportanceType) importanceSelect.getSelectedItem(), (PayType) payTypeSelect.getSelectedItem(),
+                (Users) userSelect.getSelectedItem(), true));
+    }
+
 }
