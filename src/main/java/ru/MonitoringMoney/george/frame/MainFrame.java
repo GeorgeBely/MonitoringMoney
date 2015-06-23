@@ -20,14 +20,17 @@ import java.util.Date;
 class MainFrame extends JFrame implements Serializable {
 
     /** Ширина фрейма */
-    private static final int WIDTH = 500;
+    private static final int FRAME_WIDTH = 500;
 
     /** Высота фрейма */
-    private static final int HEIGHT = 260;
+    private static final int FRAME_HEIGHT = 260;
 
+    /** Фраза, которая отображается в строчке поиска по подстроке, до начала ввода поискового выражения */
     private static final String TERM_INPUT_DEFAULT_TEXT = "Поиск по подстроке";
 
+    /** Фраза, которая отображается до суммы всех покупок отображаемым по заданным фильтрам */
     private static final String PREFIX_LABEL_SUM_PRICE = "Потрачено на сумму: ";
+
 
     private JTextArea text;
     private JTextField termInput;
@@ -42,10 +45,9 @@ class MainFrame extends JFrame implements Serializable {
 
 
     public MainFrame() {
-        Toolkit kit = Toolkit.getDefaultToolkit();
-        Dimension screenSize = kit.getScreenSize();
-        setLocation(screenSize.width / 2 - WIDTH / 2, screenSize.height / 2 - HEIGHT / 2);
-        setSize(WIDTH, HEIGHT);
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        setLocation(screenSize.width / 2 - FRAME_WIDTH / 2, screenSize.height / 2 - FRAME_HEIGHT / 2);
+        setSize(FRAME_WIDTH, FRAME_HEIGHT);
         setResizable(false);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setVisible(true);
@@ -105,8 +107,9 @@ class MainFrame extends JFrame implements Serializable {
         }};
         panel.add(payTypeSelect);
 
-        JLabel priceFromLabel = new JLabel("Цена от");
-        priceFromLabel.setBounds(5, 110, 60, 20);
+        JLabel priceFromLabel = new JLabel("Цена от") {{
+            setBounds(5, 110, 60, 20);
+        }};
         panel.add(priceFromLabel);
 
         priceFromText = new JTextField() {{
@@ -121,8 +124,9 @@ class MainFrame extends JFrame implements Serializable {
         }};
         panel.add(priceFromText);
 
-        JLabel priceToLabel = new JLabel("до");
-        priceToLabel.setBounds(145, 110, 20, 20);
+        JLabel priceToLabel = new JLabel("до") {{
+            setBounds(145, 110, 20, 20);
+        }};
         panel.add(priceToLabel);
 
         priceToText = new JTextField() {{
@@ -138,8 +142,9 @@ class MainFrame extends JFrame implements Serializable {
         }};
         panel.add(priceToText);
 
-        JLabel labelFromDate = new JLabel("В период c");
-        labelFromDate.setBounds(5, 135, 80, 20);
+        JLabel labelFromDate = new JLabel("В период c") {{
+            setBounds(5, 135, 80, 20);
+        }};
         panel.add(labelFromDate);
 
         dateFromText = new JFormattedTextField(ApplicationHelper.FORMAT_DATE) {{
@@ -155,8 +160,9 @@ class MainFrame extends JFrame implements Serializable {
         }};
         panel.add(dateFromText);
 
-        JLabel labelDateTo = new JLabel("по");
-        labelDateTo.setBounds(155, 135, 20, 20);
+        JLabel labelDateTo = new JLabel("по") {{
+            setBounds(155, 135, 20, 20);
+        }};
         panel.add(labelDateTo);
 
         dateToText = new JFormattedTextField(ApplicationHelper.FORMAT_DATE) {{
@@ -183,15 +189,16 @@ class MainFrame extends JFrame implements Serializable {
         }};
         panel.add(labelSumPrice);
 
-        JButton buttonAdd = new JButton("Добавить покупку");
-        buttonAdd.setBounds(5, 195, 240, 30);
+        JButton buttonAdd = new JButton("Добавить покупку") {{
+            setBounds(5, 195, 240, 30);
+            addActionListener(e -> EventQueue.invokeLater(() -> {
+                FrameAdd frame = new FrameAdd();
+                frame.toFront();
+                frame.setVisible(true);
+            }));
+        }};
         panel.add(buttonAdd);
 
-        buttonAdd.addActionListener(e -> EventQueue.invokeLater(() -> {
-            FrameAdd frame = new FrameAdd();
-            frame.toFront();
-            frame.setVisible(true);
-        }));
         refreshText();
     }
 

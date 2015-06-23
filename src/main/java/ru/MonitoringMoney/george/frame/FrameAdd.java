@@ -13,13 +13,18 @@ import java.util.Calendar;
 import java.util.Date;
 
 public class FrameAdd extends JFrame{
-    private static final int WIDTH = 250;
-    private static final int HEIGHT = 320;
+
+    /** Ширина фрейма */
+    private static final int FRAME_WIDTH = 250;
+
+    /** Высота фрейма */
+    private static final int FRAME_HEIGHT = 320;
+
 
     public FrameAdd() {
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        setLocation(screenSize.width / 2 - WIDTH / 2, screenSize.height / 2 - HEIGHT / 2);
-        setSize(WIDTH, HEIGHT);
+        setLocation(screenSize.width / 2 - FRAME_WIDTH / 2, screenSize.height / 2 - FRAME_HEIGHT / 2);
+        setSize(FRAME_WIDTH, FRAME_HEIGHT);
         setResizable(false);
 
         JPanel panel = new JPanel() {{
@@ -28,36 +33,45 @@ public class FrameAdd extends JFrame{
         }};
         add(panel);
 
-        final JComboBox importanceSelect = new JComboBox(ApplicationHelper.getInstance().importanceTypes.toArray());
-        importanceSelect.setBounds(5, 5, 200, 30);
+        JComboBox importanceSelect = new JComboBox<Object>(ApplicationHelper.getInstance().importanceTypes.toArray()) {{
+            setBounds(5, 5, 200, 30);
+        }};
         panel.add(importanceSelect);
 
-        JButton importanceButton = new JButton(".");
-        importanceButton.setBounds(210, 5, 30, 30);
+        JButton importanceButton = new JButton(".") {{
+            setBounds(210, 5, 30, 30);
+            addActionListener(e -> new FrameEditPropertyValues(ImportanceType.class));
+        }};
         panel.add(importanceButton);
 
-        final JComboBox payTypeSelect = new JComboBox(ApplicationHelper.getInstance().payTypes.toArray());
-        payTypeSelect.setBounds(5, 40, 200, 30);
+        JComboBox payTypeSelect = new JComboBox<Object>(ApplicationHelper.getInstance().payTypes.toArray()) {{
+            setBounds(5, 40, 200, 30);
+        }};
         panel.add(payTypeSelect);
 
-        JButton payTypeButton = new JButton(".");
-        payTypeButton.setBounds(210, 40, 30, 30);
+        JButton payTypeButton = new JButton(".") {{
+            setBounds(210, 40, 30, 30);
+            addActionListener(e -> new FrameEditPropertyValues(PayType.class));
+        }};
         panel.add(payTypeButton);
 
-        JLabel priceLabel = new JLabel("Стоимость покупки");
-        priceLabel.setBounds(5, 75, 140, 20);
+        JLabel priceLabel = new JLabel("Стоимость покупки") {{
+            setBounds(5, 75, 140, 20);
+        }};
         panel.add(priceLabel);
 
-        final JTextField price = new JTextField();
-        price.setBounds(145, 75, 90, 20);
+        JTextField price = new JTextField() {{
+            setBounds(145, 75, 90, 20);
+        }};
         panel.add(price);
 
-        JLabel labelFromDate = new JLabel("Дата покупки");
-        labelFromDate.setBounds(5, 100, 140, 20);
+        JLabel labelFromDate = new JLabel("Дата покупки") {{
+            setBounds(5, 100, 140, 20);
+        }};
         panel.add(labelFromDate);
 
 //        FORMAT_DATE.setLenient(false);
-        final JFormattedTextField date = new JFormattedTextField(ApplicationHelper.FORMAT_DATE) {{
+        JFormattedTextField date = new JFormattedTextField(ApplicationHelper.FORMAT_DATE) {{
             setBounds(145, 100, 90, 20);
             setValue(new Date());
         }};
@@ -74,45 +88,49 @@ public class FrameAdd extends JFrame{
         }};
         panel.add(textScrollPane);
 
-        JLabel purchasedLabel = new JLabel("Покупка осуществленна");
-        purchasedLabel.setBounds(5, 195, 180, 20);
+        JLabel purchasedLabel = new JLabel("Покупка осуществленна") {{
+            setBounds(5, 195, 180, 20);
+        }};
         panel.add(purchasedLabel);
 
-        final JCheckBox purchased = new JCheckBox();
-        purchased.setBounds(200, 195, 20, 20);
+        JCheckBox purchased = new JCheckBox() {{
+            setBounds(200, 195, 20, 20);
+        }};
         panel.add(purchased);
 
-        final JComboBox userSelect = new JComboBox(ApplicationHelper.getInstance().users.toArray());
-        userSelect.setBounds(5, 220, 200, 30);
-        userSelect.setSelectedItem(UsersDefault.GEORGE);
+        JComboBox userSelect = new JComboBox<Object>(ApplicationHelper.getInstance().users.toArray()) {{
+            setBounds(5, 220, 200, 30);
+            setSelectedItem(UsersDefault.GEORGE);
+        }};
         panel.add(userSelect);
 
-        JButton okButton = new JButton("Добавить");
-        okButton.setBounds(5, 255, 115, 30);
+        JButton okButton = new JButton("Добавить") {{
+            setBounds(5, 255, 115, 30);
+            addActionListener(e -> {
+                PayObject pay = new PayObject();
+                pay.setDate(DateUtils.truncate((Date) date.getValue(), Calendar.DATE));
+                pay.setDescription(textDescription.getText());
+                pay.setImportance((ImportanceType) importanceSelect.getSelectedItem());
+                pay.setPayType((PayType) payTypeSelect.getSelectedItem());
+                pay.setPrice(Integer.parseInt(price.getText().replaceAll("[^0-9]]", "")));
+                pay.setPurchased(purchased.isSelected());
+                pay.setUser((Users) userSelect.getSelectedItem());
+                ApplicationHelper.getInstance().payObjects.add(pay);
+
+                try {
+                    ApplicationHelper.writeData();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+                dispose();
+            });
+        }};
         panel.add(okButton);
 
-        JButton cancelButton = new JButton("Отмена");
-        cancelButton.setBounds(125, 255, 115, 30);
-        cancelButton.addActionListener(e -> dispose());
+        JButton cancelButton = new JButton("Отмена") {{
+            setBounds(125, 255, 115, 30);
+            addActionListener(e -> dispose());
+        }};
         panel.add(cancelButton);
-
-
-        okButton.addActionListener(e -> {
-            PayObject pay = new PayObject();
-            pay.setDate(DateUtils.truncate((Date) date.getValue(), Calendar.DATE));
-            pay.setDescription(textDescription.getText());
-            pay.setImportance((ImportanceType) importanceSelect.getSelectedItem());
-            pay.setPayType((PayType) payTypeSelect.getSelectedItem());
-            pay.setPrice(Integer.parseInt(price.getText().replaceAll("[^0-9]]", "")));
-            pay.setPurchased(purchased.isSelected());
-            pay.setUser((Users) userSelect.getSelectedItem());
-            ApplicationHelper.getInstance().payObjects.add(pay);
-
-            try {
-                ApplicationHelper.writeData();
-            } catch (IOException e1) {
-                e1.printStackTrace();
-            }
-        });
     }
 }

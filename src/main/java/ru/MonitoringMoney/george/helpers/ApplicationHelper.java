@@ -19,6 +19,11 @@ public class ApplicationHelper implements Serializable {
     /** Файл с данными о покупках */
     public static final File buyFile = new File("MoneyData.mm");
 
+    /** Формат даты для поля ввода даты */
+    public static final DateFormat FORMAT_DATE = DateFormat.getDateInstance(DateFormat.SHORT);
+
+    private static final String EMPTY = "empty";
+
     /** Список покупок */
     public List<PayObject> payObjects = new ArrayList<>();
 
@@ -31,10 +36,7 @@ public class ApplicationHelper implements Serializable {
     /** Список пользователей */
     public List<Users> users = new ArrayList<>();
 
-    /** Формат даты для поля ввода даты */
-    public static final DateFormat FORMAT_DATE = DateFormat.getDateInstance(DateFormat.SHORT);
-
-    private static final String EMPTY = "empty";
+    public Integer uniqueId;
 
 
     private static ApplicationHelper instance;
@@ -53,7 +55,7 @@ public class ApplicationHelper implements Serializable {
         importanceTypes = new ArrayList<>();
         payTypes = new ArrayList<>();
         users = new ArrayList<>();
-//        payObjects = new ArrayList<>();
+        payObjects = new ArrayList<>();
 
         for (ImportanceTypeDefault defaultType : ImportanceTypeDefault.values()) {
             importanceTypes.add(new ImportanceType(defaultType));
@@ -120,5 +122,28 @@ public class ApplicationHelper implements Serializable {
                 .filter(obj -> user == null || EMPTY.equals(user.getCode()) || obj.getUser().equals(user))
                 .filter(obj -> Objects.equals(obj.isPurchased(), purchased))
                 .collect(Collectors.toList());
+    }
+
+    public String getNewUniqueCode() {
+        if (uniqueId == null)
+            uniqueId = 0;
+        uniqueId++;
+        return "auto" + uniqueId;
+    }
+
+    public void addPropertyValue(String name, Class className) {
+        if (PayType.class.equals(className)) {
+            payTypes.add(new PayType(getNewUniqueCode(), name));
+        } else if (ImportanceType.class.equals(className)) {
+            importanceTypes.add(new ImportanceType(getNewUniqueCode(), name));
+        } else if (Users.class.equals(className)) {
+            users.add(new Users(getNewUniqueCode(), name));
+        }
+
+        try {
+            writeData();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

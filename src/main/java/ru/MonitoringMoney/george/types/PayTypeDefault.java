@@ -10,6 +10,7 @@ public enum PayTypeDefault {
     CAFE("Кафе"),
     DINING_ROOM("Столовая"),
     FAST_FOOD("Фаст вуд"),
+    MEDICINE("Лекарства"),
     ICE_WATER("Холодные напитки"),
     CHOCOLATE("Шоколад"),
     COFFEE("Кофе"),

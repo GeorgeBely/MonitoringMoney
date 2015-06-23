@@ -1,6 +1,9 @@
 package main.java.ru.MonitoringMoney.george.types;
 
+import org.apache.commons.lang.StringUtils;
+
 import java.io.Serializable;
+import java.util.Objects;
 
 /**
  *
@@ -13,12 +16,14 @@ public class PayType implements Serializable {
     private String code;
     private String name;
 
-    public PayType() {
+    public PayType(String code, String name) {
+        this.code = code;
+        this.name = name;
     }
 
     public PayType(PayTypeDefault typeDefault) {
         code = typeDefault.toString().toLowerCase();
-        name = typeDefault.getName();
+        name = typeDefault.getName().toLowerCase();
     }
 
     public String getCode() {
@@ -38,6 +43,15 @@ public class PayType implements Serializable {
     }
 
     public String toString() {
-        return name;
+        return StringUtils.capitalize(name);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o == null || getClass() != o.getClass())
+            return false;
+
+        PayType that = (PayType) o;
+        return this == o || (Objects.equals(that.getCode(), code) && Objects.equals(that.getName(), name));
     }
 }

@@ -1,5 +1,7 @@
 package main.java.ru.MonitoringMoney.george.types;
 
+import org.apache.commons.lang.StringUtils;
+
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -14,13 +16,14 @@ public class ImportanceType implements Serializable {
     private String code;
     private String name;
 
-    public ImportanceType() {
-
+    public ImportanceType(String code, String name) {
+        this.code = code;
+        this.name = name;
     }
 
     public ImportanceType(ImportanceTypeDefault typeDefault) {
         code = typeDefault.toString().toLowerCase();
-        name = typeDefault.getName();
+        name = typeDefault.getName().toLowerCase();
     }
 
     public String getCode() {
@@ -40,7 +43,7 @@ public class ImportanceType implements Serializable {
     }
 
     public String toString() {
-        return name;
+        return StringUtils.capitalize(name);
     }
 
     @Override
