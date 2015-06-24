@@ -88,21 +88,27 @@ public class FrameAdd extends JFrame{
         }};
         panel.add(textScrollPane);
 
-        JLabel purchasedLabel = new JLabel("Покупка осуществленна") {{
-            setBounds(5, 195, 180, 20);
-        }};
-        panel.add(purchasedLabel);
+//        JLabel purchasedLabel = new JLabel("Покупка осуществленна") {{
+//            setBounds(5, 195, 180, 20);
+//        }};
+//        panel.add(purchasedLabel);
 
-        JCheckBox purchased = new JCheckBox() {{
-            setBounds(200, 195, 20, 20);
-        }};
-        panel.add(purchased);
+//        JCheckBox purchased = new JCheckBox() {{
+//            setBounds(200, 195, 20, 20);
+//        }};
+//        panel.add(purchased);
 
         JComboBox userSelect = new JComboBox<Object>(ApplicationHelper.getInstance().users.toArray()) {{
             setBounds(5, 220, 200, 30);
             setSelectedItem(UsersDefault.GEORGE);
         }};
         panel.add(userSelect);
+
+        JButton userButton = new JButton(".") {{
+            setBounds(210, 220, 30, 30);
+            addActionListener(e -> new FrameEditPropertyValues(Users.class));
+        }};
+        panel.add(userButton);
 
         JButton okButton = new JButton("Добавить") {{
             setBounds(5, 255, 115, 30);
@@ -113,7 +119,8 @@ public class FrameAdd extends JFrame{
                 pay.setImportance((ImportanceType) importanceSelect.getSelectedItem());
                 pay.setPayType((PayType) payTypeSelect.getSelectedItem());
                 pay.setPrice(Integer.parseInt(price.getText().replaceAll("[^0-9]]", "")));
-                pay.setPurchased(purchased.isSelected());
+//                pay.setPurchased(purchased.isSelected());
+                pay.setPurchased(true);
                 pay.setUser((Users) userSelect.getSelectedItem());
                 ApplicationHelper.getInstance().payObjects.add(pay);
 
@@ -122,6 +129,7 @@ public class FrameAdd extends JFrame{
                 } catch (IOException e1) {
                     e1.printStackTrace();
                 }
+                MainFrameThread.frame.refreshText();
                 dispose();
             });
         }};

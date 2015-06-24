@@ -203,7 +203,7 @@ class MainFrame extends JFrame implements Serializable {
     }
 
 
-    private void refreshText() {
+    public void refreshText() {
         Integer priceFrom = null;
         Integer priceTo = null;
         Date dateFrom;
