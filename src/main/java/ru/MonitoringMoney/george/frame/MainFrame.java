@@ -150,12 +150,14 @@ class MainFrame extends JFrame implements Serializable {
         dateFromText = new JFormattedTextField(ApplicationHelper.FORMAT_DATE) {{
             setBounds(85, 135, 65, 20);
             setValue(new Date());
-            addKeyListener(new KeyListener() {
-                public void keyPressed(KeyEvent e) {}
-                public void keyReleased(KeyEvent e) {
-                    refreshText();
+            addMouseListener(new MouseListener() {
+                public void mouseReleased(MouseEvent e) {}
+                public void mouseExited(MouseEvent e) {}
+                public void mouseEntered(MouseEvent e) {}
+                public void mouseClicked(MouseEvent e) {}
+                public void mousePressed(MouseEvent e) {
+                    new FrameCalendar(dateFromText);
                 }
-                public void keyTyped(KeyEvent e) {}
             });
         }};
         panel.add(dateFromText);
@@ -168,12 +170,14 @@ class MainFrame extends JFrame implements Serializable {
         dateToText = new JFormattedTextField(ApplicationHelper.FORMAT_DATE) {{
             setBounds(180, 135, 65, 20);
             setValue(new Date());
-            addKeyListener(new KeyListener() {
-                public void keyPressed(KeyEvent e) {}
-                public void keyReleased(KeyEvent e) {
-                    refreshText();
+            addMouseListener(new MouseListener() {
+                public void mouseReleased(MouseEvent e) {}
+                public void mouseExited(MouseEvent e) {}
+                public void mouseEntered(MouseEvent e) {}
+                public void mouseClicked(MouseEvent e) {}
+                public void mousePressed(MouseEvent e) {
+                    new FrameCalendar(dateToText);
                 }
-                public void keyTyped(KeyEvent e) {}
             });
         }};
         panel.add(dateToText);
