@@ -1,4 +1,4 @@
-package main.java.ru.MonitoringMoney.george.helpers;
+package ru.MonitoringMoney.services;
 
 import com.javaswingcomponents.calendar.JSCCalendar;
 import com.javaswingcomponents.calendar.cellrenderers.CalendarCellRenderer;

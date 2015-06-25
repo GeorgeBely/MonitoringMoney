@@ -1,10 +1,10 @@
-package main.java.ru.MonitoringMoney.george.frame;
+package ru.MonitoringMoney.frame;
 
 
-import main.java.ru.MonitoringMoney.george.helpers.ApplicationHelper;
-import main.java.ru.MonitoringMoney.george.types.ImportanceType;
-import main.java.ru.MonitoringMoney.george.types.PayType;
-import main.java.ru.MonitoringMoney.george.types.Users;
+import ru.MonitoringMoney.services.ApplicationService;
+import ru.MonitoringMoney.types.ImportanceType;
+import ru.MonitoringMoney.types.PayType;
+import ru.MonitoringMoney.types.Users;
 
 import javax.swing.*;
 import java.awt.*;
@@ -54,7 +54,7 @@ public class FrameEditPropertyValues extends JFrame {
         JButton cancelButton = new JButton("Добавить") {{
             setBounds(5, 65, 235, 30);
             addActionListener(e -> {
-                ApplicationHelper.getInstance().addPropertyValue(valueNameText.getText(), className);
+                ApplicationService.getInstance().addPropertyValue(valueNameText.getText(), className);
                 dispose();
             });
         }};

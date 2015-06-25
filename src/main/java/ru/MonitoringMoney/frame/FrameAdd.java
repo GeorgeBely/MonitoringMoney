@@ -1,9 +1,9 @@
-package main.java.ru.MonitoringMoney.george.frame;
+package ru.MonitoringMoney.frame;
 
 
-import main.java.ru.MonitoringMoney.george.*;
-import main.java.ru.MonitoringMoney.george.helpers.ApplicationHelper;
-import main.java.ru.MonitoringMoney.george.types.*;
+import ru.MonitoringMoney.*;
+import ru.MonitoringMoney.services.ApplicationService;
+import ru.MonitoringMoney.types.*;
 import org.apache.commons.lang.time.DateUtils;
 
 import javax.swing.*;
@@ -33,7 +33,7 @@ public class FrameAdd extends JFrame{
         }};
         add(panel);
 
-        JComboBox importanceSelect = new JComboBox<Object>(ApplicationHelper.getInstance().importanceTypes.toArray()) {{
+        JComboBox importanceSelect = new JComboBox<Object>(ApplicationService.getInstance().importanceTypes.toArray()) {{
             setBounds(5, 5, 200, 30);
         }};
         panel.add(importanceSelect);
@@ -44,7 +44,7 @@ public class FrameAdd extends JFrame{
         }};
         panel.add(importanceButton);
 
-        JComboBox payTypeSelect = new JComboBox<Object>(ApplicationHelper.getInstance().payTypes.toArray()) {{
+        JComboBox payTypeSelect = new JComboBox<Object>(ApplicationService.getInstance().payTypes.toArray()) {{
             setBounds(5, 40, 200, 30);
         }};
         panel.add(payTypeSelect);
@@ -71,7 +71,7 @@ public class FrameAdd extends JFrame{
         panel.add(labelFromDate);
 
 //        FORMAT_DATE.setLenient(false);
-        JFormattedTextField date = new JFormattedTextField(ApplicationHelper.FORMAT_DATE) {{
+        JFormattedTextField date = new JFormattedTextField(ApplicationService.FORMAT_DATE) {{
             setBounds(145, 100, 90, 20);
             setValue(new Date());
         }};
@@ -98,7 +98,7 @@ public class FrameAdd extends JFrame{
 //        }};
 //        panel.add(purchased);
 
-        JComboBox userSelect = new JComboBox<Object>(ApplicationHelper.getInstance().users.toArray()) {{
+        JComboBox userSelect = new JComboBox<Object>(ApplicationService.getInstance().users.toArray()) {{
             setBounds(5, 220, 200, 30);
             setSelectedItem(UsersDefault.GEORGE);
         }};
@@ -122,10 +122,10 @@ public class FrameAdd extends JFrame{
 //                pay.setPurchased(purchased.isSelected());
                 pay.setPurchased(true);
                 pay.setUser((Users) userSelect.getSelectedItem());
-                ApplicationHelper.getInstance().payObjects.add(pay);
+                ApplicationService.getInstance().payObjects.add(pay);
 
                 try {
-                    ApplicationHelper.writeData();
+                    ApplicationService.writeData();
                 } catch (IOException e1) {
                     e1.printStackTrace();
                 }

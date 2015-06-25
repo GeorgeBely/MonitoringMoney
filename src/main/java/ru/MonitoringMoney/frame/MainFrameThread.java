@@ -1,4 +1,4 @@
-package main.java.ru.MonitoringMoney.george.frame;
+package ru.MonitoringMoney.frame;
 
 
 import java.awt.*;

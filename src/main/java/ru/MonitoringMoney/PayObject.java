@@ -1,7 +1,7 @@
-package main.java.ru.MonitoringMoney.george;
+package ru.MonitoringMoney;
 
-import main.java.ru.MonitoringMoney.george.helpers.ApplicationHelper;
-import main.java.ru.MonitoringMoney.george.types.*;
+import ru.MonitoringMoney.services.ApplicationService;
+import ru.MonitoringMoney.types.*;
 
 import java.io.Serializable;
 import java.util.Date;
@@ -20,6 +20,7 @@ public class PayObject implements Serializable {
     private boolean purchased;
     private Users user;
 
+
     public String toString() {
         StringBuilder builder = new StringBuilder();
         if (user != null)
@@ -31,7 +32,7 @@ public class PayObject implements Serializable {
         if (importance != null)
             builder.append(importance.getName()).append(" ");
         if (date != null)
-            builder.append(ApplicationHelper.FORMAT_DATE.format(date)).append(" ");
+            builder.append(ApplicationService.FORMAT_DATE.format(date)).append(" ");
         if (description != null)
             builder.append("\n").append(description);
         return builder.toString();

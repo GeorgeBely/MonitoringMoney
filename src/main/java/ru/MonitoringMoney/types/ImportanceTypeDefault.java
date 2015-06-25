@@ -1,4 +1,4 @@
-package main.java.ru.MonitoringMoney.george.types;
+package ru.MonitoringMoney.types;
 
 
 public enum ImportanceTypeDefault {

@@ -1,7 +1,7 @@
-package main.java.ru.MonitoringMoney.george.helpers;
+package ru.MonitoringMoney.services;
 
-import main.java.ru.MonitoringMoney.george.PayObject;
-import main.java.ru.MonitoringMoney.george.types.*;
+import ru.MonitoringMoney.PayObject;
+import ru.MonitoringMoney.types.*;
 import org.apache.commons.lang.StringUtils;
 
 import java.io.*;
@@ -10,40 +10,40 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * Хелпер для работы с приложением
+ * РҐРµР»РїРµСЂ РґР»СЏ СЂР°Р±РѕС‚С‹ СЃ РїСЂРёР»РѕР¶РµРЅРёРµРј
  */
-public class ApplicationHelper implements Serializable {
+public class ApplicationService implements Serializable {
 
     private static final long serialVersionUID = -2808789219515984025L;
 
-    /** Файл с данными о покупках */
+    /** Р¤Р°Р№Р» СЃ РґР°РЅРЅС‹РјРё Рѕ РїРѕРєСѓРїРєР°С… */
     public static final File buyFile = new File("MoneyData.mm");
 
-    /** Формат даты для поля ввода даты */
+    /** Р¤РѕСЂРјР°С‚ РґР°С‚С‹ РґР»СЏ РїРѕР»СЏ РІРІРѕРґР° РґР°С‚С‹ */
     public static final DateFormat FORMAT_DATE = DateFormat.getDateInstance(DateFormat.SHORT);
 
     private static final String EMPTY = "empty";
 
-    /** Список покупок */
+    /** РЎРїРёСЃРѕРє РїРѕРєСѓРїРѕРє */
     public List<PayObject> payObjects = new ArrayList<>();
 
-    /** Список уровней важности */
+    /** РЎРїРёСЃРѕРє СѓСЂРѕРІРЅРµР№ РІР°Р¶РЅРѕСЃС‚Рё */
     public List<ImportanceType> importanceTypes = new ArrayList<>();
 
-    /** Список товаров и услуг */
+    /** РЎРїРёСЃРѕРє С‚РѕРІР°СЂРѕРІ Рё СѓСЃР»СѓРі */
     public List<PayType> payTypes = new ArrayList<>();
 
-    /** Список пользователей */
+    /** РЎРїРёСЃРѕРє РїРѕР»СЊР·РѕРІР°С‚РµР»РµР№ */
     public List<Users> users = new ArrayList<>();
 
     public Integer uniqueId;
 
 
-    private static ApplicationHelper instance;
+    private static ApplicationService instance;
 
-    public static ApplicationHelper getInstance() {
+    public static ApplicationService getInstance() {
         if (instance == null) {
-            instance = new ApplicationHelper();
+            instance = new ApplicationService();
         }
         if (instance.importanceTypes.isEmpty() && instance.payTypes.isEmpty() && instance.users.isEmpty()) {
             instance.initDefaultProperties();
@@ -71,17 +71,17 @@ public class ApplicationHelper implements Serializable {
     public static void createNewData() throws IOException {
         if (buyFile.createNewFile()) {
             ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream(buyFile));
-            os.writeObject(new ApplicationHelper());
+            os.writeObject(new ApplicationService());
         }
     }
 
     public static void readData() throws IOException, ClassNotFoundException {
         ObjectInputStream ois = new ObjectInputStream(new FileInputStream(buyFile));
-        instance = (ApplicationHelper) ois.readObject();
+        instance = (ApplicationService) ois.readObject();
     }
 
     public static void writeData() throws IOException {
-        ObjectOutputStream bin = new ObjectOutputStream(new FileOutputStream(ApplicationHelper.buyFile));
+        ObjectOutputStream bin = new ObjectOutputStream(new FileOutputStream(ApplicationService.buyFile));
         bin.writeObject(getInstance());
     }
 

@@ -1,8 +1,8 @@
-package main.java.ru.MonitoringMoney.george.frame;
+package ru.MonitoringMoney.frame;
 
 import com.javaswingcomponents.calendar.JSCCalendar;
 import com.javaswingcomponents.calendar.listeners.CalendarSelectionEventType;
-import main.java.ru.MonitoringMoney.george.helpers.CalendarService;
+import ru.MonitoringMoney.services.CalendarService;
 
 import javax.swing.*;
 import java.awt.*;

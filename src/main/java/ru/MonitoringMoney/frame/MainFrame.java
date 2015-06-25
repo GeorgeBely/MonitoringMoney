@@ -1,9 +1,9 @@
-package main.java.ru.MonitoringMoney.george.frame;
+package ru.MonitoringMoney.frame;
 
-import main.java.ru.MonitoringMoney.george.helpers.ApplicationHelper;
-import main.java.ru.MonitoringMoney.george.types.ImportanceType;
-import main.java.ru.MonitoringMoney.george.types.PayType;
-import main.java.ru.MonitoringMoney.george.types.Users;
+import ru.MonitoringMoney.services.ApplicationService;
+import ru.MonitoringMoney.types.ImportanceType;
+import ru.MonitoringMoney.types.PayType;
+import ru.MonitoringMoney.types.Users;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
 
@@ -95,13 +95,13 @@ class MainFrame extends JFrame implements Serializable {
         }};
         panel.add(termInput);
 
-        importanceSelect = new JComboBox<Object>(ApplicationHelper.getInstance().importanceTypes.toArray()) {{
+        importanceSelect = new JComboBox<Object>(ApplicationService.getInstance().importanceTypes.toArray()) {{
             setBounds(5, 40, 240, 30);
             addActionListener(e -> refreshText());
         }};
         panel.add(importanceSelect);
 
-        payTypeSelect = new JComboBox<Object>(ApplicationHelper.getInstance().payTypes.toArray()) {{
+        payTypeSelect = new JComboBox<Object>(ApplicationService.getInstance().payTypes.toArray()) {{
             setBounds(5, 75, 240, 30);
             addActionListener(e -> refreshText());
         }};
@@ -147,7 +147,7 @@ class MainFrame extends JFrame implements Serializable {
         }};
         panel.add(labelFromDate);
 
-        dateFromText = new JFormattedTextField(ApplicationHelper.FORMAT_DATE) {{
+        dateFromText = new JFormattedTextField(ApplicationService.FORMAT_DATE) {{
             setBounds(85, 135, 65, 20);
             setValue(new Date());
             addMouseListener(new MouseListener() {
@@ -167,7 +167,7 @@ class MainFrame extends JFrame implements Serializable {
         }};
         panel.add(labelDateTo);
 
-        dateToText = new JFormattedTextField(ApplicationHelper.FORMAT_DATE) {{
+        dateToText = new JFormattedTextField(ApplicationService.FORMAT_DATE) {{
             setBounds(180, 135, 65, 20);
             setValue(new Date());
             addMouseListener(new MouseListener() {
@@ -182,7 +182,7 @@ class MainFrame extends JFrame implements Serializable {
         }};
         panel.add(dateToText);
 
-        userSelect = new JComboBox<Object>(ApplicationHelper.getInstance().users.toArray()) {{
+        userSelect = new JComboBox<Object>(ApplicationService.getInstance().users.toArray()) {{
             setBounds(5, 160, 240, 30);
             addActionListener(e -> refreshText());
         }};
@@ -224,11 +224,11 @@ class MainFrame extends JFrame implements Serializable {
             if (StringUtils.isNotBlank(priceToText.getText()))
                 priceTo = Integer.parseInt(priceToText.getText());
         } catch (Exception ignore) {}
-        text.setText(ApplicationHelper.getInstance().getTextPayObjects(term, dateFrom, dateTo, priceFrom,
+        text.setText(ApplicationService.getInstance().getTextPayObjects(term, dateFrom, dateTo, priceFrom,
                 priceTo, (ImportanceType) importanceSelect.getSelectedItem(), (PayType) payTypeSelect.getSelectedItem(),
                 (Users) userSelect.getSelectedItem(), true));
 
-        labelSumPrice.setText(PREFIX_LABEL_SUM_PRICE + " "  + ApplicationHelper.getInstance().getSumPrice(term, dateFrom, dateTo, priceFrom,
+        labelSumPrice.setText(PREFIX_LABEL_SUM_PRICE + " "  + ApplicationService.getInstance().getSumPrice(term, dateFrom, dateTo, priceFrom,
                 priceTo, (ImportanceType) importanceSelect.getSelectedItem(), (PayType) payTypeSelect.getSelectedItem(),
                 (Users) userSelect.getSelectedItem(), true));
     }

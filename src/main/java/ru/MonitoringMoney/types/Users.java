@@ -1,4 +1,4 @@
-package main.java.ru.MonitoringMoney.george.types;
+package ru.MonitoringMoney.types;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -8,20 +8,21 @@ import java.util.Objects;
 /**
  *
  */
-public class PayType implements Serializable {
+public class Users implements Serializable {
 
-    private static final long serialVersionUID = -9031825584982262846L;
+    private static final long serialVersionUID = -5378473412329676164L;
 
 
     private String code;
     private String name;
 
-    public PayType(String code, String name) {
+
+    public Users(String code, String name) {
         this.code = code;
         this.name = name;
     }
 
-    public PayType(PayTypeDefault typeDefault) {
+    public Users(UsersDefault typeDefault) {
         code = typeDefault.toString().toLowerCase();
         name = typeDefault.getName().toLowerCase();
     }
@@ -51,7 +52,7 @@ public class PayType implements Serializable {
         if (o == null || getClass() != o.getClass())
             return false;
 
-        PayType that = (PayType) o;
+        Users that = (Users) o;
         return this == o || (Objects.equals(that.getCode(), code) && Objects.equals(that.getName(), name));
     }
 }
