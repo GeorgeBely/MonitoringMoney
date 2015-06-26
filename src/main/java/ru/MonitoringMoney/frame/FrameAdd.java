@@ -8,6 +8,8 @@ import org.apache.commons.lang.time.DateUtils;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
@@ -20,12 +22,18 @@ public class FrameAdd extends JFrame{
     /** Высота фрейма */
     private static final int FRAME_HEIGHT = 320;
 
+    /** Заголовок фрейма */
+    private static final String FRAME_NAME = "Добавление покупки";
+
+
+    private JFormattedTextField dateText;
 
     public FrameAdd() {
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         setLocation(screenSize.width / 2 - FRAME_WIDTH / 2, screenSize.height / 2 - FRAME_HEIGHT / 2);
         setSize(FRAME_WIDTH, FRAME_HEIGHT);
         setResizable(false);
+        setName(FRAME_NAME);
 
         JPanel panel = new JPanel() {{
             setFocusable(true);
@@ -71,11 +79,20 @@ public class FrameAdd extends JFrame{
         panel.add(labelFromDate);
 
 //        FORMAT_DATE.setLenient(false);
-        JFormattedTextField date = new JFormattedTextField(ApplicationService.FORMAT_DATE) {{
+        dateText = new JFormattedTextField(ApplicationService.FORMAT_DATE) {{
             setBounds(145, 100, 90, 20);
             setValue(new Date());
+            addMouseListener(new MouseListener() {
+                public void mouseReleased(MouseEvent e) {}
+                public void mouseExited(MouseEvent e) {}
+                public void mouseEntered(MouseEvent e) {}
+                public void mouseClicked(MouseEvent e) {}
+                public void mousePressed(MouseEvent e) {
+                    new FrameCalendar(dateText);
+                }
+            });
         }};
-        panel.add(date);
+        panel.add(dateText);
 
         JTextArea textDescription = new JTextArea() {{
             setLineWrap(true);
@@ -114,7 +131,7 @@ public class FrameAdd extends JFrame{
             setBounds(5, 255, 115, 30);
             addActionListener(e -> {
                 PayObject pay = new PayObject();
-                pay.setDate(DateUtils.truncate((Date) date.getValue(), Calendar.DATE));
+                pay.setDate(DateUtils.truncate((Date) dateText.getValue(), Calendar.DATE));
                 pay.setDescription(textDescription.getText());
                 pay.setImportance((ImportanceType) importanceSelect.getSelectedItem());
                 pay.setPayType((PayType) payTypeSelect.getSelectedItem());
