@@ -33,7 +33,7 @@ public class FrameAdd extends JFrame{
         setLocation(screenSize.width / 2 - FRAME_WIDTH / 2, screenSize.height / 2 - FRAME_HEIGHT / 2);
         setSize(FRAME_WIDTH, FRAME_HEIGHT);
         setResizable(false);
-        setName(FRAME_NAME);
+        setTitle(FRAME_NAME);
 
         JPanel panel = new JPanel() {{
             setFocusable(true);
