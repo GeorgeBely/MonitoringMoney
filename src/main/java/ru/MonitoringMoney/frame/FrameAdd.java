@@ -3,6 +3,7 @@ package ru.MonitoringMoney.frame;
 
 import ru.MonitoringMoney.*;
 import ru.MonitoringMoney.services.ApplicationService;
+import ru.MonitoringMoney.services.ImageService;
 import ru.MonitoringMoney.types.*;
 import org.apache.commons.lang.time.DateUtils;
 
@@ -34,6 +35,8 @@ public class FrameAdd extends JFrame{
         setSize(FRAME_WIDTH, FRAME_HEIGHT);
         setResizable(false);
         setTitle(FRAME_NAME);
+        setVisible(true);
+        toFront();
 
         JPanel panel = new JPanel() {{
             setFocusable(true);
@@ -46,9 +49,10 @@ public class FrameAdd extends JFrame{
         }};
         panel.add(importanceSelect);
 
-        JButton importanceButton = new JButton(".") {{
+        JButton importanceButton = new JButton() {{
             setBounds(210, 5, 30, 30);
             addActionListener(e -> new FrameEditPropertyValues(ImportanceType.class));
+            setIcon(ImageService.getPlusButtonIcon());
         }};
         panel.add(importanceButton);
 
@@ -57,9 +61,10 @@ public class FrameAdd extends JFrame{
         }};
         panel.add(payTypeSelect);
 
-        JButton payTypeButton = new JButton(".") {{
+        JButton payTypeButton = new JButton() {{
             setBounds(210, 40, 30, 30);
             addActionListener(e -> new FrameEditPropertyValues(PayType.class));
+            setIcon(ImageService.getPlusButtonIcon());
         }};
         panel.add(payTypeButton);
 
@@ -121,9 +126,10 @@ public class FrameAdd extends JFrame{
         }};
         panel.add(userSelect);
 
-        JButton userButton = new JButton(".") {{
+        JButton userButton = new JButton() {{
             setBounds(210, 220, 30, 30);
             addActionListener(e -> new FrameEditPropertyValues(Users.class));
+            setIcon(ImageService.getPlusButtonIcon());
         }};
         panel.add(userButton);
 

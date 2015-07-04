@@ -8,7 +8,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.Date;
 
-public class FrameCalendar extends JFrame{
+public class FrameCalendar extends JFrame {
 
     /** Ширина фрейма */
     private static final int FRAME_WIDTH = 215;

@@ -1,5 +1,6 @@
 package ru.MonitoringMoney.services;
 
+import ru.MonitoringMoney.ImageCanvas;
 import ru.MonitoringMoney.PayObject;
 import ru.MonitoringMoney.types.*;
 import org.apache.commons.lang.StringUtils;
@@ -7,6 +8,7 @@ import org.apache.commons.lang.StringUtils;
 import java.io.*;
 import java.text.DateFormat;
 import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -22,7 +24,8 @@ public class ApplicationService implements Serializable {
     /** Формат даты для поля ввода даты */
     public static final DateFormat FORMAT_DATE = DateFormat.getDateInstance(DateFormat.SHORT);
 
-    private static final String EMPTY = "empty";
+    /** Код пустого поля свойства покупки */
+    public static final String EMPTY = "empty";
 
     /** Список покупок */
     public List<PayObject> payObjects = new ArrayList<>();
@@ -35,6 +38,9 @@ public class ApplicationService implements Serializable {
 
     /** Список пользователей */
     public List<Users> users = new ArrayList<>();
+
+    /** Иконки и картинки в приложение */
+    public Map<String, ImageCanvas> images = new HashMap<>();
 
     public Integer uniqueId;
 
@@ -78,6 +84,8 @@ public class ApplicationService implements Serializable {
     public static void readData() throws IOException, ClassNotFoundException {
         ObjectInputStream ois = new ObjectInputStream(new FileInputStream(buyFile));
         instance = (ApplicationService) ois.readObject();
+        if (instance.images == null)
+            instance.images = new HashMap<>();
     }
 
     public static void writeData() throws IOException {
@@ -85,9 +93,8 @@ public class ApplicationService implements Serializable {
         bin.writeObject(getInstance());
     }
 
-    public String getTextPayObjects(String term, Date dateFrom, Date dateTo, Integer priseFrom, Integer priseTo,
-                                    ImportanceType importanceType, PayType payType, Users user, boolean purchased) {
-        Optional<String> optional = getPayObjectsWithFilters(term, dateFrom, dateTo, priseFrom, priseTo, importanceType, payType, user, purchased)
+    public String getTextPayObjects(List<PayObject> payObjects) {
+        Optional<String> optional = payObjects
                 .stream()
                 .map(PayObject::toString)
                 .reduce((s1, s2) -> s1 + "\n\n" + s2);
@@ -97,9 +104,8 @@ public class ApplicationService implements Serializable {
         return "";
     }
 
-    public Integer getSumPrice(String term, Date dateFrom, Date dateTo, Integer priseFrom, Integer priseTo,
-                               ImportanceType importanceType, PayType payType, Users user, boolean purchased) {
-        Optional<Integer> optional = getPayObjectsWithFilters(term, dateFrom, dateTo, priseFrom, priseTo, importanceType, payType, user, purchased)
+    public Integer getSumPrice(List<PayObject> payObjects) {
+        Optional<Integer> optional = payObjects
                 .stream()
                 .map(PayObject::getPrice)
                 .reduce((s1, s2) -> s1 + s2);
