@@ -233,8 +233,10 @@ public class MainFrame extends JFrame {
         if (!TERM_INPUT_DEFAULT_TEXT.equals(termInput.getText()) && StringUtils.isNotBlank(termInput.getText()))
             term = termInput.getText();
         dateFrom = DateUtils.truncate((Date) dateFromText.getValue(), Calendar.DATE);
-        dateTo = DateUtils.truncate((Date) dateToText.getValue(), Calendar.DATE);
-        dateTo.setDate(dateTo.getDate() + 1);
+        Calendar calendarTo = Calendar.getInstance();
+        calendarTo.setTime(DateUtils.truncate((Date) dateToText.getValue(), Calendar.DATE));
+        calendarTo.add(Calendar.DATE, 1);
+        dateTo = calendarTo.getTime();
         try {
             if (StringUtils.isNotBlank(priceFromText.getText()))
                 priceFrom = Integer.parseInt(priceFromText.getText());

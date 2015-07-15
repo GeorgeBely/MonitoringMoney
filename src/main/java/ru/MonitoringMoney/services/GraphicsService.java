@@ -11,7 +11,7 @@ import org.jfree.data.time.Minute;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
 import ru.MonitoringMoney.PayObject;
-import ru.MonitoringMoney.frame.MainFrameThread;
+import ru.MonitoringMoney.main.MonitoringMoney;
 
 import java.awt.*;
 import java.util.*;
@@ -96,15 +96,15 @@ public class GraphicsService {
             String name;
             Integer coast;
             Date date;
-            if (!MainFrameThread.frame.isUsePayType()) {
+            if (!MonitoringMoney.frame.isUsePayType()) {
                 name = payObject.getPayType().toString();
                 coast = payObject.getPrice();
                 date = payObject.getDate();
-            } else if (!MainFrameThread.frame.isUseImportant()) {
+            } else if (!MonitoringMoney.frame.isUseImportant()) {
                 name = payObject.getImportance().toString();
                 coast = payObject.getPrice();
                 date = payObject.getDate();
-            } else if (!MainFrameThread.frame.isUseUser()) {
+            } else if (!MonitoringMoney.frame.isUseUser()) {
                 name = payObject.getUser().toString();
                 coast = payObject.getPrice();
                 date = payObject.getDate();
@@ -145,13 +145,13 @@ public class GraphicsService {
         for (PayObject payObject : getPayObjects()) {
             String name;
             Integer coast;
-            if (!MainFrameThread.frame.isUsePayType()) {
+            if (!MonitoringMoney.frame.isUsePayType()) {
                 name = payObject.getPayType().toString();
                 coast = payObject.getPrice();
-            } else if (!MainFrameThread.frame.isUseImportant()) {
+            } else if (!MonitoringMoney.frame.isUseImportant()) {
                 name = payObject.getImportance().toString();
                 coast = payObject.getPrice();
-            } else if (!MainFrameThread.frame.isUseUser()) {
+            } else if (!MonitoringMoney.frame.isUseUser()) {
                 name = payObject.getUser().toString();
                 coast = payObject.getPrice();
             } else {
@@ -174,7 +174,7 @@ public class GraphicsService {
     }
 
     private static List<PayObject> getPayObjects() {
-        List<PayObject> payObjects = MainFrameThread.frame.getPayObjectWithCurrentFilters();
+        List<PayObject> payObjects = MonitoringMoney.frame.getPayObjectWithCurrentFilters();
         if (payObjects.isEmpty()) {
             payObjects = ApplicationService.getInstance().getPayObjectsWithFilters(null, null, null, null, null, null, null,null, true);
         }

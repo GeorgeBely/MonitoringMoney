@@ -126,7 +126,6 @@ public class ApplicationService implements Serializable {
                 .filter(obj -> importanceType == null || EMPTY.equals(importanceType.getCode()) || obj.getImportance().equals(importanceType))
                 .filter(obj -> payType == null || EMPTY.equals(payType.getCode()) || obj.getPayType().equals(payType))
                 .filter(obj -> user == null || EMPTY.equals(user.getCode()) || obj.getUser().equals(user))
-                .filter(obj -> Objects.equals(obj.isPurchased(), purchased))
                 .collect(Collectors.toList());
     }
 

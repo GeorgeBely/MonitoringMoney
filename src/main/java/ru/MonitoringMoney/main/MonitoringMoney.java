@@ -1,14 +1,19 @@
 package ru.MonitoringMoney.main;
 
-import ru.MonitoringMoney.frame.MainFrameThread;
+import ru.MonitoringMoney.frame.MainFrame;
 import ru.MonitoringMoney.services.ApplicationService;
 
+import java.awt.*;
 import java.io.*;
 
 
 public class MonitoringMoney implements Serializable {
 
-    public static final String VERSION = "1.3.0";
+    public static final String VERSION = "1.3.1";
+
+
+    /** Основной фрейм приложения */
+    public static MainFrame frame;
 
     public static void main(String args[]) throws IOException, ClassNotFoundException {
         if (!ApplicationService.buyFile.exists())
@@ -16,6 +21,6 @@ public class MonitoringMoney implements Serializable {
 
         ApplicationService.readData();
 
-        new MainFrameThread().start();
+        EventQueue.invokeLater(() -> frame = new MainFrame());
     }
 }

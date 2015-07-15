@@ -1,9 +1,11 @@
 package ru.MonitoringMoney;
 
+import org.apache.commons.lang.time.DateUtils;
 import ru.MonitoringMoney.services.ApplicationService;
 import ru.MonitoringMoney.types.*;
 
 import java.io.Serializable;
+import java.util.Calendar;
 import java.util.Date;
 
 
@@ -17,7 +19,6 @@ public class PayObject implements Serializable {
     private PayType payType;
     private ImportanceType importance;
     private String description;
-    private boolean purchased;
     private Users user;
 
 
@@ -51,7 +52,7 @@ public class PayObject implements Serializable {
     }
 
     public void setDate(Date date) {
-        this.date = date;
+        this.date = DateUtils.truncate(date, Calendar.DATE);
     }
 
     public PayType getPayType() {
@@ -76,14 +77,6 @@ public class PayObject implements Serializable {
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public boolean isPurchased() {
-        return purchased;
-    }
-
-    public void setPurchased(boolean purchased) {
-        this.purchased = purchased;
     }
 
     public Users getUser() {
