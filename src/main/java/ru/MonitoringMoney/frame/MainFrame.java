@@ -202,7 +202,7 @@ public class MainFrame extends JFrame {
 
         JButton buttonAdd = new JButton("Добавить покупку") {{
             setBounds(5, 195, 240, 30);
-            addActionListener(e -> EventQueue.invokeLater(FrameAdd::new));
+            addActionListener(e -> MonitoringMoney.frameAdd.showFrame());
         }};
         panel.add(buttonAdd);
 
@@ -246,7 +246,7 @@ public class MainFrame extends JFrame {
 
         return ApplicationService.getInstance().getPayObjectsWithFilters(term, dateFrom, dateTo, priceFrom,
                 priceTo, (ImportanceType) importanceSelect.getSelectedItem(), (PayType) payTypeSelect.getSelectedItem(),
-                (Users) userSelect.getSelectedItem(), true);
+                (Users) userSelect.getSelectedItem());
     }
 
     public boolean isUsePayType() {

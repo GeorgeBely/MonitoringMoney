@@ -10,8 +10,7 @@ import org.apache.commons.lang.time.DateUtils;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.awt.event.*;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
@@ -29,6 +28,10 @@ public class FrameAdd extends JFrame{
 
 
     private JFormattedTextField dateText;
+    private JComboBox<ImportanceType> importanceSelect;
+    private JComboBox<PayType> payTypeSelect;
+    private JComboBox<Users> userSelect;
+
 
     public FrameAdd() {
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
@@ -36,7 +39,6 @@ public class FrameAdd extends JFrame{
         setSize(FRAME_WIDTH, FRAME_HEIGHT);
         setResizable(false);
         setTitle(FRAME_NAME);
-        setVisible(true);
         toFront();
 
         JPanel panel = new JPanel() {{
@@ -45,7 +47,9 @@ public class FrameAdd extends JFrame{
         }};
         add(panel);
 
-        JComboBox importanceSelect = new JComboBox<Object>(ApplicationService.getInstance().importanceTypes.toArray()) {{
+        importanceSelect = new JComboBox<ImportanceType>() {{
+            ImportanceType[] items = new ImportanceType[ApplicationService.getInstance().importanceTypes.size()];
+            setModel(new DefaultComboBoxModel<>(ApplicationService.getInstance().importanceTypes.toArray(items)));
             setBounds(5, 5, 200, 30);
         }};
         panel.add(importanceSelect);
@@ -57,7 +61,9 @@ public class FrameAdd extends JFrame{
         }};
         panel.add(importanceButton);
 
-        JComboBox payTypeSelect = new JComboBox<Object>(ApplicationService.getInstance().payTypes.toArray()) {{
+        payTypeSelect = new JComboBox<PayType>() {{
+            PayType[] items = new PayType[ApplicationService.getInstance().payTypes.size()];
+            setModel(new DefaultComboBoxModel<>(ApplicationService.getInstance().payTypes.toArray(items)));
             setBounds(5, 40, 200, 30);
         }};
         panel.add(payTypeSelect);
@@ -111,9 +117,10 @@ public class FrameAdd extends JFrame{
         }};
         panel.add(textScrollPane);
 
-        JComboBox userSelect = new JComboBox<Object>(ApplicationService.getInstance().users.toArray()) {{
+        userSelect = new JComboBox<Users>() {{
+            Users[] items = new Users[ApplicationService.getInstance().users.size()];
+            setModel(new DefaultComboBoxModel<>(ApplicationService.getInstance().users.toArray(items)));
             setBounds(5, 220, 200, 30);
-            setSelectedItem(UsersDefault.GEORGE);
         }};
         panel.add(userSelect);
 
@@ -142,15 +149,33 @@ public class FrameAdd extends JFrame{
                     e1.printStackTrace();
                 }
                 MonitoringMoney.frame.refreshText();
-                dispose();
+                hideFrame();
             });
         }};
         panel.add(okButton);
 
         JButton cancelButton = new JButton("Отмена") {{
             setBounds(125, 255, 115, 30);
-            addActionListener(e -> dispose());
+            addActionListener(e -> hideFrame());
         }};
         panel.add(cancelButton);
+    }
+
+
+    public void addSelectElement(Object item, Class className) {
+        if (PayType.class.equals(className))
+            payTypeSelect.addItem((PayType) item);
+        else if (ImportanceType.class.equals(className))
+            importanceSelect.addItem((ImportanceType) item);
+        else if (Users.class.equals(className))
+            userSelect.addItem((Users) item);
+    }
+
+    public void showFrame() {
+        setVisible(true);
+    }
+
+    public void hideFrame() {
+        setVisible(false);
     }
 }

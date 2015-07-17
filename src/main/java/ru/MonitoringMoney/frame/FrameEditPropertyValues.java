@@ -1,6 +1,7 @@
 package ru.MonitoringMoney.frame;
 
 
+import ru.MonitoringMoney.main.MonitoringMoney;
 import ru.MonitoringMoney.services.ApplicationService;
 import ru.MonitoringMoney.types.ImportanceType;
 import ru.MonitoringMoney.types.PayType;
@@ -51,13 +52,16 @@ public class FrameEditPropertyValues extends JFrame {
         }};
         panel.add(valueNameText);
 
-        JButton cancelButton = new JButton("Добавить") {{
+        JButton addButton = new JButton("Добавить") {{
             setBounds(5, 65, 235, 30);
             addActionListener(e -> {
-                ApplicationService.getInstance().addPropertyValue(valueNameText.getText(), className);
+                Object newValue = ApplicationService.getInstance().addPropertyValue(valueNameText.getText(), className);
+                if (newValue != null) {
+                    MonitoringMoney.frameAdd.addSelectElement(newValue, className);
+                }
                 dispose();
             });
         }};
-        panel.add(cancelButton);
+        panel.add(addButton);
     }
 }

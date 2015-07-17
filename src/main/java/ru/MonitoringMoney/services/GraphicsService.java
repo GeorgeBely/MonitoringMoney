@@ -176,7 +176,7 @@ public class GraphicsService {
     private static List<PayObject> getPayObjects() {
         List<PayObject> payObjects = MonitoringMoney.frame.getPayObjectWithCurrentFilters();
         if (payObjects.isEmpty()) {
-            payObjects = ApplicationService.getInstance().getPayObjectsWithFilters(null, null, null, null, null, null, null,null, true);
+            payObjects = ApplicationService.getInstance().getPayObjectsWithFilters(null, null, null, null, null, null, null,null);
         }
         return payObjects;
     }

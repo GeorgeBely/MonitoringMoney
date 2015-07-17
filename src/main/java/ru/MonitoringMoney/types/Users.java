@@ -22,10 +22,6 @@ public class Users implements Serializable {
         this.name = name;
     }
 
-    public Users(UsersDefault typeDefault) {
-        code = typeDefault.toString().toLowerCase();
-        name = typeDefault.getName().toLowerCase();
-    }
 
     public String getCode() {
         return code;

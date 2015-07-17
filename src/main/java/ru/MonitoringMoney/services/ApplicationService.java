@@ -69,9 +69,6 @@ public class ApplicationService implements Serializable {
         for (PayTypeDefault defaultType : PayTypeDefault.values()) {
             payTypes.add(new PayType(defaultType));
         }
-        for (UsersDefault defaultType : UsersDefault.values()) {
-            users.add(new Users(defaultType));
-        }
     }
 
     public static void createNewData() throws IOException {
@@ -116,7 +113,7 @@ public class ApplicationService implements Serializable {
     }
 
     public List<PayObject> getPayObjectsWithFilters(String term, Date dateFrom, Date dateTo, Integer priseFrom, Integer priseTo,
-                                                    ImportanceType importanceType, PayType payType, Users user, boolean purchased) {
+                                                    ImportanceType importanceType, PayType payType, Users user) {
         return payObjects.stream()
                 .filter(obj -> StringUtils.isBlank(term) || obj.getDescription().contains(term))
                 .filter(obj -> dateFrom == null || obj.getDate().equals(dateFrom) || obj.getDate().after(dateFrom))
@@ -136,13 +133,17 @@ public class ApplicationService implements Serializable {
         return "auto" + uniqueId;
     }
 
-    public void addPropertyValue(String name, Class className) {
+    public Object addPropertyValue(String name, Class className) {
+        Object newValue = null;
         if (PayType.class.equals(className)) {
-            payTypes.add(new PayType(getNewUniqueCode(), name));
+            newValue = new PayType(getNewUniqueCode(), name);
+            payTypes.add((PayType) newValue);
         } else if (ImportanceType.class.equals(className)) {
-            importanceTypes.add(new ImportanceType(getNewUniqueCode(), name));
+            newValue = new ImportanceType(getNewUniqueCode(), name);
+            importanceTypes.add((ImportanceType) newValue);
         } else if (Users.class.equals(className)) {
-            users.add(new Users(getNewUniqueCode(), name));
+            newValue = new Users(getNewUniqueCode(), name);
+            users.add((Users) newValue);
         }
 
         try {
@@ -150,5 +151,6 @@ public class ApplicationService implements Serializable {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        return newValue;
     }
 }
