@@ -115,7 +115,7 @@ public class ApplicationService implements Serializable {
     public List<PayObject> getPayObjectsWithFilters(String term, Date dateFrom, Date dateTo, Integer priseFrom, Integer priseTo,
                                                     ImportanceType importanceType, PayType payType, Users user) {
         return payObjects.stream()
-                .filter(obj -> StringUtils.isBlank(term) || obj.getDescription().contains(term))
+                .filter(obj -> StringUtils.isBlank(term) || obj.toString().toLowerCase().contains(term.toLowerCase()))
                 .filter(obj -> dateFrom == null || obj.getDate().equals(dateFrom) || obj.getDate().after(dateFrom))
                 .filter(obj -> dateTo == null || obj.getDate().before(dateTo))
                 .filter(obj -> priseFrom == null || obj.getPrice() >= priseFrom)

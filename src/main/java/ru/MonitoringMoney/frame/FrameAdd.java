@@ -31,6 +31,7 @@ public class FrameAdd extends JFrame{
     private JComboBox<ImportanceType> importanceSelect;
     private JComboBox<PayType> payTypeSelect;
     private JComboBox<Users> userSelect;
+    private JTextArea textDescription;
 
 
     public FrameAdd() {
@@ -106,7 +107,7 @@ public class FrameAdd extends JFrame{
         }};
         panel.add(dateText);
 
-        JTextArea textDescription = new JTextArea() {{
+        textDescription = new JTextArea() {{
             setLineWrap(true);
             setWrapStyleWord(true);
         }};
@@ -172,6 +173,7 @@ public class FrameAdd extends JFrame{
     }
 
     public void showFrame() {
+        textDescription.setText("");
         setVisible(true);
     }
 

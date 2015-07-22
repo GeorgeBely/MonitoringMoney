@@ -22,6 +22,9 @@ import java.util.List;
  */
 public class GraphicsService {
 
+    private static final String ANOTHER_BLOCK_NAME = "Другие";
+
+
     /**
      * Создание компонента графика "Пирог"
      *
@@ -166,8 +169,36 @@ public class GraphicsService {
             }
         }
 
+        Map<String, Integer> sortedValueMap = new TreeMap<>((s1, s2) -> {
+            if (ANOTHER_BLOCK_NAME.equals(s1))
+                return 1;
+            if (ANOTHER_BLOCK_NAME.equals(s2))
+                return -1;
+            return valueMap.get(s2).compareTo(valueMap.get(s1));
+        });
+        sortedValueMap.putAll(valueMap);
+
+        if (valueMap.size() > 10) {
+            Map<String, Integer> shortValueMap = new HashMap<>();
+            int count = 0;
+            for (Map.Entry<String, Integer> value : sortedValueMap.entrySet()) {
+                if (count < 9) {
+                    shortValueMap.put(value.getKey(), value.getValue());
+                } else {
+                    if (shortValueMap.get(ANOTHER_BLOCK_NAME) == null) {
+                        shortValueMap.put(ANOTHER_BLOCK_NAME, value.getValue());
+                    } else {
+                        shortValueMap.put(ANOTHER_BLOCK_NAME, shortValueMap.get(ANOTHER_BLOCK_NAME) + value.getValue());
+                    }
+                }
+                count++;
+            }
+            sortedValueMap.clear();
+            sortedValueMap.putAll(shortValueMap);
+        }
+
         DefaultPieDataset defaultPieDataset = new DefaultPieDataset();
-        for (Map.Entry<String, Integer> value : valueMap.entrySet()) {
+        for (Map.Entry<String, Integer> value : sortedValueMap.entrySet()) {
             defaultPieDataset.setValue(value.getKey(), value.getValue());
         }
         return defaultPieDataset;
