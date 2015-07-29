@@ -2,6 +2,7 @@ package ru.MonitoringMoney.services;
 
 import ru.MonitoringMoney.ImageCanvas;
 import ru.MonitoringMoney.PayObject;
+import ru.MonitoringMoney.main.MonitoringMoney;
 import ru.MonitoringMoney.types.*;
 import org.apache.commons.lang.StringUtils;
 
@@ -85,9 +86,13 @@ public class ApplicationService implements Serializable {
             instance.images = new HashMap<>();
     }
 
-    public static void writeData() throws IOException {
-        ObjectOutputStream bin = new ObjectOutputStream(new FileOutputStream(ApplicationService.buyFile));
-        bin.writeObject(getInstance());
+    public static void writeData() {
+        try {
+            ObjectOutputStream bin = new ObjectOutputStream(new FileOutputStream(ApplicationService.buyFile));
+            bin.writeObject(getInstance());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public String getTextPayObjects(List<PayObject> payObjects) {
@@ -146,11 +151,15 @@ public class ApplicationService implements Serializable {
             users.add((Users) newValue);
         }
 
-        try {
-            writeData();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        writeData();
         return newValue;
+    }
+
+    public static List<PayObject> getPayObjects() {
+        List<PayObject> payObjects = MonitoringMoney.frame.getPayObjectWithCurrentFilters();
+        if (payObjects.isEmpty()) {
+            payObjects = ApplicationService.getInstance().getPayObjectsWithFilters(null, null, null, null, null, null, null,null);
+        }
+        return payObjects;
     }
 }

@@ -15,7 +15,6 @@ import ru.MonitoringMoney.main.MonitoringMoney;
 
 import java.awt.*;
 import java.util.*;
-import java.util.List;
 
 /**
  * Сервис для работы с компонентами графиков.
@@ -95,7 +94,7 @@ public class GraphicsService {
     public static TimeSeriesCollection getTimeSeriesData() {
         Map<String, Map<Date, Integer>> valueMap = new HashMap<>();
 
-        for (PayObject payObject : getPayObjects()) {
+        for (PayObject payObject : ApplicationService.getPayObjects()) {
             String name;
             Integer coast;
             Date date;
@@ -145,7 +144,7 @@ public class GraphicsService {
 
     public static DefaultPieDataset getCountMoneyPieData() {
         Map<String, Integer> valueMap = new HashMap<>();
-        for (PayObject payObject : getPayObjects()) {
+        for (PayObject payObject : ApplicationService.getPayObjects()) {
             String name;
             Integer coast;
             if (!MonitoringMoney.frame.isUsePayType()) {
@@ -202,14 +201,6 @@ public class GraphicsService {
             defaultPieDataset.setValue(value.getKey(), value.getValue());
         }
         return defaultPieDataset;
-    }
-
-    private static List<PayObject> getPayObjects() {
-        List<PayObject> payObjects = MonitoringMoney.frame.getPayObjectWithCurrentFilters();
-        if (payObjects.isEmpty()) {
-            payObjects = ApplicationService.getInstance().getPayObjectsWithFilters(null, null, null, null, null, null, null,null);
-        }
-        return payObjects;
     }
 
 }

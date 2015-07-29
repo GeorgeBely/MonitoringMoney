@@ -25,12 +25,8 @@ public class CalendarService {
             setBounds(bound);
             setUI(DarkSteelCalendarUI.createUI(this));
             getCalendarModel().setFirstDayOfWeek(DayOfWeek.MONDAY);
-            setCalendarCellRenderer(getCustomCellRenderer());
+            setCalendarCellRenderer(new CustomCellRenderer());
         }};
-    }
-
-    public static CustomCellRenderer getCustomCellRenderer() {
-        return new CustomCellRenderer();
     }
 }
 

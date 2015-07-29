@@ -11,7 +11,6 @@ import org.apache.commons.lang.time.DateUtils;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -101,7 +100,7 @@ public class FrameAdd extends JFrame{
                 public void mouseEntered(MouseEvent e) {}
                 public void mouseClicked(MouseEvent e) {}
                 public void mousePressed(MouseEvent e) {
-                    new FrameCalendar(dateText);
+                    new CalendarFrame(dateText);
                 }
             });
         }};
@@ -144,11 +143,7 @@ public class FrameAdd extends JFrame{
                 pay.setUser((Users) userSelect.getSelectedItem());
                 ApplicationService.getInstance().payObjects.add(pay);
 
-                try {
-                    ApplicationService.writeData();
-                } catch (IOException e1) {
-                    e1.printStackTrace();
-                }
+                ApplicationService.writeData();
                 MonitoringMoney.frame.refreshText();
                 hideFrame();
             });

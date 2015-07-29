@@ -23,7 +23,7 @@ import java.util.List;
 public class MainFrame extends JFrame {
 
     /** Ширина фрейма */
-    private static final int FRAME_WIDTH = 500;
+    private static final int FRAME_WIDTH = 510;
 
     /** Высота фрейма */
     private static final int FRAME_HEIGHT = 260;
@@ -48,6 +48,7 @@ public class MainFrame extends JFrame {
     public JComboBox userSelect;
     private JLabel labelSumPrice;
     private FrameGraphics frameGraphics;
+    public EditFrame editFrame;
 
 
     public MainFrame() {
@@ -71,7 +72,7 @@ public class MainFrame extends JFrame {
         }};
         JScrollPane textScrollPane = new JScrollPane() {{
             setViewportView(text);
-            setBounds(250, 5, 240, 186);
+            setBounds(250, 5, 250, 186);
         }};
         panel.add(textScrollPane);
 
@@ -163,7 +164,7 @@ public class MainFrame extends JFrame {
                 public void mouseEntered(MouseEvent e) {}
                 public void mouseClicked(MouseEvent e) {}
                 public void mousePressed(MouseEvent e) {
-                    new FrameCalendar(dateFromText);
+                    new CalendarFrame(dateFromText);
                 }
             });
         }};
@@ -183,7 +184,7 @@ public class MainFrame extends JFrame {
                 public void mouseEntered(MouseEvent e) {}
                 public void mouseClicked(MouseEvent e) {}
                 public void mousePressed(MouseEvent e) {
-                    new FrameCalendar(dateToText);
+                    new CalendarFrame(dateToText);
                 }
             });
         }};
@@ -207,11 +208,18 @@ public class MainFrame extends JFrame {
         panel.add(buttonAdd);
 
         JButton buttonGraphics = new JButton() {{
-            setBounds(460, 195, 30, 30);
+            setBounds(470, 195, 30, 30);
             addActionListener(e -> EventQueue.invokeLater(() -> frameGraphics = new FrameGraphics()));
             setIcon(ImageService.getGraphicsButtonIcon());
         }};
         panel.add(buttonGraphics);
+
+        JButton buttonEditPays = new JButton() {{
+            setBounds(435, 195, 30, 30);
+            addActionListener(e -> EventQueue.invokeLater(() -> editFrame = new EditFrame()));
+            setIcon(ImageService.getEditButtonIcon());
+        }};
+        panel.add(buttonEditPays);
 
         refreshText();
     }
@@ -222,6 +230,8 @@ public class MainFrame extends JFrame {
         labelSumPrice.setText(PREFIX_LABEL_SUM_PRICE + " "  + ApplicationService.getInstance().getSumPrice(getPayObjectWithCurrentFilters()));
         if (frameGraphics != null)
             frameGraphics.update();
+        if (editFrame != null)
+            editFrame.updateTable();
     }
 
     public List<PayObject> getPayObjectWithCurrentFilters() {

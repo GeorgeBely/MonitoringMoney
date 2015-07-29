@@ -17,22 +17,41 @@ public class ImageService {
     private static final String LOCATION_ICONS = LOCATION_IMAGES + "/icons";
 
 
-
     /**
      * @return иконку для кнопки отображения графиков.
      */
     public static ImageIcon getGraphicsButtonIcon() {
-        Image image = getImage("graphicsButton.jpg");
-        if (image == null)
-            return null;
-        return new ImageIcon(image);
+        return getIcon("graphicsButton.jpg");
     }
 
     /**
      * @return иконку для кнопки добавления типов.
      */
     public static ImageIcon getPlusButtonIcon() {
-        Image image = getImage("plus.png");
+        return getIcon("plus.png");
+    }
+
+    /**
+     * @return иконку для кнопки редактирования покупок.
+     */
+    public static ImageIcon getEditButtonIcon() {
+        return getIcon("edit.jpg");
+    }
+
+    /**
+     * @return иконку для кнопки удаления покупки.
+     */
+    public static ImageIcon getRemoveButtonIcon() {
+        return getIcon("remove.jpg");
+    }
+
+
+    /**
+     * @param name имя файла иконки
+     * @return объект иконки
+     */
+    public static ImageIcon getIcon(String name) {
+        Image image = getImage(name);
         if (image == null)
             return null;
         return new ImageIcon(image);
