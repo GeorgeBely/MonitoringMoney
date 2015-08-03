@@ -1,5 +1,6 @@
 package ru.MonitoringMoney.services;
 
+import org.apache.commons.lang.StringUtils;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.labels.StandardPieSectionLabelGenerator;
@@ -22,6 +23,10 @@ import java.util.*;
 public class GraphicsService {
 
     private static final String ANOTHER_BLOCK_NAME = "Другие";
+
+    public static final String[] GRAPHICS_NAMES = new String[]{"Процентное соотношение покупок", "График затрат по времени"};
+
+    public static final String[] VIEW_DATA_NAMES = new String[]{"", "Тип покупки", "Уровень важности", "Платильщик"};
 
 
     /**
@@ -58,14 +63,14 @@ public class GraphicsService {
      * @return компонент графика "График изминения значений по датам".
      */
     public static JFreeChart getTimeSeriesComponent(String name, String nameX, String nameY, Color background) {
-        JFreeChart chartCategory = ChartFactory.createTimeSeriesChart(name, nameX, nameY, getTimeSeriesData());
+        JFreeChart chartCategory = ChartFactory.createTimeSeriesChart(name, nameX, nameY, getTimeSeriesData(""));
         chartCategory.setBackgroundPaint(background);
 
         return chartCategory;
     }
 
-    public static void updatePieData(JFreeChart pie) {
-        DefaultPieDataset data = getCountMoneyPieData();
+    public static void updatePieData(JFreeChart pie, String selectData) {
+        DefaultPieDataset data = getCountMoneyPieData(selectData);
         PiePlot plot = (PiePlot) pie.getPlot();
 
         plot.setExplodePercent((String) data.getKeys().get(0), 0.20);
@@ -87,26 +92,26 @@ public class GraphicsService {
         }
     }
 
-    public static void updateTimeSeriesData(JFreeChart timeSeries) {
-        ((XYPlot) timeSeries.getPlot()).setDataset(getTimeSeriesData());
+    public static void updateTimeSeriesData(JFreeChart timeSeries, String selectData) {
+        ((XYPlot) timeSeries.getPlot()).setDataset(getTimeSeriesData(selectData));
     }
 
-    public static TimeSeriesCollection getTimeSeriesData() {
+    public static TimeSeriesCollection getTimeSeriesData(String selectData) {
         Map<String, Map<Date, Integer>> valueMap = new HashMap<>();
 
         for (PayObject payObject : ApplicationService.getPayObjects()) {
             String name;
             Integer coast;
             Date date;
-            if (!MonitoringMoney.frame.isUsePayType()) {
+            if ((StringUtils.isBlank(selectData) && !MonitoringMoney.frame.isUsePayType()) || VIEW_DATA_NAMES[1].equals(selectData)) {
                 name = payObject.getPayType().toString();
                 coast = payObject.getPrice();
                 date = payObject.getDate();
-            } else if (!MonitoringMoney.frame.isUseImportant()) {
+            } else if ((StringUtils.isBlank(selectData) && !MonitoringMoney.frame.isUseImportant()) || VIEW_DATA_NAMES[2].equals(selectData)) {
                 name = payObject.getImportance().toString();
                 coast = payObject.getPrice();
                 date = payObject.getDate();
-            } else if (!MonitoringMoney.frame.isUseUser()) {
+            } else if ((StringUtils.isBlank(selectData) && !MonitoringMoney.frame.isUseUser()) || VIEW_DATA_NAMES[3].equals(selectData)) {
                 name = payObject.getUser().toString();
                 coast = payObject.getPrice();
                 date = payObject.getDate();
@@ -142,18 +147,18 @@ public class GraphicsService {
         return dataSet;
     }
 
-    public static DefaultPieDataset getCountMoneyPieData() {
+    public static DefaultPieDataset getCountMoneyPieData(String selectData) {
         Map<String, Integer> valueMap = new HashMap<>();
         for (PayObject payObject : ApplicationService.getPayObjects()) {
             String name;
             Integer coast;
-            if (!MonitoringMoney.frame.isUsePayType()) {
+            if ((StringUtils.isBlank(selectData) && !MonitoringMoney.frame.isUsePayType()) || VIEW_DATA_NAMES[1].equals(selectData)) {
                 name = payObject.getPayType().toString();
                 coast = payObject.getPrice();
-            } else if (!MonitoringMoney.frame.isUseImportant()) {
+            } else if ((StringUtils.isBlank(selectData) && !MonitoringMoney.frame.isUseImportant()) || VIEW_DATA_NAMES[2].equals(selectData)) {
                 name = payObject.getImportance().toString();
                 coast = payObject.getPrice();
-            } else if (!MonitoringMoney.frame.isUseUser()) {
+            } else if ((StringUtils.isBlank(selectData) && !MonitoringMoney.frame.isUseUser()) || VIEW_DATA_NAMES[3].equals(selectData)) {
                 name = payObject.getUser().toString();
                 coast = payObject.getPrice();
             } else {

@@ -47,7 +47,7 @@ public class MainFrame extends JFrame {
     public JFormattedTextField dateToText;
     public JComboBox userSelect;
     private JLabel labelSumPrice;
-    private FrameGraphics frameGraphics;
+    private GraphicsFrame graphicsFrame;
     public EditFrame editFrame;
 
 
@@ -209,7 +209,7 @@ public class MainFrame extends JFrame {
 
         JButton buttonGraphics = new JButton() {{
             setBounds(470, 195, 30, 30);
-            addActionListener(e -> EventQueue.invokeLater(() -> frameGraphics = new FrameGraphics()));
+            addActionListener(e -> EventQueue.invokeLater(() -> graphicsFrame = new GraphicsFrame()));
             setIcon(ImageService.getGraphicsButtonIcon());
         }};
         panel.add(buttonGraphics);
@@ -228,8 +228,8 @@ public class MainFrame extends JFrame {
     public void refreshText() {
         text.setText(ApplicationService.getInstance().getTextPayObjects(getPayObjectWithCurrentFilters()));
         labelSumPrice.setText(PREFIX_LABEL_SUM_PRICE + " "  + ApplicationService.getInstance().getSumPrice(getPayObjectWithCurrentFilters()));
-        if (frameGraphics != null)
-            frameGraphics.update();
+        if (graphicsFrame != null)
+            graphicsFrame.updateData();
         if (editFrame != null)
             editFrame.updateTable();
     }
