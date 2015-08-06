@@ -17,32 +17,49 @@ public class ImageService {
     private static final String LOCATION_ICONS = LOCATION_IMAGES + "/icons";
 
 
-    /**
-     * @return иконку для кнопки отображения графиков.
-     */
+    /** @return иконку для кнопки отображения графиков. */
     public static ImageIcon getGraphicsButtonIcon() {
-        return getIcon("graphicsButton.jpg");
+        return getIcon("graphicsButton.png");
     }
 
-    /**
-     * @return иконку для кнопки добавления типов.
-     */
+    /** @return изображение иконки графиков. */
+    public static Image getGraphicsImage() {
+        return getImage("graphicsButton.png");
+    }
+
+    /** @return изображение иконки календаря. */
+    public static Image getCalendarImage() {
+        return getImage("calendar.png");
+    }
+
+    /** @return изображение иконки редактирования. */
+    public static Image getEditImage() {
+        return getImage("edit.png");
+    }
+
+    /** @return иконку для кнопки добавления типов. */
     public static ImageIcon getPlusButtonIcon() {
         return getIcon("plus.png");
     }
 
-    /**
-     * @return иконку для кнопки редактирования покупок.
-     */
-    public static ImageIcon getEditButtonIcon() {
-        return getIcon("edit.jpg");
+    /** @return изображение иконки плюса */
+    public static Image getPlusImage() {
+        return getImage("plus.png");
     }
 
-    /**
-     * @return иконку для кнопки удаления покупки.
-     */
+    /** @return изображение основной иконки приложения */
+    public static Image getMoneyImage() {
+        return getImage("money.png");
+    }
+
+    /** @return иконку для кнопки редактирования покупок. */
+    public static ImageIcon getEditButtonIcon() {
+        return getIcon("edit.png");
+    }
+
+    /** @return иконку для кнопки удаления покупки. */
     public static ImageIcon getRemoveButtonIcon() {
-        return getIcon("remove.jpg");
+        return getIcon("remove.png");
     }
 
 
@@ -57,6 +74,10 @@ public class ImageService {
         return new ImageIcon(image);
     }
 
+    /**
+     * @param imageName имя файла изображения
+     * @return объект изображения
+     */
     public static Image getImage(String imageName) {
         try {
             ImageCanvas image = ApplicationService.getInstance().images.get(imageName);

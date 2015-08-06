@@ -3,6 +3,7 @@ package ru.MonitoringMoney.frame;
 import ru.MonitoringMoney.PayObject;
 import ru.MonitoringMoney.main.MonitoringMoney;
 import ru.MonitoringMoney.services.ApplicationService;
+import ru.MonitoringMoney.services.ImageService;
 import ru.MonitoringMoney.services.TableService;
 import ru.MonitoringMoney.types.ImportanceType;
 import ru.MonitoringMoney.types.PayType;
@@ -47,6 +48,7 @@ public class EditFrame extends JFrame {
         setResizable(false);
         setVisible(true);
         setTitle(FRAME_NAME);
+        setIconImage(ImageService.getEditImage());
 
         JPanel panel = new JPanel() {{
             setFocusable(true);
@@ -105,7 +107,7 @@ public class EditFrame extends JFrame {
             }
             payObject.setDescription((String) vector.get(5));
         }
-        MonitoringMoney.frame.refreshText();
+        MonitoringMoney.mainFrame.refreshText();
         ApplicationService.writeData();
     }
 

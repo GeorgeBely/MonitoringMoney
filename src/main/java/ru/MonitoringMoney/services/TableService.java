@@ -169,7 +169,7 @@ public class TableService {
         }
 
         public boolean shouldSelectCell(EventObject anEvent) {
-            MonitoringMoney.frame.editFrame.removeItemList.add((PayObject) value);
+            MonitoringMoney.mainFrame.editFrame.removeItemList.add((PayObject) value);
             ((DefaultTableModel) table.getModel()).removeRow(row);
             return true;
         }

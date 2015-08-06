@@ -4,6 +4,7 @@ package ru.MonitoringMoney.frame;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import ru.MonitoringMoney.services.GraphicsService;
+import ru.MonitoringMoney.services.ImageService;
 
 import javax.swing.*;
 import java.awt.*;
@@ -34,6 +35,7 @@ public class GraphicsFrame extends JFrame {
         setSize(FRAME_WIDTH, FRAME_HEIGHT);
         setVisible(true);
         setTitle(FRAME_NAME);
+        setIconImage(ImageService.getGraphicsImage());
         toFront();
 
         addComponentListener(new ComponentListener() {

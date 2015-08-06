@@ -103,15 +103,15 @@ public class GraphicsService {
             String name;
             Integer coast;
             Date date;
-            if ((StringUtils.isBlank(selectData) && !MonitoringMoney.frame.isUsePayType()) || VIEW_DATA_NAMES[1].equals(selectData)) {
+            if ((StringUtils.isBlank(selectData) && !MonitoringMoney.mainFrame.isUsePayType()) || VIEW_DATA_NAMES[1].equals(selectData)) {
                 name = payObject.getPayType().toString();
                 coast = payObject.getPrice();
                 date = payObject.getDate();
-            } else if ((StringUtils.isBlank(selectData) && !MonitoringMoney.frame.isUseImportant()) || VIEW_DATA_NAMES[2].equals(selectData)) {
+            } else if ((StringUtils.isBlank(selectData) && !MonitoringMoney.mainFrame.isUseImportant()) || VIEW_DATA_NAMES[2].equals(selectData)) {
                 name = payObject.getImportance().toString();
                 coast = payObject.getPrice();
                 date = payObject.getDate();
-            } else if ((StringUtils.isBlank(selectData) && !MonitoringMoney.frame.isUseUser()) || VIEW_DATA_NAMES[3].equals(selectData)) {
+            } else if ((StringUtils.isBlank(selectData) && !MonitoringMoney.mainFrame.isUseUser()) || VIEW_DATA_NAMES[3].equals(selectData)) {
                 name = payObject.getUser().toString();
                 coast = payObject.getPrice();
                 date = payObject.getDate();
@@ -152,13 +152,13 @@ public class GraphicsService {
         for (PayObject payObject : ApplicationService.getPayObjects()) {
             String name;
             Integer coast;
-            if ((StringUtils.isBlank(selectData) && !MonitoringMoney.frame.isUsePayType()) || VIEW_DATA_NAMES[1].equals(selectData)) {
+            if ((StringUtils.isBlank(selectData) && !MonitoringMoney.mainFrame.isUsePayType()) || VIEW_DATA_NAMES[1].equals(selectData)) {
                 name = payObject.getPayType().toString();
                 coast = payObject.getPrice();
-            } else if ((StringUtils.isBlank(selectData) && !MonitoringMoney.frame.isUseImportant()) || VIEW_DATA_NAMES[2].equals(selectData)) {
+            } else if ((StringUtils.isBlank(selectData) && !MonitoringMoney.mainFrame.isUseImportant()) || VIEW_DATA_NAMES[2].equals(selectData)) {
                 name = payObject.getImportance().toString();
                 coast = payObject.getPrice();
-            } else if ((StringUtils.isBlank(selectData) && !MonitoringMoney.frame.isUseUser()) || VIEW_DATA_NAMES[3].equals(selectData)) {
+            } else if ((StringUtils.isBlank(selectData) && !MonitoringMoney.mainFrame.isUseUser()) || VIEW_DATA_NAMES[3].equals(selectData)) {
                 name = payObject.getUser().toString();
                 coast = payObject.getPrice();
             } else {

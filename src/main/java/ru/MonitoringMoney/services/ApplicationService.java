@@ -156,7 +156,7 @@ public class ApplicationService implements Serializable {
     }
 
     public static List<PayObject> getPayObjects() {
-        List<PayObject> payObjects = MonitoringMoney.frame.getPayObjectWithCurrentFilters();
+        List<PayObject> payObjects = MonitoringMoney.mainFrame.getPayObjectWithCurrentFilters();
         if (payObjects.isEmpty()) {
             payObjects = ApplicationService.getInstance().getPayObjectsWithFilters(null, null, null, null, null, null, null,null);
         }

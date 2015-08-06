@@ -1,6 +1,6 @@
 package ru.MonitoringMoney.main;
 
-import ru.MonitoringMoney.frame.FrameAdd;
+import ru.MonitoringMoney.frame.AddFrame;
 import ru.MonitoringMoney.frame.MainFrame;
 import ru.MonitoringMoney.services.ApplicationService;
 
@@ -11,14 +11,14 @@ import java.io.*;
 public class MonitoringMoney implements Serializable {
 
     /** Версия приложения */
-    public static final String VERSION = "1.4.1";
+    public static final String VERSION = "1.4.2";
 
 
     /** Основной фрейм приложения */
-    public static MainFrame frame;
+    public static MainFrame mainFrame;
 
     /** Фрейм добавления покупки */
-    public static FrameAdd frameAdd;
+    public static AddFrame addFrame;
 
 
     public static void main(String args[]) throws IOException, ClassNotFoundException {
@@ -27,7 +27,7 @@ public class MonitoringMoney implements Serializable {
 
         ApplicationService.readData();
 
-        EventQueue.invokeLater(() -> frameAdd = new FrameAdd());
-        EventQueue.invokeLater(() -> frame = new MainFrame());
+        EventQueue.invokeLater(() -> addFrame = new AddFrame());
+        EventQueue.invokeLater(() -> mainFrame = new MainFrame());
     }
 }

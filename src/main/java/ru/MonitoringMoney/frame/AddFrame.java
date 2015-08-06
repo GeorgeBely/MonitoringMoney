@@ -14,7 +14,7 @@ import java.awt.event.*;
 import java.util.Calendar;
 import java.util.Date;
 
-public class FrameAdd extends JFrame{
+public class AddFrame extends JFrame {
 
     /** Ширина фрейма */
     private static final int FRAME_WIDTH = 250;
@@ -33,12 +33,13 @@ public class FrameAdd extends JFrame{
     private JTextArea textDescription;
 
 
-    public FrameAdd() {
+    public AddFrame() {
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         setLocation(screenSize.width / 2 - FRAME_WIDTH / 2, screenSize.height / 2 - FRAME_HEIGHT / 2);
         setSize(FRAME_WIDTH, FRAME_HEIGHT);
         setResizable(false);
         setTitle(FRAME_NAME);
+        setIconImage(ImageService.getPlusImage());
         toFront();
 
         JPanel panel = new JPanel() {{
@@ -56,6 +57,7 @@ public class FrameAdd extends JFrame{
 
         JButton importanceButton = new JButton() {{
             setBounds(210, 5, 30, 30);
+            setBorder(null);
             addActionListener(e -> new FrameEditPropertyValues(ImportanceType.class));
             setIcon(ImageService.getPlusButtonIcon());
         }};
@@ -70,6 +72,7 @@ public class FrameAdd extends JFrame{
 
         JButton payTypeButton = new JButton() {{
             setBounds(210, 40, 30, 30);
+            setBorder(null);
             addActionListener(e -> new FrameEditPropertyValues(PayType.class));
             setIcon(ImageService.getPlusButtonIcon());
         }};
@@ -90,7 +93,6 @@ public class FrameAdd extends JFrame{
         }};
         panel.add(labelFromDate);
 
-//        FORMAT_DATE.setLenient(false);
         dateText = new JFormattedTextField(ApplicationService.FORMAT_DATE) {{
             setBounds(145, 100, 90, 20);
             setValue(new Date());
@@ -125,6 +127,7 @@ public class FrameAdd extends JFrame{
         panel.add(userSelect);
 
         JButton userButton = new JButton() {{
+            setBorder(null);
             setBounds(210, 220, 30, 30);
             addActionListener(e -> new FrameEditPropertyValues(Users.class));
             setIcon(ImageService.getPlusButtonIcon());
@@ -144,7 +147,7 @@ public class FrameAdd extends JFrame{
                 ApplicationService.getInstance().payObjects.add(pay);
 
                 ApplicationService.writeData();
-                MonitoringMoney.frame.refreshText();
+                MonitoringMoney.mainFrame.refreshText();
                 hideFrame();
             });
         }};
@@ -157,14 +160,24 @@ public class FrameAdd extends JFrame{
         panel.add(cancelButton);
     }
 
-
-    public void addSelectElement(Object item, Class className) {
-        if (PayType.class.equals(className))
+    /**
+     * Добавляет переданное значение нового типа покупки в список типов.
+     * По классу определяет в какой список добавить.
+     * Устанавлмвает значение <code>item</code> выбраным в записанном списке.
+     *
+     * @param item      новое значение
+     */
+    public void addSelectElement(Object item) {
+        if (item instanceof PayType) {
             payTypeSelect.addItem((PayType) item);
-        else if (ImportanceType.class.equals(className))
+            payTypeSelect.setSelectedItem(item);
+        } else if (item instanceof ImportanceType) {
             importanceSelect.addItem((ImportanceType) item);
-        else if (Users.class.equals(className))
+            importanceSelect.setSelectedItem(item);
+        } else if (item instanceof Users) {
             userSelect.addItem((Users) item);
+            userSelect.setSelectedItem(item);
+        }
     }
 
     public void showFrame() {

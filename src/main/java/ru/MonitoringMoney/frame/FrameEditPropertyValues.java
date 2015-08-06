@@ -57,7 +57,8 @@ public class FrameEditPropertyValues extends JFrame {
             addActionListener(e -> {
                 Object newValue = ApplicationService.getInstance().addPropertyValue(valueNameText.getText(), className);
                 if (newValue != null) {
-                    MonitoringMoney.frameAdd.addSelectElement(newValue, className);
+                    MonitoringMoney.addFrame.addSelectElement(newValue);
+                    MonitoringMoney.mainFrame.addSelectElement(newValue);
                 }
                 dispose();
             });

@@ -39,13 +39,13 @@ public class MainFrame extends JFrame {
 
     private JTextArea text;
     public JTextField termInput;
-    public JComboBox importanceSelect;
-    public JComboBox payTypeSelect;
+    public JComboBox<ImportanceType> importanceSelect;
+    public JComboBox<PayType> payTypeSelect;
     public JTextField priceFromText;
     public JTextField priceToText;
     public JFormattedTextField dateFromText;
     public JFormattedTextField dateToText;
-    public JComboBox userSelect;
+    public JComboBox<Users> userSelect;
     private JLabel labelSumPrice;
     private GraphicsFrame graphicsFrame;
     public EditFrame editFrame;
@@ -59,6 +59,7 @@ public class MainFrame extends JFrame {
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setVisible(true);
         setTitle(FRAME_NAME + "_" + MonitoringMoney.VERSION);
+        setIconImage(ImageService.getMoneyImage());
 
         JPanel panel = new JPanel(){{
             setFocusable(true);
@@ -103,13 +104,17 @@ public class MainFrame extends JFrame {
         }};
         panel.add(termInput);
 
-        importanceSelect = new JComboBox<Object>(ApplicationService.getInstance().importanceTypes.toArray()) {{
+        importanceSelect = new JComboBox<ImportanceType>() {{
+            ImportanceType[] items = new ImportanceType[ApplicationService.getInstance().importanceTypes.size()];
+            setModel(new DefaultComboBoxModel<>(ApplicationService.getInstance().importanceTypes.toArray(items)));
             setBounds(5, 40, 240, 30);
             addActionListener(e -> refreshText());
         }};
         panel.add(importanceSelect);
 
-        payTypeSelect = new JComboBox<Object>(ApplicationService.getInstance().payTypes.toArray()) {{
+        payTypeSelect = new JComboBox<PayType>() {{
+            PayType[] items = new PayType[ApplicationService.getInstance().payTypes.size()];
+            setModel(new DefaultComboBoxModel<>(ApplicationService.getInstance().payTypes.toArray(items)));
             setBounds(5, 75, 240, 30);
             addActionListener(e -> refreshText());
         }};
@@ -190,7 +195,9 @@ public class MainFrame extends JFrame {
         }};
         panel.add(dateToText);
 
-        userSelect = new JComboBox<Object>(ApplicationService.getInstance().users.toArray()) {{
+        userSelect = new JComboBox<Users>() {{
+            Users[] items = new Users[ApplicationService.getInstance().users.size()];
+            setModel(new DefaultComboBoxModel<>(ApplicationService.getInstance().users.toArray(items)));
             setBounds(5, 160, 240, 30);
             addActionListener(e -> refreshText());
         }};
@@ -203,11 +210,12 @@ public class MainFrame extends JFrame {
 
         JButton buttonAdd = new JButton("Добавить покупку") {{
             setBounds(5, 195, 240, 30);
-            addActionListener(e -> MonitoringMoney.frameAdd.showFrame());
+            addActionListener(e -> MonitoringMoney.addFrame.showFrame());
         }};
         panel.add(buttonAdd);
 
         JButton buttonGraphics = new JButton() {{
+            setBorder(null);
             setBounds(470, 195, 30, 30);
             addActionListener(e -> EventQueue.invokeLater(() -> graphicsFrame = new GraphicsFrame()));
             setIcon(ImageService.getGraphicsButtonIcon());
@@ -215,6 +223,7 @@ public class MainFrame extends JFrame {
         panel.add(buttonGraphics);
 
         JButton buttonEditPays = new JButton() {{
+            setBorder(null);
             setBounds(435, 195, 30, 30);
             addActionListener(e -> EventQueue.invokeLater(() -> editFrame = new EditFrame()));
             setIcon(ImageService.getEditButtonIcon());
@@ -268,5 +277,20 @@ public class MainFrame extends JFrame {
     }
     public boolean isUseUser() {
         return !ApplicationService.EMPTY.equals(((Users) userSelect.getSelectedItem()).getCode());
+    }
+
+    /**
+     * Добавляет переданное значение нового типа покупки в список типов.
+     * По классу определяет в какой список добавить
+     *
+     * @param item      новое значение
+     */
+    public void addSelectElement(Object item) {
+        if (item instanceof PayType)
+            payTypeSelect.addItem((PayType) item);
+        else if (item instanceof ImportanceType)
+            importanceSelect.addItem((ImportanceType) item);
+        else if (item instanceof Users)
+            userSelect.addItem((Users) item);
     }
 }

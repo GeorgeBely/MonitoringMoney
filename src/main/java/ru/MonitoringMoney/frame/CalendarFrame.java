@@ -5,6 +5,7 @@ import com.javaswingcomponents.calendar.listeners.CalendarSelectionEventType;
 import ru.MonitoringMoney.main.MonitoringMoney;
 import ru.MonitoringMoney.services.ApplicationService;
 import ru.MonitoringMoney.services.CalendarService;
+import ru.MonitoringMoney.services.ImageService;
 
 import javax.swing.*;
 import java.awt.*;
@@ -32,7 +33,7 @@ public class CalendarFrame extends JFrame {
         calendar.addCalendarSelectionListener(e -> {
             if (CalendarSelectionEventType.DATE_SELECTED.equals(e.getCalendarSelectionEventType())) {
                 calendarField.setValue(e.getSelectedDates().get(0));
-                MonitoringMoney.frame.refreshText();
+                MonitoringMoney.mainFrame.refreshText();
                 dispose();
             }
         });
@@ -59,6 +60,7 @@ public class CalendarFrame extends JFrame {
         setResizable(false);
         setVisible(true);
         setTitle(FRAME_NAME);
+        setIconImage(ImageService.getCalendarImage());
 
         JPanel panel = new JPanel() {{
             setFocusable(true);
