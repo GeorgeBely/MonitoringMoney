@@ -143,7 +143,7 @@ public class TableService {
                         setBounds(10, 5, 279, 90);
                     }};
 
-                    PopupDialog.showTooltipWindow(textField, new Dimension(300, 110), new Component[]{textScrollPane}, false);
+                    new PopupDialog(textField, new Dimension(300, 110), new Component[]{textScrollPane}, false, true);
                 }
             });
             textField.setEditable(false);

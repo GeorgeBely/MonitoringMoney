@@ -10,10 +10,10 @@ import java.awt.geom.GeneralPath;
 
 public class PopupDialog {
 
-    private static JDialog dialog = null;
-    private static Timer timer;
-    private static float opacity = 0.1f;
-    private static JPanel contentPanel;
+    private JDialog dialog = null;
+    private Timer timer;
+    private float opacity = 0.1f;
+    private JPanel contentPanel;
 
     /**
      * Отрисовывает диалог выше переданного компонента
@@ -23,7 +23,7 @@ public class PopupDialog {
      * @param components    компоненты, которые нужно добавить в диалог
      * @param useCloseCross при {true}, добавить крестик скрывающий диалог
      */
-    public static void showTooltipWindow(JComponent source, Dimension size, Component[] components, boolean useCloseCross) {
+    public PopupDialog(JComponent source, Dimension size, Component[] components, boolean useCloseCross, boolean closeUnfocus) {
         if (dialog != null) {
             dialog.setVisible(false);
         }
@@ -156,13 +156,16 @@ public class PopupDialog {
         dialog.getContentPane().add(contentPanel, BorderLayout.CENTER);
 
         // Закрытие окна при потере фокуса
-        dialog.addWindowFocusListener(new WindowFocusListener() {
-            public void windowGainedFocus(WindowEvent e) { }
-            public void windowLostFocus(WindowEvent e) {
-                closeDialog();
-            }
-        });
+        if (closeUnfocus) {
+            dialog.addWindowFocusListener(new WindowFocusListener() {
+                public void windowGainedFocus(WindowEvent e) {
+                }
 
+                public void windowLostFocus(WindowEvent e) {
+                    closeDialog();
+                }
+            });
+        }
         // Отмена стандартной декорации окна и его прозрачности
         dialog.setUndecorated(true);
         AWTUtilities.setWindowOpaque(dialog, false);
@@ -178,7 +181,7 @@ public class PopupDialog {
     /**
      * Таймер для плавного исчезновения при закрытии
      */
-    public static void closeDialog() {
+    public void closeDialog() {
         if (timer != null && timer.isRunning()) {
             timer.stop();
         }

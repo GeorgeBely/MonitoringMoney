@@ -41,6 +41,7 @@ public class CalendarService {
         Date date = ApplicationService.FORMAT_DATE.parse(textField.getText());
         calendar.getCalendarModel().setDisplayDate(date);
         calendar.getCalendarModel().setSelectedDate(date);
+        PopupDialog popupDialog = new PopupDialog(textField, new Dimension(220, 225), new Component[]{calendar}, false, true);
         calendar.addCalendarSelectionListener(e -> {
             if (CalendarSelectionEventType.DATE_SELECTED.equals(e.getCalendarSelectionEventType())) {
                 if (textField instanceof JFormattedTextField)
@@ -49,10 +50,9 @@ public class CalendarService {
                     textField.setText(ApplicationService.FORMAT_DATE.format(e.getSelectedDates().get(0)));
                 if (!TABLE_EDIT_CALENDAR_ACTION.equals(action))
                     MonitoringMoney.mainFrame.refreshText();
-                PopupDialog.closeDialog();
+                popupDialog.closeDialog();
             }
         });
-        PopupDialog.showTooltipWindow(textField, new Dimension(220, 225), new Component[]{calendar}, false);
     }
 }
 
