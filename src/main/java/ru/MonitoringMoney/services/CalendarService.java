@@ -3,16 +3,23 @@ package ru.MonitoringMoney.services;
 import com.javaswingcomponents.calendar.JSCCalendar;
 import com.javaswingcomponents.calendar.cellrenderers.CalendarCellRenderer;
 import com.javaswingcomponents.calendar.cellrenderers.CellRendererComponentParameter;
+import com.javaswingcomponents.calendar.listeners.CalendarSelectionEventType;
 import com.javaswingcomponents.calendar.model.DayOfWeek;
 import com.javaswingcomponents.calendar.plaf.darksteel.*;
+import ru.MonitoringMoney.frame.PopupDialog;
+import ru.MonitoringMoney.main.MonitoringMoney;
 
 import javax.swing.*;
 import java.awt.*;
+import java.text.ParseException;
+import java.util.Date;
 
 /**
  * Сервис для работы с компонентом календарь.
  */
 public class CalendarService {
+
+    public static final String TABLE_EDIT_CALENDAR_ACTION = "editTableAction";
 
 
     /**
@@ -27,6 +34,25 @@ public class CalendarService {
             getCalendarModel().setFirstDayOfWeek(DayOfWeek.MONDAY);
             setCalendarCellRenderer(new CustomCellRenderer());
         }};
+    }
+
+    public static void addPopupCalendarDialog(JTextField textField, String action) throws ParseException {
+        JSCCalendar calendar = CalendarService.getCalendarComponent(new Rectangle(10, 5, 200, 200));
+        Date date = ApplicationService.FORMAT_DATE.parse(textField.getText());
+        calendar.getCalendarModel().setDisplayDate(date);
+        calendar.getCalendarModel().setSelectedDate(date);
+        calendar.addCalendarSelectionListener(e -> {
+            if (CalendarSelectionEventType.DATE_SELECTED.equals(e.getCalendarSelectionEventType())) {
+                if (textField instanceof JFormattedTextField)
+                    ((JFormattedTextField) textField).setValue(e.getSelectedDates().get(0));
+                else
+                    textField.setText(ApplicationService.FORMAT_DATE.format(e.getSelectedDates().get(0)));
+                if (!TABLE_EDIT_CALENDAR_ACTION.equals(action))
+                    MonitoringMoney.mainFrame.refreshText();
+                PopupDialog.closeDialog();
+            }
+        });
+        PopupDialog.showTooltipWindow(textField, new Dimension(220, 225), new Component[]{calendar}, false);
     }
 }
 

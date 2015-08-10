@@ -4,6 +4,7 @@ package ru.MonitoringMoney.frame;
 import ru.MonitoringMoney.*;
 import ru.MonitoringMoney.main.MonitoringMoney;
 import ru.MonitoringMoney.services.ApplicationService;
+import ru.MonitoringMoney.services.CalendarService;
 import ru.MonitoringMoney.services.ImageService;
 import ru.MonitoringMoney.types.*;
 import org.apache.commons.lang.time.DateUtils;
@@ -11,6 +12,7 @@ import org.apache.commons.lang.time.DateUtils;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -102,7 +104,7 @@ public class AddFrame extends JFrame {
                 public void mouseEntered(MouseEvent e) {}
                 public void mouseClicked(MouseEvent e) {}
                 public void mousePressed(MouseEvent e) {
-                    new CalendarFrame(dateText);
+                    try { CalendarService.addPopupCalendarDialog(dateText, ""); } catch (ParseException ignore) { }
                 }
             });
         }};
@@ -115,7 +117,7 @@ public class AddFrame extends JFrame {
 
         JScrollPane textScrollPane = new JScrollPane() {{
             setViewportView(textDescription);
-            setBounds(5, 130, 240, 60);
+            setBounds(5, 130, 235, 80);
         }};
         panel.add(textScrollPane);
 

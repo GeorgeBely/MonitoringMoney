@@ -2,8 +2,7 @@ package ru.MonitoringMoney.services;
 
 
 import ru.MonitoringMoney.PayObject;
-import ru.MonitoringMoney.frame.CalendarFrame;
-import ru.MonitoringMoney.frame.TextAreaFrame;
+import ru.MonitoringMoney.frame.PopupDialog;
 import ru.MonitoringMoney.main.MonitoringMoney;
 
 import javax.swing.*;
@@ -11,6 +10,8 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import java.awt.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.text.DateFormat;
@@ -82,7 +83,7 @@ public class TableService {
                 public void mouseEntered(MouseEvent e) { }
                 public void mouseClicked(MouseEvent e) { }
                 public void mousePressed(MouseEvent e) {
-                    try { new CalendarFrame(textField); } catch (ParseException ignore) {}
+                    try { CalendarService.addPopupCalendarDialog(textField, CalendarService.TABLE_EDIT_CALENDAR_ACTION); } catch (ParseException ignore) { }
                 }
             });
             textField.setEditable(false);
@@ -124,7 +125,25 @@ public class TableService {
                 public void mouseEntered(MouseEvent e) { }
                 public void mouseClicked(MouseEvent e) { }
                 public void mousePressed(MouseEvent e) {
-                    try { new TextAreaFrame(textField); } catch (ParseException ignore) {}
+
+                    JTextArea textArea = new JTextArea() {{
+                        setLineWrap(true);
+                        setWrapStyleWord(true);
+                        setText(textField.getText());
+                    }};
+                    textArea.addKeyListener(new KeyListener() {
+                        public void keyTyped(KeyEvent e) { }
+                        public void keyPressed(KeyEvent e) { }
+                        public void keyReleased(KeyEvent e) {
+                            textField.setText(textArea.getText());
+                        }
+                    });
+                    JScrollPane textScrollPane = new JScrollPane() {{
+                        setViewportView(textArea);
+                        setBounds(10, 5, 279, 90);
+                    }};
+
+                    PopupDialog.showTooltipWindow(textField, new Dimension(300, 110), new Component[]{textScrollPane}, false);
                 }
             });
             textField.setEditable(false);

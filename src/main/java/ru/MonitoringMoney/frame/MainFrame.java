@@ -3,6 +3,7 @@ package ru.MonitoringMoney.frame;
 import ru.MonitoringMoney.PayObject;
 import ru.MonitoringMoney.main.MonitoringMoney;
 import ru.MonitoringMoney.services.ApplicationService;
+import ru.MonitoringMoney.services.CalendarService;
 import ru.MonitoringMoney.services.ImageService;
 import ru.MonitoringMoney.types.ImportanceType;
 import ru.MonitoringMoney.types.PayType;
@@ -16,6 +17,7 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -169,7 +171,7 @@ public class MainFrame extends JFrame {
                 public void mouseEntered(MouseEvent e) {}
                 public void mouseClicked(MouseEvent e) {}
                 public void mousePressed(MouseEvent e) {
-                    new CalendarFrame(dateFromText);
+                    try { CalendarService.addPopupCalendarDialog(dateFromText, ""); } catch (ParseException ignore) { }
                 }
             });
         }};
@@ -189,7 +191,7 @@ public class MainFrame extends JFrame {
                 public void mouseEntered(MouseEvent e) {}
                 public void mouseClicked(MouseEvent e) {}
                 public void mousePressed(MouseEvent e) {
-                    new CalendarFrame(dateToText);
+                    try { CalendarService.addPopupCalendarDialog(dateToText, ""); } catch (ParseException ignore) { }
                 }
             });
         }};
