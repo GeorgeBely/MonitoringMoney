@@ -8,7 +8,7 @@ import java.util.Objects;
 /**
  *
  */
-public class ImportanceType implements Serializable {
+public class ImportanceType implements TypeValue, Serializable {
 
     private static final long serialVersionUID = 3734720365475548880L;
 

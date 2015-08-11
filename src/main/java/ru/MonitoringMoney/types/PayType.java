@@ -8,7 +8,7 @@ import java.util.Objects;
 /**
  *
  */
-public class PayType implements Serializable {
+public class PayType implements TypeValue, Serializable {
 
     private static final long serialVersionUID = -9031825584982262846L;
 

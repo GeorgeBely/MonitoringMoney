@@ -8,7 +8,7 @@ import java.util.Objects;
 /**
  *
  */
-public class Users implements Serializable {
+public class Users implements TypeValue, Serializable {
 
     private static final long serialVersionUID = -5378473412329676164L;
 

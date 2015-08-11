@@ -66,6 +66,8 @@ public class AddFrame extends JFrame {
         importanceSelect = new JComboBox<ImportanceType>() {{
             ImportanceType[] items = new ImportanceType[ApplicationService.getInstance().importanceTypes.size()];
             setModel(new DefaultComboBoxModel<>(ApplicationService.getInstance().importanceTypes.toArray(items)));
+            if (items.length == 2)
+                setSelectedIndex(1);
             setBounds(5, 5, 200, 30);
             addMouseListener(createPopupCloseMouseListener());
         }};
@@ -85,6 +87,8 @@ public class AddFrame extends JFrame {
         payTypeSelect = new JComboBox<PayType>() {{
             PayType[] items = new PayType[ApplicationService.getInstance().payTypes.size()];
             setModel(new DefaultComboBoxModel<>(ApplicationService.getInstance().payTypes.toArray(items)));
+            if (items.length == 2)
+                setSelectedIndex(1);
             setBounds(5, 40, 200, 30);
             addMouseListener(createPopupCloseMouseListener());
         }};
@@ -155,6 +159,8 @@ public class AddFrame extends JFrame {
         userSelect = new JComboBox<Users>() {{
             Users[] items = new Users[ApplicationService.getInstance().users.size()];
             setModel(new DefaultComboBoxModel<>(ApplicationService.getInstance().users.toArray(items)));
+            if (items.length == 2)
+                setSelectedIndex(1);
             setBounds(5, 220, 200, 30);
             addActionListener(e -> disposePopup());
         }};

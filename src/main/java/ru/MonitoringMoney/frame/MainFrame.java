@@ -4,20 +4,20 @@ import ru.MonitoringMoney.PayObject;
 import ru.MonitoringMoney.main.MonitoringMoney;
 import ru.MonitoringMoney.services.ApplicationService;
 import ru.MonitoringMoney.services.CalendarService;
+import ru.MonitoringMoney.services.CheckBoxListService;
 import ru.MonitoringMoney.services.ImageService;
 import ru.MonitoringMoney.types.ImportanceType;
 import ru.MonitoringMoney.types.PayType;
+import ru.MonitoringMoney.types.TypeValue;
 import ru.MonitoringMoney.types.Users;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.awt.event.*;
 import java.text.ParseException;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
@@ -41,13 +41,13 @@ public class MainFrame extends JFrame {
 
     private JTextArea text;
     public JTextField termInput;
-    public JComboBox<ImportanceType> importanceSelect;
-    public JComboBox<PayType> payTypeSelect;
+    private JComboBox<CheckBoxListService.CheckComboValue>  importanceSelect;
+    private JComboBox<CheckBoxListService.CheckComboValue> payTypeSelect;
     public JTextField priceFromText;
     public JTextField priceToText;
     public JFormattedTextField dateFromText;
     public JFormattedTextField dateToText;
-    public JComboBox<Users> userSelect;
+    private JComboBox<CheckBoxListService.CheckComboValue> userSelect;
     private JLabel labelSumPrice;
     private GraphicsFrame graphicsFrame;
     public EditFrame editFrame;
@@ -103,22 +103,29 @@ public class MainFrame extends JFrame {
                 }
                 public void keyTyped(KeyEvent e) {}
             });
+            addFocusListener(new FocusListener() {
+                public void focusGained(FocusEvent e) { }
+                public void focusLost(FocusEvent e) {
+                    if ("".equals(getText()))
+                        setText(TERM_INPUT_DEFAULT_TEXT);
+                }
+            });
         }};
         panel.add(termInput);
 
-        importanceSelect = new JComboBox<ImportanceType>() {{
-            ImportanceType[] items = new ImportanceType[ApplicationService.getInstance().importanceTypes.size()];
-            setModel(new DefaultComboBoxModel<>(ApplicationService.getInstance().importanceTypes.toArray(items)));
+        importanceSelect = new JComboBox<CheckBoxListService.CheckComboValue>() {{
+            setModel(CheckBoxListService.getModel(ApplicationService.getInstance().importanceTypes));
             setBounds(5, 40, 240, 30);
-            addActionListener(e -> refreshText());
+            setRenderer(new CheckBoxListService.CheckComboRenderer());
+            addActionListener(new CheckBoxListService.CheckBoxList());
         }};
         panel.add(importanceSelect);
 
-        payTypeSelect = new JComboBox<PayType>() {{
-            PayType[] items = new PayType[ApplicationService.getInstance().payTypes.size()];
-            setModel(new DefaultComboBoxModel<>(ApplicationService.getInstance().payTypes.toArray(items)));
+        payTypeSelect = new JComboBox<CheckBoxListService.CheckComboValue>() {{
+            setModel(CheckBoxListService.getModel(ApplicationService.getInstance().payTypes));
             setBounds(5, 75, 240, 30);
-            addActionListener(e -> refreshText());
+            setRenderer(new CheckBoxListService.CheckComboRenderer());
+            addActionListener(new CheckBoxListService.CheckBoxList());
         }};
         panel.add(payTypeSelect);
 
@@ -197,11 +204,11 @@ public class MainFrame extends JFrame {
         }};
         panel.add(dateToText);
 
-        userSelect = new JComboBox<Users>() {{
-            Users[] items = new Users[ApplicationService.getInstance().users.size()];
-            setModel(new DefaultComboBoxModel<>(ApplicationService.getInstance().users.toArray(items)));
+        userSelect = new JComboBox<CheckBoxListService.CheckComboValue>() {{
+            setModel(CheckBoxListService.getModel(ApplicationService.getInstance().users));
             setBounds(5, 160, 240, 30);
-            addActionListener(e -> refreshText());
+            setRenderer(new CheckBoxListService.CheckComboRenderer());
+            addActionListener(new CheckBoxListService.CheckBoxList());
         }};
         panel.add(userSelect);
 
@@ -265,20 +272,40 @@ public class MainFrame extends JFrame {
                 priceTo = Integer.parseInt(priceToText.getText());
         } catch (Exception ignore) {}
 
+        List<TypeValue> selectedPayTypes = getSelectedValues((DefaultComboBoxModel) payTypeSelect.getModel());
+        List<TypeValue> selectedImportanceTypes = getSelectedValues((DefaultComboBoxModel) importanceSelect.getModel());
+        List<TypeValue> selectedUsers = getSelectedValues((DefaultComboBoxModel) userSelect.getModel());
+
         return ApplicationService.getInstance().getPayObjectsWithFilters(term, dateFrom, dateTo, priceFrom,
-                priceTo, (ImportanceType) importanceSelect.getSelectedItem(), (PayType) payTypeSelect.getSelectedItem(),
-                (Users) userSelect.getSelectedItem());
+                priceTo, selectedImportanceTypes, selectedPayTypes, selectedUsers);
+    }
+
+    private List<TypeValue> getSelectedValues(DefaultComboBoxModel defaultModel) {
+        List<TypeValue> selected = new ArrayList<>();
+        for (int i = 0; i < defaultModel.getSize(); i++) {
+            CheckBoxListService.CheckComboValue value = (CheckBoxListService.CheckComboValue) defaultModel.getElementAt(i);
+            if (value.isSelected()) {
+                selected.add(value.getType());
+            }
+        }
+        return selected;
     }
 
     public boolean isUsePayType() {
-        return !ApplicationService.EMPTY.equals(((PayType) payTypeSelect.getSelectedItem()).getCode());
+        List<TypeValue> selectedPayTypes = getSelectedValues((DefaultComboBoxModel) payTypeSelect.getModel());
+        return selectedPayTypes.size() == 0 ||
+                (selectedPayTypes.size() == 1 && !ApplicationService.EMPTY.equals(selectedPayTypes.get(0).getCode()));
     }
 
     public boolean isUseImportant() {
-        return !ApplicationService.EMPTY.equals(((ImportanceType) importanceSelect.getSelectedItem()).getCode());
+        List<TypeValue> selectedPayTypes = getSelectedValues((DefaultComboBoxModel) importanceSelect.getModel());
+        return selectedPayTypes.size() == 0 ||
+                (selectedPayTypes.size() == 1 && !ApplicationService.EMPTY.equals(selectedPayTypes.get(0).getCode()));
     }
     public boolean isUseUser() {
-        return !ApplicationService.EMPTY.equals(((Users) userSelect.getSelectedItem()).getCode());
+        List<TypeValue> selectedPayTypes = getSelectedValues((DefaultComboBoxModel) userSelect.getModel());
+        return selectedPayTypes.size() == 0 ||
+                (selectedPayTypes.size() == 1 && !ApplicationService.EMPTY.equals(selectedPayTypes.get(0).getCode()));
     }
 
     /**
@@ -289,10 +316,10 @@ public class MainFrame extends JFrame {
      */
     public void addSelectElement(Object item) {
         if (item instanceof PayType)
-            payTypeSelect.addItem((PayType) item);
+            payTypeSelect.addItem(new CheckBoxListService.CheckComboValue((PayType) item, false));
         else if (item instanceof ImportanceType)
-            importanceSelect.addItem((ImportanceType) item);
+            importanceSelect.addItem(new CheckBoxListService.CheckComboValue((ImportanceType) item, false));
         else if (item instanceof Users)
-            userSelect.addItem((Users) item);
+            userSelect.addItem(new CheckBoxListService.CheckComboValue((Users) item, false));
     }
 }

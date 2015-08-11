@@ -70,6 +70,8 @@ public class ApplicationService implements Serializable {
         for (PayTypeDefault defaultType : PayTypeDefault.values()) {
             payTypes.add(new PayType(defaultType));
         }
+
+        users.add(new Users(EMPTY, ""));
     }
 
     public static void createNewData() throws IOException {
@@ -118,17 +120,24 @@ public class ApplicationService implements Serializable {
     }
 
     public List<PayObject> getPayObjectsWithFilters(String term, Date dateFrom, Date dateTo, Integer priseFrom, Integer priseTo,
-                                                    ImportanceType importanceType, PayType payType, Users user) {
+                                                    List<TypeValue> importanceTypes, List<TypeValue> payTypes, List<TypeValue> users) {
         return payObjects.stream()
                 .filter(obj -> StringUtils.isBlank(term) || obj.toString().toLowerCase().contains(term.toLowerCase()))
                 .filter(obj -> dateFrom == null || obj.getDate().equals(dateFrom) || obj.getDate().after(dateFrom))
                 .filter(obj -> dateTo == null || obj.getDate().before(dateTo))
                 .filter(obj -> priseFrom == null || obj.getPrice() >= priseFrom)
                 .filter(obj -> priseTo == null || obj.getPrice() <= priseTo)
-                .filter(obj -> importanceType == null || EMPTY.equals(importanceType.getCode()) || obj.getImportance().equals(importanceType))
-                .filter(obj -> payType == null || EMPTY.equals(payType.getCode()) || obj.getPayType().equals(payType))
-                .filter(obj -> user == null || EMPTY.equals(user.getCode()) || obj.getUser().equals(user))
+                .filter(obj -> checkValue(obj.getImportance(), importanceTypes))
+                .filter(obj -> checkValue(obj.getPayType(), payTypes))
+                .filter(obj -> checkValue(obj.getUser(), users))
                 .collect(Collectors.toList());
+    }
+
+    public boolean checkValue(TypeValue value, List<TypeValue> values) {
+        return values == null
+                || values.isEmpty()
+                || (values.size() == 1 && EMPTY.equals((values.get(0)).getCode()))
+                || values.contains(value);
     }
 
     public String getNewUniqueCode() {
