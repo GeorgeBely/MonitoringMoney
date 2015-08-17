@@ -24,8 +24,10 @@ public class GraphicsFrame extends JFrame {
 
     private ChartPanel piePanel;
     private ChartPanel categoryPanel;
+    private ChartPanel barPanel;
     private JFreeChart pieChart;
     private JFreeChart timeSerialChart;
+    private JFreeChart barChart;
     private JComboBox selectGraphic;
     private JComboBox selectViewData;
 
@@ -85,6 +87,16 @@ public class GraphicsFrame extends JFrame {
         GraphicsService.updateTimeSeriesData(timeSerialChart, "");
         panel.add(categoryPanel);
 
+        barChart = (GraphicsService.getBatChartsComponent("Суммарные затраты по времени",
+                "Месяц", "колличество", this.getBackground()));
+        barPanel = new ChartPanel(barChart) {{
+            setLocation(5, 50);
+            setSize(FRAME_WIDTH - 30, FRAME_HEIGHT - 55);
+            setVisible(false);
+        }};
+        GraphicsService.updateBarData(barChart, "");
+        panel.add(barPanel);
+
 
         useSelectGraphic();
     }
@@ -93,12 +105,14 @@ public class GraphicsFrame extends JFrame {
         Container frame = piePanel.getParent();
         piePanel.setSize(frame.getWidth() - 15, frame.getHeight() - 55);
         categoryPanel.setSize(frame.getWidth() - 15, frame.getHeight() - 55);
+        barPanel.setSize(frame.getWidth() - 15, frame.getHeight() - 55);
     }
 
     public void updateData() {
         String selectDataValue = (String) selectViewData.getSelectedItem();
         GraphicsService.updatePieData(pieChart, selectDataValue);
         GraphicsService.updateTimeSeriesData(timeSerialChart, selectDataValue);
+        GraphicsService.updateBarData(barChart, selectDataValue);
     }
 
     private void useSelectGraphic() {
@@ -108,11 +122,14 @@ public class GraphicsFrame extends JFrame {
             piePanel.setVisible(true);
         else if (GraphicsService.GRAPHICS_NAMES[1].equals(value))
             categoryPanel.setVisible(true);
+        else if (GraphicsService.GRAPHICS_NAMES[2].equals(value))
+            barPanel.setVisible(true);
     }
 
     private void setNotVisibleAllGraphics() {
         piePanel.setVisible(false);
         categoryPanel.setVisible(false);
+        barPanel.setVisible(false);
     }
 }
 

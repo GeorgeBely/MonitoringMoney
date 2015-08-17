@@ -1,12 +1,16 @@
 package ru.MonitoringMoney.services;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.time.DateUtils;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.labels.StandardPieSectionLabelGenerator;
+import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PieLabelLinkStyle;
 import org.jfree.chart.plot.PiePlot;
 import org.jfree.chart.plot.XYPlot;
+import org.jfree.data.category.CategoryDataset;
+import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.general.DefaultPieDataset;
 import org.jfree.data.time.Minute;
 import org.jfree.data.time.TimeSeries;
@@ -24,7 +28,9 @@ public class GraphicsService {
 
     private static final String ANOTHER_BLOCK_NAME = "Другие";
 
-    public static final String[] GRAPHICS_NAMES = new String[]{"Процентное соотношение покупок", "График затрат по времени"};
+    public static final String ALL_COAST = "Всего затрат";
+
+    public static final String[] GRAPHICS_NAMES = new String[]{"Процентное соотношение покупок", "График затрат по времени", "Суммарные затраты по времени"};
 
     public static final String[] VIEW_DATA_NAMES = new String[]{"", "Тип покупки", "Уровень важности", "Платильщик"};
 
@@ -69,6 +75,13 @@ public class GraphicsService {
         return chartCategory;
     }
 
+    public static JFreeChart getBatChartsComponent(String name, String nameX, String nameY, Color background) {
+        JFreeChart chartBar = ChartFactory.createBarChart(name, nameX, nameY, getBarChartData(""));
+        chartBar.setBackgroundPaint(background);
+
+        return chartBar;
+    }
+
     public static void updatePieData(JFreeChart pie, String selectData) {
         DefaultPieDataset data = getCountMoneyPieData(selectData);
         PiePlot plot = (PiePlot) pie.getPlot();
@@ -94,6 +107,53 @@ public class GraphicsService {
 
     public static void updateTimeSeriesData(JFreeChart timeSeries, String selectData) {
         ((XYPlot) timeSeries.getPlot()).setDataset(getTimeSeriesData(selectData));
+    }
+
+    public static void updateBarData(JFreeChart timeSeries, String selectData) {
+        ((CategoryPlot) timeSeries.getPlot()).setDataset(getBarChartData(selectData));
+    }
+
+    public static CategoryDataset getBarChartData(String selectData) {
+        DefaultCategoryDataset dataSet = new DefaultCategoryDataset();
+
+        Map<Date, Map<Object, Integer>> sortDataMap = new TreeMap<>(Date::compareTo);
+        for (PayObject payObject : ApplicationService.getPayObjects()) {
+            Date month = DateUtils.truncate(payObject.getDate(), Calendar.MONTH);
+            Map<Object, Integer> monthValues = sortDataMap.get(month);
+
+            Object selectValue;
+            if (VIEW_DATA_NAMES[1].equals(selectData)) {
+                selectValue = payObject.getPayType();
+            } else if (VIEW_DATA_NAMES[2].equals(selectData)) {
+                selectValue = payObject.getImportance();
+            } else if (VIEW_DATA_NAMES[3].equals(selectData)) {
+                selectValue = payObject.getUser();
+            } else {
+                selectValue = ALL_COAST;
+            }
+
+            if (monthValues == null) {
+                Map<Object, Integer> valueMap = new HashMap<>();
+                valueMap.put(selectValue, payObject.getPrice());
+                sortDataMap.put(month, valueMap);
+            } else {
+                if (monthValues.containsKey(selectValue)) {
+                    Integer price = monthValues.get(selectValue);
+                    monthValues.put(selectValue, payObject.getPrice() + price);
+                } else {
+                    monthValues.put(selectValue, payObject.getPrice());
+                }
+            }
+        }
+
+
+        for (Map.Entry<Date, Map<Object, Integer>> entry : sortDataMap.entrySet()) {
+            for (Map.Entry<Object, Integer> value : entry.getValue().entrySet()) {
+                String monthName = ApplicationService.FORMAT_MONTH_AND_YEAR.format(entry.getKey());
+                dataSet.addValue(value.getValue(), value.getKey().toString(), monthName);
+            }
+        }
+        return dataSet;
     }
 
     public static TimeSeriesCollection getTimeSeriesData(String selectData) {

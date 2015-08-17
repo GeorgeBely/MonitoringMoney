@@ -8,6 +8,7 @@ import org.apache.commons.lang.StringUtils;
 
 import java.io.*;
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,6 +25,9 @@ public class ApplicationService implements Serializable {
 
     /** Формат даты для поля ввода даты */
     public static final DateFormat FORMAT_DATE = DateFormat.getDateInstance(DateFormat.SHORT);
+
+    /** Формат даты отображающий только название месяца и год*/
+    public static final DateFormat FORMAT_MONTH_AND_YEAR = new SimpleDateFormat("LLLL yyyy");
 
     /** Код пустого поля свойства покупки */
     public static final String EMPTY = "empty";
