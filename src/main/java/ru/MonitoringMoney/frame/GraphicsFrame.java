@@ -3,6 +3,7 @@ package ru.MonitoringMoney.frame;
 
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+import ru.MonitoringMoney.services.ApplicationService;
 import ru.MonitoringMoney.services.GraphicsService;
 import ru.MonitoringMoney.services.ImageService;
 
@@ -32,19 +33,20 @@ public class GraphicsFrame extends JFrame {
     private JComboBox selectViewData;
 
     public GraphicsFrame() {
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        setLocation(screenSize.width / 2 - FRAME_WIDTH / 2, screenSize.height / 2 - FRAME_HEIGHT / 2);
-        setSize(FRAME_WIDTH, FRAME_HEIGHT);
+        setLocation(ApplicationService.getInstance().getWindowLocation(GraphicsFrame.class));
+        setSize(ApplicationService.getInstance().getWindowSize(GraphicsFrame.class));
         setVisible(true);
         setTitle(FRAME_NAME);
         setIconImage(ImageService.getGraphicsImage());
         toFront();
-
         addComponentListener(new ComponentListener() {
             public void componentResized(ComponentEvent e) {
+                ApplicationService.getInstance().updateSizeWindow(GraphicsFrame.class, getSize());
                 resizeFrame();
             }
-            public void componentMoved(ComponentEvent e) {}
+            public void componentMoved(ComponentEvent e) {
+                ApplicationService.getInstance().updateLocationWindow(GraphicsFrame.class, getLocation());
+            }
             public void componentShown(ComponentEvent e) {}
             public void componentHidden(ComponentEvent e) {}
         });

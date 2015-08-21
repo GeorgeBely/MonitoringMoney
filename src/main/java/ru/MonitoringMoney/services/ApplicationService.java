@@ -2,10 +2,14 @@ package ru.MonitoringMoney.services;
 
 import ru.MonitoringMoney.ImageCanvas;
 import ru.MonitoringMoney.PayObject;
+import ru.MonitoringMoney.frame.AddFrame;
+import ru.MonitoringMoney.frame.GraphicsFrame;
+import ru.MonitoringMoney.frame.MainFrame;
 import ru.MonitoringMoney.main.MonitoringMoney;
 import ru.MonitoringMoney.types.*;
 import org.apache.commons.lang.StringUtils;
 
+import java.awt.*;
 import java.io.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -31,6 +35,14 @@ public class ApplicationService implements Serializable {
 
     /** Код пустого поля свойства покупки */
     public static final String EMPTY = "empty";
+
+    /** Карта со значениями размера фрейма по умолчанию. Ключ объект класса фрейма, значение размер фрейма */
+    private static final Map<Class, Dimension> DEFAULT_FRAME_SIZE = new HashMap<Class, Dimension>() {{
+        put(AddFrame.class, new Dimension(250, 320));
+        put(MainFrame.class, new Dimension(510, 260));
+        put(GraphicsFrame.class, new Dimension(515, 335));
+    }};
+
 
     /** Список покупок */
     public List<PayObject> payObjects = new ArrayList<>();
@@ -58,6 +70,12 @@ public class ApplicationService implements Serializable {
 
     /** Уникальный для id нового типа объекта TypeValue. обавляется в поле code */
     public Integer uniqueId;
+
+    /** Карта со значениями расположений окон. Ключ класс фрейма, значение координата */
+    public Map<Class, Point> locationWindows = new HashMap<>();
+
+    /** Карта со значениями размера окон. Ключ класс фрейма, значение размер окна */
+    public Map<Class, Dimension> sizeWindows = new HashMap<>();
 
 
     /**
@@ -348,5 +366,40 @@ public class ApplicationService implements Serializable {
             payObjects = ApplicationService.getInstance().getPayObjectsWithFilters(null, null, null, null, null, null, null,null);
         }
         return payObjects;
+    }
+
+
+    public Point getWindowLocation(Class className) {
+        if (locationWindows == null)
+            locationWindows = new HashMap<>();
+
+        if (!locationWindows.containsKey(className)) {
+            Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+            Dimension frameSize = getWindowSize(className);
+            Integer x = (int) (screenSize.width / 2 - frameSize.getWidth() / 2);
+            Integer y = (int) (screenSize.height / 2 - frameSize.getHeight() / 2);
+            locationWindows.put(className, new Point(x, y));
+        }
+        return locationWindows.get(className);
+    }
+
+    public Dimension getWindowSize(Class className) {
+        if (sizeWindows == null)
+            sizeWindows = new HashMap<>();
+
+        if (!sizeWindows.containsKey(className)) {
+            sizeWindows.put(className, DEFAULT_FRAME_SIZE.get(className));
+        }
+        return sizeWindows.get(className);
+    }
+
+    public void updateLocationWindow(Class className, Point position) {
+        locationWindows.put(className, position);
+        writeData();
+    }
+
+    public void updateSizeWindow(Class className, Dimension size) {
+        sizeWindows.put(className, size);
+        writeData();
     }
 }

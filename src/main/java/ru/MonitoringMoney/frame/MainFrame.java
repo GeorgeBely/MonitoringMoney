@@ -24,12 +24,6 @@ import java.util.List;
 
 public class MainFrame extends JFrame {
 
-    /** Ширина фрейма */
-    private static final int FRAME_WIDTH = 510;
-
-    /** Высота фрейма */
-    private static final int FRAME_HEIGHT = 260;
-
     /** Фраза, которая отображается в строчке поиска по подстроке, до начала ввода поискового выражения */
     private static final String TERM_INPUT_DEFAULT_TEXT = "Поиск по подстроке";
 
@@ -54,14 +48,24 @@ public class MainFrame extends JFrame {
 
 
     public MainFrame() {
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        setLocation(screenSize.width / 2 - FRAME_WIDTH / 2, screenSize.height / 2 - FRAME_HEIGHT / 2);
-        setSize(FRAME_WIDTH, FRAME_HEIGHT);
+        setLocation(ApplicationService.getInstance().getWindowLocation(MainFrame.class));
+        setSize(ApplicationService.getInstance().getWindowSize(MainFrame.class));
         setResizable(false);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setVisible(true);
         setTitle(FRAME_NAME + "_" + MonitoringMoney.VERSION);
         setIconImage(ImageService.getMoneyImage());
+
+        addComponentListener(new ComponentListener() {
+            public void componentResized(ComponentEvent e) {
+                ApplicationService.getInstance().updateSizeWindow(MainFrame.class, getSize());
+            }
+            public void componentMoved(ComponentEvent e) {
+                ApplicationService.getInstance().updateLocationWindow(MainFrame.class, getLocation());
+            }
+            public void componentShown(ComponentEvent e) { }
+            public void componentHidden(ComponentEvent e) { }
+        });
 
         JPanel panel = new JPanel(){{
             setFocusable(true);
@@ -113,20 +117,26 @@ public class MainFrame extends JFrame {
         }};
         panel.add(termInput);
 
-        importanceSelect = new JComboBox<CheckBoxListService.CheckComboValue>() {{
-            setModel(CheckBoxListService.getModel(ApplicationService.getInstance().getSortedImportance()));
-            setBounds(5, 40, 240, 30);
-            setRenderer(new CheckBoxListService.CheckComboRenderer());
-            addActionListener(new CheckBoxListService.CheckBoxList());
-        }};
+        importanceSelect = new JComboBox<CheckBoxListService.CheckComboValue>() {
+            public void setPopupVisible(boolean v) { }
+            {
+                setModel(CheckBoxListService.getModel(ApplicationService.getInstance().getSortedImportance()));
+                setBounds(5, 40, 240, 30);
+                setRenderer(new CheckBoxListService.CheckComboRenderer());
+                addActionListener(new CheckBoxListService.CheckBoxList());
+            }
+        };
         panel.add(importanceSelect);
 
-        payTypeSelect = new JComboBox<CheckBoxListService.CheckComboValue>() {{
-            setModel(CheckBoxListService.getModel(ApplicationService.getInstance().getSortedPayTypes()));
-            setBounds(5, 75, 240, 30);
-            setRenderer(new CheckBoxListService.CheckComboRenderer());
-            addActionListener(new CheckBoxListService.CheckBoxList());
-        }};
+        payTypeSelect = new JComboBox<CheckBoxListService.CheckComboValue>() {
+            public void setPopupVisible(boolean v) { }
+            {
+                setModel(CheckBoxListService.getModel(ApplicationService.getInstance().getSortedPayTypes()));
+                setBounds(5, 75, 240, 30);
+                setRenderer(new CheckBoxListService.CheckComboRenderer());
+                addActionListener(new CheckBoxListService.CheckBoxList());
+            }
+        };
         panel.add(payTypeSelect);
 
         JLabel priceFromLabel = new JLabel("Цена от") {{
@@ -204,12 +214,15 @@ public class MainFrame extends JFrame {
         }};
         panel.add(dateToText);
 
-        userSelect = new JComboBox<CheckBoxListService.CheckComboValue>() {{
-            setModel(CheckBoxListService.getModel(ApplicationService.getInstance().getSortedUsers()));
-            setBounds(5, 160, 240, 30);
-            setRenderer(new CheckBoxListService.CheckComboRenderer());
-            addActionListener(new CheckBoxListService.CheckBoxList());
-        }};
+        userSelect = new JComboBox<CheckBoxListService.CheckComboValue>() {
+            public void setPopupVisible(boolean v) { }
+            {
+                setModel(CheckBoxListService.getModel(ApplicationService.getInstance().getSortedUsers()));
+                setBounds(5, 160, 240, 30);
+                setRenderer(new CheckBoxListService.CheckComboRenderer());
+                addActionListener(new CheckBoxListService.CheckBoxList());
+            }
+        };
         panel.add(userSelect);
 
         labelSumPrice = new JLabel() {{

@@ -18,12 +18,6 @@ import java.util.Date;
 
 public class AddFrame extends JFrame {
 
-    /** Ширина фрейма */
-    private static final int FRAME_WIDTH = 250;
-
-    /** Высота фрейма */
-    private static final int FRAME_HEIGHT = 320;
-
     /** Заголовок фрейма */
     private static final String FRAME_NAME = "Добавление покупки";
 
@@ -41,16 +35,20 @@ public class AddFrame extends JFrame {
 
 
     public AddFrame() {
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        setLocation(screenSize.width / 2 - FRAME_WIDTH / 2, screenSize.height / 2 - FRAME_HEIGHT / 2);
-        setSize(FRAME_WIDTH, FRAME_HEIGHT);
+        setLocation(ApplicationService.getInstance().getWindowLocation(AddFrame.class));
+        setSize(ApplicationService.getInstance().getWindowSize(AddFrame.class));
         setResizable(false);
         setTitle(FRAME_NAME);
         setIconImage(ImageService.getPlusImage());
         toFront();
         addComponentListener(new ComponentListener() {
-            public void componentResized(ComponentEvent e) { }
-            public void componentMoved(ComponentEvent e) { disposePopup(); }
+            public void componentResized(ComponentEvent e) {
+                ApplicationService.getInstance().updateSizeWindow(AddFrame.class, getSize());
+            }
+            public void componentMoved(ComponentEvent e) {
+                ApplicationService.getInstance().updateLocationWindow(AddFrame.class, getLocation());
+                disposePopup();
+            }
             public void componentShown(ComponentEvent e) { }
             public void componentHidden(ComponentEvent e) { disposePopup(); }
         });
