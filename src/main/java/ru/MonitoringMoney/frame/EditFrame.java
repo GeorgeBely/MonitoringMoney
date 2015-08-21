@@ -107,6 +107,7 @@ public class EditFrame extends JFrame {
             }
             payObject.setDescription((String) vector.get(5));
         }
+        ApplicationService.getInstance().updateAllFrequencyUse();
         MonitoringMoney.mainFrame.refreshText();
         ApplicationService.writeData();
     }

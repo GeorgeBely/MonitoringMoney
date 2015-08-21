@@ -114,7 +114,7 @@ public class MainFrame extends JFrame {
         panel.add(termInput);
 
         importanceSelect = new JComboBox<CheckBoxListService.CheckComboValue>() {{
-            setModel(CheckBoxListService.getModel(ApplicationService.getInstance().importanceTypes));
+            setModel(CheckBoxListService.getModel(ApplicationService.getInstance().getSortedImportance()));
             setBounds(5, 40, 240, 30);
             setRenderer(new CheckBoxListService.CheckComboRenderer());
             addActionListener(new CheckBoxListService.CheckBoxList());
@@ -122,7 +122,7 @@ public class MainFrame extends JFrame {
         panel.add(importanceSelect);
 
         payTypeSelect = new JComboBox<CheckBoxListService.CheckComboValue>() {{
-            setModel(CheckBoxListService.getModel(ApplicationService.getInstance().payTypes));
+            setModel(CheckBoxListService.getModel(ApplicationService.getInstance().getSortedPayTypes()));
             setBounds(5, 75, 240, 30);
             setRenderer(new CheckBoxListService.CheckComboRenderer());
             addActionListener(new CheckBoxListService.CheckBoxList());
@@ -205,7 +205,7 @@ public class MainFrame extends JFrame {
         panel.add(dateToText);
 
         userSelect = new JComboBox<CheckBoxListService.CheckComboValue>() {{
-            setModel(CheckBoxListService.getModel(ApplicationService.getInstance().users));
+            setModel(CheckBoxListService.getModel(ApplicationService.getInstance().getSortedUsers()));
             setBounds(5, 160, 240, 30);
             setRenderer(new CheckBoxListService.CheckComboRenderer());
             addActionListener(new CheckBoxListService.CheckBoxList());

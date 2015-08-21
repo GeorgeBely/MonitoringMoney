@@ -3,7 +3,6 @@ package ru.MonitoringMoney.frame;
 
 import org.apache.commons.lang.StringUtils;
 import ru.MonitoringMoney.*;
-import ru.MonitoringMoney.main.MonitoringMoney;
 import ru.MonitoringMoney.services.ApplicationService;
 import ru.MonitoringMoney.services.CalendarService;
 import ru.MonitoringMoney.services.ImageService;
@@ -64,9 +63,8 @@ public class AddFrame extends JFrame {
         add(panel);
 
         importanceSelect = new JComboBox<ImportanceType>() {{
-            ImportanceType[] items = new ImportanceType[ApplicationService.getInstance().importanceTypes.size()];
-            setModel(new DefaultComboBoxModel<>(ApplicationService.getInstance().importanceTypes.toArray(items)));
-            if (items.length == 2)
+            setModel(new DefaultComboBoxModel<>(ApplicationService.getInstance().getSortedImportance()));
+            if (getModel().getSize() == 2)
                 setSelectedIndex(1);
             setBounds(5, 5, 200, 30);
             addMouseListener(createPopupCloseMouseListener());
@@ -85,9 +83,8 @@ public class AddFrame extends JFrame {
         panel.add(importanceButton);
 
         payTypeSelect = new JComboBox<PayType>() {{
-            PayType[] items = new PayType[ApplicationService.getInstance().payTypes.size()];
-            setModel(new DefaultComboBoxModel<>(ApplicationService.getInstance().payTypes.toArray(items)));
-            if (items.length == 2)
+            setModel(new DefaultComboBoxModel<>(ApplicationService.getInstance().getSortedPayTypes()));
+            if (getModel().getSize() == 2)
                 setSelectedIndex(1);
             setBounds(5, 40, 200, 30);
             addMouseListener(createPopupCloseMouseListener());
@@ -157,9 +154,8 @@ public class AddFrame extends JFrame {
         panel.add(textScrollPane);
 
         userSelect = new JComboBox<Users>() {{
-            Users[] items = new Users[ApplicationService.getInstance().users.size()];
-            setModel(new DefaultComboBoxModel<>(ApplicationService.getInstance().users.toArray(items)));
-            if (items.length == 2)
+            setModel(new DefaultComboBoxModel<>(ApplicationService.getInstance().getSortedUsers()));
+            if (getModel().getSize() == 2)
                 setSelectedIndex(1);
             setBounds(5, 220, 200, 30);
             addActionListener(e -> disposePopup());
@@ -238,10 +234,8 @@ public class AddFrame extends JFrame {
             pay.setPayType((PayType) payTypeSelect.getSelectedItem());
             pay.setPrice(Integer.parseInt(priceText.getText()));
             pay.setUser((Users) userSelect.getSelectedItem());
-            ApplicationService.getInstance().payObjects.add(pay);
+            ApplicationService.getInstance().addPayObject(pay);
 
-            ApplicationService.writeData();
-            MonitoringMoney.mainFrame.refreshText();
             hideFrame();
         }
     }

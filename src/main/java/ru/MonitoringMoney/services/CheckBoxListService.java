@@ -8,14 +8,13 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.List;
 
 public class CheckBoxListService {
 
-    public static DefaultComboBoxModel<CheckBoxListService.CheckComboValue> getModel(List valueList) {
-        CheckBoxListService.CheckComboValue[] stores = new CheckBoxListService.CheckComboValue[valueList.size()];
+    public static DefaultComboBoxModel<CheckBoxListService.CheckComboValue> getModel(TypeValue[] values) {
+        CheckBoxListService.CheckComboValue[] stores = new CheckBoxListService.CheckComboValue[values.length];
         int i = 0;
-        for (Object type : valueList) {
+        for (Object type : values) {
             stores[i] = new CheckBoxListService.CheckComboValue((TypeValue) type, false);
             i++;
         }

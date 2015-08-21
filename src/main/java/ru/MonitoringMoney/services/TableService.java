@@ -60,11 +60,11 @@ public class TableService {
         public SelectCellEditor(JComboBox<Object> comboBox, String columnName) {
             super(comboBox);
             if (TableService.IMPORTANCE_COLUMN.equals(columnName)) {
-                comboBox.setModel(new DefaultComboBoxModel<>(ApplicationService.getInstance().importanceTypes.toArray()));
+                comboBox.setModel(new DefaultComboBoxModel<>(ApplicationService.getInstance().getSortedImportance()));
             } else if (TableService.PAY_TYPE_COLUMN.equals(columnName)) {
-                comboBox.setModel(new DefaultComboBoxModel<>(ApplicationService.getInstance().payTypes.toArray()));
+                comboBox.setModel(new DefaultComboBoxModel<>(ApplicationService.getInstance().getSortedPayTypes()));
             } else if (TableService.USER_COLUMN.equals(columnName)) {
-                comboBox.setModel(new DefaultComboBoxModel<>(ApplicationService.getInstance().users.toArray()));
+                comboBox.setModel(new DefaultComboBoxModel<>(ApplicationService.getInstance().getSortedUsers()));
             }
             comboBox.addActionListener(e -> fireEditingStopped());
         }
