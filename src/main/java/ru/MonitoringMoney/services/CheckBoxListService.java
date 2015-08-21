@@ -40,6 +40,10 @@ public class CheckBoxListService {
         public TypeValue getType() {
             return type;
         }
+
+        public void setState(Boolean state) {
+            this.state = state;
+        }
     }
 
     public static class CheckBoxList implements ActionListener {
@@ -47,12 +51,21 @@ public class CheckBoxListService {
             JComboBox cb = (JComboBox) e.getSource();
             CheckComboValue store = (CheckComboValue) cb.getSelectedItem();
             CheckComboRenderer ccr = (CheckComboRenderer) cb.getRenderer();
-            ccr.checkBox.setSelected((store.state = !store.state));
+
+            if (ApplicationService.EMPTY.equals(store.getType().getCode())) {
+                DefaultComboBoxModel defaultModel = (DefaultComboBoxModel) cb.getModel();
+                for (int i = 0; i < defaultModel.getSize(); i++) {
+                    CheckBoxListService.CheckComboValue value = (CheckBoxListService.CheckComboValue) defaultModel.getElementAt(i);
+                    value.setState(false);
+                }
+            } else {
+                ccr.checkBox.setSelected((store.state = !store.state));
+            }
             MonitoringMoney.mainFrame.refreshText();
         }
     }
 
-    public static class CheckComboRenderer<E> implements ListCellRenderer {
+    public static class CheckComboRenderer implements ListCellRenderer {
         private JCheckBox checkBox;
 
         public CheckComboRenderer() {
