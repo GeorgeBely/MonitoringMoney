@@ -12,13 +12,10 @@ import java.awt.*;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 
+/**
+ * Фрейм с графической информацией
+ */
 public class GraphicsFrame extends JFrame {
-
-    /** Ширина фрейма */
-    private static final int FRAME_WIDTH = 515;
-
-    /** Высота фрейма */
-    private static final int FRAME_HEIGHT = 335;
 
     private static final String FRAME_NAME = "Графики затрат";
 
@@ -40,15 +37,13 @@ public class GraphicsFrame extends JFrame {
         setIconImage(ImageService.getGraphicsImage());
         toFront();
         addComponentListener(new ComponentListener() {
-            public void componentResized(ComponentEvent e) {
+            public void componentResized(ComponentEvent e) { resizeFrame(); }
+            public void componentMoved(ComponentEvent e) { }
+            public void componentShown(ComponentEvent e) {}
+            public void componentHidden(ComponentEvent e) {
                 ApplicationService.getInstance().updateSizeWindow(GraphicsFrame.class, getSize());
-                resizeFrame();
-            }
-            public void componentMoved(ComponentEvent e) {
                 ApplicationService.getInstance().updateLocationWindow(GraphicsFrame.class, getLocation());
             }
-            public void componentShown(ComponentEvent e) {}
-            public void componentHidden(ComponentEvent e) {}
         });
 
 
@@ -73,7 +68,7 @@ public class GraphicsFrame extends JFrame {
         pieChart = GraphicsService.getPieComponent("Процентное соотношение покупок", this.getBackground());
         piePanel = new ChartPanel(pieChart) {{
             setLocation(5, 50);
-            setSize(FRAME_WIDTH - 30, FRAME_HEIGHT - 55);
+            setSize(super.getWidth() - 30, super.getHeight()  - 55);
             setVisible(false);
         }};
         GraphicsService.updatePieData(pieChart, "");
@@ -83,7 +78,7 @@ public class GraphicsFrame extends JFrame {
                 "Дата покупок", "колличество", this.getBackground()));
         categoryPanel = new ChartPanel(timeSerialChart) {{
             setLocation(5, 50);
-            setSize(FRAME_WIDTH - 30, FRAME_HEIGHT - 55);
+            setSize(super.getWidth() - 30, super.getHeight()  - 55);
             setVisible(false);
         }};
         GraphicsService.updateTimeSeriesData(timeSerialChart, "");
@@ -93,7 +88,7 @@ public class GraphicsFrame extends JFrame {
                 "Месяц", "колличество", this.getBackground()));
         barPanel = new ChartPanel(barChart) {{
             setLocation(5, 50);
-            setSize(FRAME_WIDTH - 30, FRAME_HEIGHT - 55);
+            setSize(super.getWidth() - 30, super.getHeight()  - 55);
             setVisible(false);
         }};
         GraphicsService.updateBarData(barChart, "");

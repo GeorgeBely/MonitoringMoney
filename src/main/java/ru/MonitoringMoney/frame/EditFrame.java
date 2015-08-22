@@ -11,24 +11,18 @@ import ru.MonitoringMoney.types.Users;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import java.awt.*;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
 
+/**
+ * Фрейм для редактирования покупок
+ */
 public class EditFrame extends JFrame {
-
-    /**
-     * Ширина фрейма
-     */
-    private static final int FRAME_WIDTH = 660;
-
-    /**
-     * Высота фрейма
-     */
-    private static final int FRAME_HEIGHT = 390;
 
     /**
      * Заголовок фрейма
@@ -42,13 +36,21 @@ public class EditFrame extends JFrame {
 
 
     public EditFrame() {
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        setLocation(screenSize.width / 2 - FRAME_WIDTH / 2, screenSize.height / 2 - FRAME_HEIGHT / 2);
-        setSize(FRAME_WIDTH, FRAME_HEIGHT);
+        setLocation(ApplicationService.getInstance().getWindowLocation(EditFrame.class));
+        setSize(ApplicationService.getInstance().getWindowSize(EditFrame.class));
         setResizable(false);
         setVisible(true);
         setTitle(FRAME_NAME);
         setIconImage(ImageService.getEditImage());
+        addComponentListener(new ComponentListener() {
+            public void componentResized(ComponentEvent e) { }
+            public void componentMoved(ComponentEvent e) { }
+            public void componentShown(ComponentEvent e) { }
+            public void componentHidden(ComponentEvent e) {
+                ApplicationService.getInstance().updateSizeWindow(EditFrame.class, getSize());
+                ApplicationService.getInstance().updateLocationWindow(EditFrame.class, getLocation());
+            }
+        });
 
         JPanel panel = new JPanel() {{
             setFocusable(true);

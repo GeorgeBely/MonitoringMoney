@@ -8,6 +8,9 @@ import java.awt.event.*;
 import java.awt.geom.GeneralPath;
 
 
+/**
+ * Всплывающее окно
+ */
 public class PopupDialog {
 
     private JDialog dialog = null;

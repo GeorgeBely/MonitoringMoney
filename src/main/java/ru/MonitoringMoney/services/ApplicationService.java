@@ -3,6 +3,7 @@ package ru.MonitoringMoney.services;
 import ru.MonitoringMoney.ImageCanvas;
 import ru.MonitoringMoney.PayObject;
 import ru.MonitoringMoney.frame.AddFrame;
+import ru.MonitoringMoney.frame.EditFrame;
 import ru.MonitoringMoney.frame.GraphicsFrame;
 import ru.MonitoringMoney.frame.MainFrame;
 import ru.MonitoringMoney.main.MonitoringMoney;
@@ -41,6 +42,7 @@ public class ApplicationService implements Serializable {
         put(AddFrame.class, new Dimension(250, 320));
         put(MainFrame.class, new Dimension(510, 260));
         put(GraphicsFrame.class, new Dimension(515, 335));
+        put(EditFrame.class, new Dimension(660, 390));
     }};
 
 
@@ -369,6 +371,10 @@ public class ApplicationService implements Serializable {
     }
 
 
+    /**
+     * @param className объект класса, позицию фрейма которого нужно получить
+     * @return координату фрейма
+     */
     public Point getWindowLocation(Class className) {
         if (locationWindows == null)
             locationWindows = new HashMap<>();
@@ -383,6 +389,10 @@ public class ApplicationService implements Serializable {
         return locationWindows.get(className);
     }
 
+    /**
+     * @param className объект класса, размер фрейма которого нужно получить
+     * @return размер фрейма
+     */
     public Dimension getWindowSize(Class className) {
         if (sizeWindows == null)
             sizeWindows = new HashMap<>();
@@ -393,13 +403,33 @@ public class ApplicationService implements Serializable {
         return sizeWindows.get(className);
     }
 
+    /**
+     * Сохраняет координату фоейма
+     *
+     * @param className объект класса, позицию фрейма которого нужно перезаписать
+     * @param position  координата фрейма
+     */
     public void updateLocationWindow(Class className, Point position) {
         locationWindows.put(className, position);
+
+        //Запысываем положение основного фрейма, так как при его закрытии происходит остановка приложения
+        locationWindows.put(MainFrame.class, MonitoringMoney.mainFrame.getLocation());
+
         writeData();
     }
 
+    /**
+     * Сохраняет размер фрейма
+     *
+     * @param className объект класса, размер фрейма которого нужно перезаписать
+     * @param size      размер фрейма
+     */
     public void updateSizeWindow(Class className, Dimension size) {
         sizeWindows.put(className, size);
+
+        //Запысываем размер основного фрейма, так как при его закрытии происходит остановка приложения
+        sizeWindows.put(MainFrame.class, MonitoringMoney.mainFrame.getSize());
+
         writeData();
     }
 }

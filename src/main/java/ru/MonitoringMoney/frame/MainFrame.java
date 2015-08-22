@@ -22,6 +22,9 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * Основной фрейм приложения
+ */
 public class MainFrame extends JFrame {
 
     /** Фраза, которая отображается в строчке поиска по подстроке, до начала ввода поискового выражения */
@@ -57,14 +60,13 @@ public class MainFrame extends JFrame {
         setIconImage(ImageService.getMoneyImage());
 
         addComponentListener(new ComponentListener() {
-            public void componentResized(ComponentEvent e) {
+            public void componentResized(ComponentEvent e) { }
+            public void componentMoved(ComponentEvent e) { }
+            public void componentShown(ComponentEvent e) { }
+            public void componentHidden(ComponentEvent e) {
                 ApplicationService.getInstance().updateSizeWindow(MainFrame.class, getSize());
-            }
-            public void componentMoved(ComponentEvent e) {
                 ApplicationService.getInstance().updateLocationWindow(MainFrame.class, getLocation());
             }
-            public void componentShown(ComponentEvent e) { }
-            public void componentHidden(ComponentEvent e) { }
         });
 
         JPanel panel = new JPanel(){{

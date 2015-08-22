@@ -16,6 +16,10 @@ import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
 
+
+/**
+ * Фрейм для добавления покупок
+ */
 public class AddFrame extends JFrame {
 
     /** Заголовок фрейма */
@@ -42,15 +46,14 @@ public class AddFrame extends JFrame {
         setIconImage(ImageService.getPlusImage());
         toFront();
         addComponentListener(new ComponentListener() {
-            public void componentResized(ComponentEvent e) {
+            public void componentResized(ComponentEvent e) { }
+            public void componentMoved(ComponentEvent e) { disposePopup(); }
+            public void componentShown(ComponentEvent e) { }
+            public void componentHidden(ComponentEvent e) {
                 ApplicationService.getInstance().updateSizeWindow(AddFrame.class, getSize());
-            }
-            public void componentMoved(ComponentEvent e) {
                 ApplicationService.getInstance().updateLocationWindow(AddFrame.class, getLocation());
                 disposePopup();
             }
-            public void componentShown(ComponentEvent e) { }
-            public void componentHidden(ComponentEvent e) { disposePopup(); }
         });
 
         JPanel panel = new JPanel() {{
