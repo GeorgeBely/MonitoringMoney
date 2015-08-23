@@ -13,6 +13,7 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.io.Serializable;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,7 +23,9 @@ import java.util.Vector;
 /**
  * Фрейм для редактирования покупок
  */
-public class EditFrame extends JFrame {
+public class EditFrame extends JFrame implements Serializable {
+
+    public static final long serialVersionUID = 1783363045918964188L;
 
     /**
      * Заголовок фрейма
@@ -30,7 +33,12 @@ public class EditFrame extends JFrame {
     private static final String FRAME_NAME = "Редактирование покупок";
 
 
-    private JTable table;
+    private JTable editPayObjectTable;
+    private JLabel editPayObjectLabel;
+    private JLabel editTypeValueLabel;
+    private JButton editTypeValueButton;
+    private JButton editPayObjectButton;
+    private JScrollPane editPayObjectScrollPane;
 
     public List<PayObject> removeItemList = new ArrayList<>();
 
@@ -59,18 +67,52 @@ public class EditFrame extends JFrame {
         add(panel);
 
 
-        JLabel infoLabel = new JLabel("Редактор покупок") {{
-            setBounds(300, 0, 500, 30);
+        editPayObjectLabel = new JLabel("Редактор покупок") {{
+            setBounds(161, 0, 200, 30);
         }};
-        panel.add(infoLabel);
+        panel.add(editPayObjectLabel);
 
-        table = new JTable();
+        editPayObjectButton = new JButton("Редактор покупок") {{
+            setBounds(128, 0, 170, 30);
+            setVisible(false);
+            addActionListener(e -> {
+                setVisible(false);
+                editTypeValueButton.setVisible(true);
+                editPayObjectLabel.setVisible(true);
+                editTypeValueLabel.setVisible(false);
+                editPayObjectScrollPane.setVisible(true);
+            });
+        }};
+        panel.add(editPayObjectButton);
+
+
+        editTypeValueLabel = new JLabel("Редактирование типов") {{
+            setBounds(400, 0, 200, 30);
+            setVisible(false);
+        }};
+        panel.add(editTypeValueLabel);
+
+
+        editTypeValueButton = new JButton("Редактирование типов") {{
+            setBounds(381, 0, 170, 30);
+            addActionListener(e -> {
+                setVisible(false);
+                editPayObjectButton.setVisible(true);
+                editPayObjectLabel.setVisible(false);
+                editTypeValueLabel.setVisible(true);
+                editPayObjectScrollPane.setVisible(false);
+            });
+        }};
+        panel.add(editTypeValueButton);
+
+
+        editPayObjectTable = new JTable();
         updateTable();
-        JScrollPane textScrollPane = new JScrollPane() {{
-            setViewportView(table);
+        editPayObjectScrollPane = new JScrollPane() {{
+            setViewportView(editPayObjectTable);
             setBounds(5, 30, 645, 290);
         }};
-        panel.add(textScrollPane);
+        panel.add(editPayObjectScrollPane);
 
         JButton okButton = new JButton("Применить") {{
             setBounds(45, 325, 115, 30);
@@ -91,7 +133,7 @@ public class EditFrame extends JFrame {
     public void updateData() {
         ApplicationService.getInstance().payObjects.removeAll(removeItemList);
         removeItemList.clear();
-        for (Object obj : ((DefaultTableModel) table.getModel()).getDataVector()) {
+        for (Object obj : ((DefaultTableModel) editPayObjectTable.getModel()).getDataVector()) {
             Vector vector = (Vector) obj;
             PayObject payObject = (PayObject) vector.get(6);
             payObject.setUser((Users) vector.get(0));
@@ -115,19 +157,19 @@ public class EditFrame extends JFrame {
     }
 
     public void updateTable() {
-        table.setModel(TableService.getTableData());
-        table.getColumn(TableService.REMOVE_COLUMN).setMinWidth(20);
-        table.getColumn(TableService.REMOVE_COLUMN).setMaxWidth(20);
-        table.getColumn(TableService.REMOVE_COLUMN).setMinWidth(20);
-        table.getColumn(TableService.REMOVE_COLUMN).setMaxWidth(20);
-        table.getColumn(TableService.REMOVE_COLUMN).setCellEditor(new TableService.RemoveButtonCellEditor());
-        table.getColumn(TableService.REMOVE_COLUMN).setCellRenderer(new TableService.ButtonCellRenderer());
-        table.getColumn(TableService.DESCRIPTION_COLUMN).setCellEditor(new TableService.TextAreaCellEditor(new JTextField()));
-        table.getColumn(TableService.DATE_COLUMN).setCellRenderer(new TableService.DateCellRenderer(ApplicationService.FORMAT_DATE));
-        table.getColumn(TableService.DATE_COLUMN).setCellEditor(new TableService.DateCellEditor(new JTextField(), ApplicationService.FORMAT_DATE));
-        table.getColumn(TableService.USER_COLUMN).setCellEditor(new TableService.SelectCellEditor(new JComboBox<>(), TableService.USER_COLUMN));
-        table.getColumn(TableService.IMPORTANCE_COLUMN).setCellEditor(new TableService.SelectCellEditor(new JComboBox<>(), TableService.IMPORTANCE_COLUMN));
-        table.getColumn(TableService.PAY_TYPE_COLUMN).setCellEditor(new TableService.SelectCellEditor(new JComboBox<>(), TableService.PAY_TYPE_COLUMN));
+        editPayObjectTable.setModel(TableService.getTableData());
+        editPayObjectTable.getColumn(TableService.REMOVE_COLUMN).setMinWidth(20);
+        editPayObjectTable.getColumn(TableService.REMOVE_COLUMN).setMaxWidth(20);
+        editPayObjectTable.getColumn(TableService.REMOVE_COLUMN).setMinWidth(20);
+        editPayObjectTable.getColumn(TableService.REMOVE_COLUMN).setMaxWidth(20);
+        editPayObjectTable.getColumn(TableService.REMOVE_COLUMN).setCellEditor(new TableService.RemoveButtonCellEditor());
+        editPayObjectTable.getColumn(TableService.REMOVE_COLUMN).setCellRenderer(new TableService.ButtonCellRenderer());
+        editPayObjectTable.getColumn(TableService.DESCRIPTION_COLUMN).setCellEditor(new TableService.TextAreaCellEditor(new JTextField()));
+        editPayObjectTable.getColumn(TableService.DATE_COLUMN).setCellRenderer(new TableService.DateCellRenderer(ApplicationService.FORMAT_DATE));
+        editPayObjectTable.getColumn(TableService.DATE_COLUMN).setCellEditor(new TableService.DateCellEditor(new JTextField(), ApplicationService.FORMAT_DATE));
+        editPayObjectTable.getColumn(TableService.USER_COLUMN).setCellEditor(new TableService.SelectCellEditor(new JComboBox<>(), TableService.USER_COLUMN));
+        editPayObjectTable.getColumn(TableService.IMPORTANCE_COLUMN).setCellEditor(new TableService.SelectCellEditor(new JComboBox<>(), TableService.IMPORTANCE_COLUMN));
+        editPayObjectTable.getColumn(TableService.PAY_TYPE_COLUMN).setCellEditor(new TableService.SelectCellEditor(new JComboBox<>(), TableService.PAY_TYPE_COLUMN));
     }
 
 }
