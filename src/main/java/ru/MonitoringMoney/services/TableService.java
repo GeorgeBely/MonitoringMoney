@@ -4,6 +4,10 @@ package ru.MonitoringMoney.services;
 import ru.MonitoringMoney.PayObject;
 import ru.MonitoringMoney.frame.PopupDialog;
 import ru.MonitoringMoney.main.MonitoringMoney;
+import ru.MonitoringMoney.types.ImportanceType;
+import ru.MonitoringMoney.types.PayType;
+import ru.MonitoringMoney.types.TypeValue;
+import ru.MonitoringMoney.types.Users;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -16,15 +20,13 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.text.DateFormat;
 import java.text.ParseException;
-import java.util.Date;
-import java.util.EventObject;
+import java.util.*;
 import java.util.List;
-import java.util.Vector;
 
 public class TableService {
 
     public static final String USER_COLUMN = "Платильщик";
-    public static final String IMPORTANCE_COLUMN = "Важность";
+    public static final String IMPORTANCE_COLUMN = "Уровень важности";
     public static final String PAY_TYPE_COLUMN = "Тип покупки";
     public static final String PRICE_COLUMN = "Стоимость";
     public static final String DATE_COLUMN = "Дата";
@@ -32,7 +34,38 @@ public class TableService {
     public static final String REMOVE_COLUMN = "X";
 
 
-    public static DefaultTableModel getTableData() {
+    public static DefaultTableModel getTypeValueTableData(Class className) {
+        DefaultTableModel dm = new DefaultTableModel();
+
+        String columnName = null;
+        List<TypeValue> values = new ArrayList<>();
+        if (className.equals(ImportanceType.class)) {
+            values.addAll(ApplicationService.getInstance().importanceTypes);
+            columnName = IMPORTANCE_COLUMN;
+        } else if (className.equals(PayType.class)) {
+            values.addAll(ApplicationService.getInstance().payTypes);
+            columnName = PAY_TYPE_COLUMN;
+        } else if (className.equals(Users.class)) {
+            values.addAll(ApplicationService.getInstance().users);
+            columnName = USER_COLUMN;
+        }
+
+        Object[] header = new Object[]{columnName, REMOVE_COLUMN};
+        Object[][] data = new Object[values.size() - 1][2];
+
+        int index = 0;
+        for (TypeValue value : values) {
+            if (!ApplicationService.EMPTY.equals(value.getCode())) {
+                data[index][0] = value.getName();
+                data[index][1] = value;
+                index++;
+            }
+        }
+        dm.setDataVector(data, header);
+        return dm;
+    }
+
+    public static DefaultTableModel getPayObjectTableData() {
         DefaultTableModel dm = new DefaultTableModel();
         Object[] header = new Object[]{USER_COLUMN, IMPORTANCE_COLUMN, PAY_TYPE_COLUMN, PRICE_COLUMN, DATE_COLUMN, DESCRIPTION_COLUMN, REMOVE_COLUMN};
         List<PayObject> payObjects = ApplicationService.getPayObjects();
@@ -188,7 +221,14 @@ public class TableService {
         }
 
         public boolean shouldSelectCell(EventObject anEvent) {
-            MonitoringMoney.mainFrame.editFrame.removeItemList.add((PayObject) value);
+            if (value instanceof PayObject)
+                MonitoringMoney.mainFrame.editFrame.removePayObjectList.add((PayObject) value);
+            else if (value instanceof ImportanceType)
+                MonitoringMoney.mainFrame.editFrame.removeImportanceList.add((ImportanceType) value);
+            else if (value instanceof PayType)
+                MonitoringMoney.mainFrame.editFrame.removePayTypeList.add((PayType) value);
+            else if (value instanceof Users)
+                MonitoringMoney.mainFrame.editFrame.removeUserList.add((Users) value);
             ((DefaultTableModel) table.getModel()).removeRow(row);
             return true;
         }

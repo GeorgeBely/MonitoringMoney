@@ -16,6 +16,7 @@ import org.apache.commons.lang.time.DateUtils;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.Serializable;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -25,7 +26,10 @@ import java.util.List;
 /**
  * Основной фрейм приложения
  */
-public class MainFrame extends JFrame {
+public class MainFrame extends JFrame implements Serializable {
+
+    private static final long serialVersionUID = -7550278965422223450L;
+
 
     /** Фраза, которая отображается в строчке поиска по подстроке, до начала ввода поискового выражения */
     private static final String TERM_INPUT_DEFAULT_TEXT = "Поиск по подстроке";
@@ -264,7 +268,7 @@ public class MainFrame extends JFrame {
         if (graphicsFrame != null)
             graphicsFrame.updateData();
         if (editFrame != null)
-            editFrame.updateTable();
+            editFrame.updatePayObjectTable();
     }
 
     public List<PayObject> getPayObjectWithCurrentFilters() {
@@ -336,5 +340,33 @@ public class MainFrame extends JFrame {
             importanceSelect.addItem(new CheckBoxListService.CheckComboValue((ImportanceType) item, false));
         else if (item instanceof Users)
             userSelect.addItem(new CheckBoxListService.CheckComboValue((Users) item, false));
+    }
+
+    public void removeSelectElement(Object item) {
+        if (item instanceof PayType) {
+            CheckBoxListService.CheckComboValue value = getSelectValue((TypeValue) item, payTypeSelect);
+            if (value != null) {
+                payTypeSelect.removeItem(value);
+            }
+        } else if (item instanceof ImportanceType) {
+            CheckBoxListService.CheckComboValue value = getSelectValue((TypeValue) item, importanceSelect);
+            if (value != null) {
+                importanceSelect.removeItem(value);
+            }
+        } else if (item instanceof Users) {
+            CheckBoxListService.CheckComboValue value = getSelectValue((TypeValue) item, userSelect);
+            if (value != null) {
+                userSelect.removeItem(value);
+            }
+        }
+    }
+
+    public CheckBoxListService.CheckComboValue getSelectValue(TypeValue value, JComboBox comboBox) {
+        for (int i = 0; i < comboBox.getItemCount(); i++) {
+            CheckBoxListService.CheckComboValue comboValue = (CheckBoxListService.CheckComboValue) comboBox.getItemAt(i);
+            if (comboValue.getType().equals(value))
+                return comboValue;
+        }
+        return null;
     }
 }

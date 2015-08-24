@@ -12,6 +12,7 @@ import org.apache.commons.lang.time.DateUtils;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.io.Serializable;
 import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
@@ -20,7 +21,10 @@ import java.util.Date;
 /**
  * Фрейм для добавления покупок
  */
-public class AddFrame extends JFrame {
+public class AddFrame extends JFrame implements Serializable {
+
+    private static final long serialVersionUID = -5105213622223281168L;
+
 
     /** Заголовок фрейма */
     private static final String FRAME_NAME = "Добавление покупки";
@@ -270,6 +274,16 @@ public class AddFrame extends JFrame {
         } else if (item instanceof Users) {
             userSelect.addItem((Users) item);
             userSelect.setSelectedItem(item);
+        }
+    }
+
+    public void removeSelectElement(Object item) {
+        if (item instanceof PayType) {
+            payTypeSelect.removeItem(item);
+        } else if (item instanceof ImportanceType) {
+            importanceSelect.removeItem(item);
+        } else if (item instanceof Users) {
+            userSelect.removeItem(item);
         }
     }
 

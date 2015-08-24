@@ -7,17 +7,18 @@ import ru.MonitoringMoney.services.ImageService;
 import ru.MonitoringMoney.services.TableService;
 import ru.MonitoringMoney.types.ImportanceType;
 import ru.MonitoringMoney.types.PayType;
+import ru.MonitoringMoney.types.TypeValue;
 import ru.MonitoringMoney.types.Users;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import java.awt.*;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
 import java.io.Serializable;
 import java.text.ParseException;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.List;
-import java.util.Vector;
 
 
 /**
@@ -25,7 +26,7 @@ import java.util.Vector;
  */
 public class EditFrame extends JFrame implements Serializable {
 
-    public static final long serialVersionUID = 1783363045918964188L;
+    private static final long serialVersionUID = 1783363045918964188L;
 
     /**
      * Заголовок фрейма
@@ -39,8 +40,15 @@ public class EditFrame extends JFrame implements Serializable {
     private JButton editTypeValueButton;
     private JButton editPayObjectButton;
     private JScrollPane editPayObjectScrollPane;
+    private JTable editImportanceTable;
+    private JTable editPayTypeTable;
+    private JTable editUserTable;
+    private Container editTypeValueContainer;
 
-    public List<PayObject> removeItemList = new ArrayList<>();
+    public List<PayObject> removePayObjectList = new ArrayList<>();
+    public List<ImportanceType> removeImportanceList = new ArrayList<>();
+    public List<PayType> removePayTypeList = new ArrayList<>();
+    public List<Users> removeUserList = new ArrayList<>();
 
 
     public EditFrame() {
@@ -81,6 +89,7 @@ public class EditFrame extends JFrame implements Serializable {
                 editPayObjectLabel.setVisible(true);
                 editTypeValueLabel.setVisible(false);
                 editPayObjectScrollPane.setVisible(true);
+                editTypeValueContainer.setVisible(false);
             });
         }};
         panel.add(editPayObjectButton);
@@ -101,18 +110,84 @@ public class EditFrame extends JFrame implements Serializable {
                 editPayObjectLabel.setVisible(false);
                 editTypeValueLabel.setVisible(true);
                 editPayObjectScrollPane.setVisible(false);
+                editTypeValueContainer.setVisible(true);
             });
         }};
         panel.add(editTypeValueButton);
 
 
         editPayObjectTable = new JTable();
-        updateTable();
+        updatePayObjectTable();
         editPayObjectScrollPane = new JScrollPane() {{
             setViewportView(editPayObjectTable);
             setBounds(5, 30, 645, 290);
         }};
         panel.add(editPayObjectScrollPane);
+
+        editTypeValueContainer = new Container() {{
+            setBounds(5, 30, 645, 290);
+            setVisible(false);
+        }};
+        panel.add(editTypeValueContainer);
+
+        JPanel editTypeValuePanel = new JPanel() {{
+            setBounds(0, 0, 645, 290);
+            setFocusable(true);
+            setLayout(null);
+        }};
+        editTypeValueContainer.add(editTypeValuePanel);
+
+        editImportanceTable = new JTable();
+        JScrollPane editImportanceScrollPane = new JScrollPane() {{
+            setViewportView(editImportanceTable);
+            setBounds(5, 5, 200, 240);
+        }};
+        editTypeValuePanel.add(editImportanceScrollPane);
+
+        JButton importanceButton = new JButton("Добавить") {{
+            setBounds(30, 250, 150, 30);
+            addActionListener(e -> {
+                ImportanceType type = new ImportanceType(ApplicationService.getInstance().getNewUniqueCode(), "");
+                ((DefaultTableModel) editImportanceTable.getModel()).addRow(new Object[]{"", type});
+            });
+            setIcon(ImageService.getPlusButtonIcon());
+        }};
+        editTypeValuePanel.add(importanceButton);
+
+        editPayTypeTable = new JTable();
+        JScrollPane editPayTypeScrollPane = new JScrollPane() {{
+            setViewportView(editPayTypeTable);
+            setBounds(225, 5, 200, 240);
+        }};
+        editTypeValuePanel.add(editPayTypeScrollPane);
+
+        JButton payTypeButton = new JButton("Добавить") {{
+            setBounds(250, 250, 150, 30);
+            addActionListener(e -> {
+                PayType type = new PayType(ApplicationService.getInstance().getNewUniqueCode(), "");
+                ((DefaultTableModel) editPayTypeTable.getModel()).addRow(new Object[]{"", type});
+            });
+            setIcon(ImageService.getPlusButtonIcon());
+        }};
+        editTypeValuePanel.add(payTypeButton);
+
+        editUserTable = new JTable();
+        JScrollPane editUserScrollPane = new JScrollPane() {{
+            setViewportView(editUserTable);
+            setBounds(445, 5, 200, 240);
+        }};
+        editTypeValuePanel.add(editUserScrollPane);
+        updateTypeValueTable();
+
+        JButton userButton = new JButton("Добавить") {{
+            setBounds(470, 250, 150, 30);
+            addActionListener(e -> {
+                Users type = new Users(ApplicationService.getInstance().getNewUniqueCode(), "");
+                ((DefaultTableModel) editUserTable.getModel()).addRow(new Object[]{"", type});
+            });
+            setIcon(ImageService.getPlusButtonIcon());
+        }};
+        editTypeValuePanel.add(userButton);
 
         JButton okButton = new JButton("Применить") {{
             setBounds(45, 325, 115, 30);
@@ -131,8 +206,9 @@ public class EditFrame extends JFrame implements Serializable {
     }
 
     public void updateData() {
-        ApplicationService.getInstance().payObjects.removeAll(removeItemList);
-        removeItemList.clear();
+        ApplicationService.getInstance().payObjects.removeAll(removePayObjectList);
+        removePayObjectList.clear();
+
         for (Object obj : ((DefaultTableModel) editPayObjectTable.getModel()).getDataVector()) {
             Vector vector = (Vector) obj;
             PayObject payObject = (PayObject) vector.get(6);
@@ -151,25 +227,126 @@ public class EditFrame extends JFrame implements Serializable {
             }
             payObject.setDescription((String) vector.get(5));
         }
+
+        for (Object obj : ((DefaultTableModel) editImportanceTable.getModel()).getDataVector()) {
+            Vector vector = (Vector) obj;
+            ImportanceType importanceType = (ImportanceType) vector.get(1);
+            importanceType.setName((String) vector.get(0));
+            if (!ApplicationService.getInstance().importanceTypes.contains(importanceType)) {
+                ApplicationService.getInstance().importanceTypes.add(importanceType);
+                MonitoringMoney.addFrame.addSelectElement(importanceType);
+                MonitoringMoney.mainFrame.addSelectElement(importanceType);
+            }
+        }
+        for (Object obj : ((DefaultTableModel) editPayTypeTable.getModel()).getDataVector()) {
+            Vector vector = (Vector) obj;
+            PayType payType = (PayType) vector.get(1);
+            payType.setName((String) vector.get(0));
+            if (!ApplicationService.getInstance().payTypes.contains(payType)) {
+                ApplicationService.getInstance().payTypes.add(payType);
+                MonitoringMoney.addFrame.addSelectElement(payType);
+                MonitoringMoney.mainFrame.addSelectElement(payType);
+            }
+        }
+        for (Object obj : ((DefaultTableModel) editUserTable.getModel()).getDataVector()) {
+            Vector vector = (Vector) obj;
+            Users user = (Users) vector.get(1);
+            user.setName((String) vector.get(0));
+            if (!ApplicationService.getInstance().users.contains(user)) {
+                ApplicationService.getInstance().users.add(user);
+                MonitoringMoney.addFrame.addSelectElement(user);
+                MonitoringMoney.mainFrame.addSelectElement(user);
+            }
+        }
+
+        Map<TypeValue, List<PayObject>> payObjectsUseRemoveTypeMap = new HashMap<>();
+        for (PayObject payObject : ApplicationService.getInstance().payObjects) {
+            if (removeImportanceList.contains(payObject.getImportance())) {
+                if (payObjectsUseRemoveTypeMap.containsKey(payObject.getImportance())) {
+                    payObjectsUseRemoveTypeMap.get(payObject.getImportance()).add(payObject);
+                } else {
+                    payObjectsUseRemoveTypeMap.put(payObject.getImportance(), new ArrayList<PayObject>(){{add(payObject);}});
+                }
+            }
+
+            if (removeUserList.contains(payObject.getUser())) {
+                if (payObjectsUseRemoveTypeMap.containsKey(payObject.getUser())) {
+                    payObjectsUseRemoveTypeMap.get(payObject.getUser()).add(payObject);
+                } else {
+                    payObjectsUseRemoveTypeMap.put(payObject.getUser(), new ArrayList<PayObject>(){{add(payObject);}});
+                }
+            }
+
+            if (removePayTypeList.contains(payObject.getPayType())) {
+                if (payObjectsUseRemoveTypeMap.containsKey(payObject.getPayType())) {
+                    payObjectsUseRemoveTypeMap.get(payObject.getPayType()).add(payObject);
+                } else {
+                    payObjectsUseRemoveTypeMap.put(payObject.getPayType(), new ArrayList<PayObject>(){{add(payObject);}});
+                }
+            }
+        }
+
+        removeImportanceList.stream()
+                .filter(importanceType -> !payObjectsUseRemoveTypeMap.containsKey(importanceType))
+                .filter(ApplicationService.getInstance().importanceTypes::contains)
+                .forEach(value -> {
+                    MonitoringMoney.addFrame.removeSelectElement(value);
+                    MonitoringMoney.mainFrame.removeSelectElement(value);
+                    ApplicationService.getInstance().importanceTypes.remove(value);
+                });
+        removePayTypeList.stream()
+                .filter(payType -> !payObjectsUseRemoveTypeMap.containsKey(payType))
+                .filter(ApplicationService.getInstance().payTypes::contains)
+                .forEach(value -> {
+                    MonitoringMoney.addFrame.removeSelectElement(value);
+                    MonitoringMoney.mainFrame.removeSelectElement(value);
+                    ApplicationService.getInstance().payTypes.remove(value);
+                });
+        removeUserList.stream()
+                .filter(user -> !payObjectsUseRemoveTypeMap.containsKey(user))
+                .filter(ApplicationService.getInstance().users::contains)
+                .forEach(value -> {
+                    MonitoringMoney.addFrame.removeSelectElement(value);
+                    MonitoringMoney.mainFrame.removeSelectElement(value);
+                    ApplicationService.getInstance().users.remove(value);
+                });
+
+        removePayTypeList.clear();
+        removeUserList.clear();
+        removeImportanceList.clear();
+
         ApplicationService.getInstance().updateAllFrequencyUse();
         MonitoringMoney.mainFrame.refreshText();
         ApplicationService.writeData();
     }
 
-    public void updateTable() {
-        editPayObjectTable.setModel(TableService.getTableData());
-        editPayObjectTable.getColumn(TableService.REMOVE_COLUMN).setMinWidth(20);
-        editPayObjectTable.getColumn(TableService.REMOVE_COLUMN).setMaxWidth(20);
-        editPayObjectTable.getColumn(TableService.REMOVE_COLUMN).setMinWidth(20);
-        editPayObjectTable.getColumn(TableService.REMOVE_COLUMN).setMaxWidth(20);
-        editPayObjectTable.getColumn(TableService.REMOVE_COLUMN).setCellEditor(new TableService.RemoveButtonCellEditor());
-        editPayObjectTable.getColumn(TableService.REMOVE_COLUMN).setCellRenderer(new TableService.ButtonCellRenderer());
+    public void updateTypeValueTable() {
+        editImportanceTable.setModel(TableService.getTypeValueTableData(ImportanceType.class));
+        editPayTypeTable.setModel(TableService.getTypeValueTableData(PayType.class));
+        editUserTable.setModel(TableService.getTypeValueTableData(Users.class));
+        addRemoveColumnView(editImportanceTable);
+        addRemoveColumnView(editPayTypeTable);
+        addRemoveColumnView(editUserTable);
+    }
+
+    public void updatePayObjectTable() {
+        editPayObjectTable.setModel(TableService.getPayObjectTableData());
+        addRemoveColumnView(editPayObjectTable);
         editPayObjectTable.getColumn(TableService.DESCRIPTION_COLUMN).setCellEditor(new TableService.TextAreaCellEditor(new JTextField()));
         editPayObjectTable.getColumn(TableService.DATE_COLUMN).setCellRenderer(new TableService.DateCellRenderer(ApplicationService.FORMAT_DATE));
         editPayObjectTable.getColumn(TableService.DATE_COLUMN).setCellEditor(new TableService.DateCellEditor(new JTextField(), ApplicationService.FORMAT_DATE));
         editPayObjectTable.getColumn(TableService.USER_COLUMN).setCellEditor(new TableService.SelectCellEditor(new JComboBox<>(), TableService.USER_COLUMN));
         editPayObjectTable.getColumn(TableService.IMPORTANCE_COLUMN).setCellEditor(new TableService.SelectCellEditor(new JComboBox<>(), TableService.IMPORTANCE_COLUMN));
         editPayObjectTable.getColumn(TableService.PAY_TYPE_COLUMN).setCellEditor(new TableService.SelectCellEditor(new JComboBox<>(), TableService.PAY_TYPE_COLUMN));
+    }
+
+    private void addRemoveColumnView(JTable table) {
+        table.getColumn(TableService.REMOVE_COLUMN).setMinWidth(20);
+        table.getColumn(TableService.REMOVE_COLUMN).setMaxWidth(20);
+        table.getColumn(TableService.REMOVE_COLUMN).setMinWidth(20);
+        table.getColumn(TableService.REMOVE_COLUMN).setMaxWidth(20);
+        table.getColumn(TableService.REMOVE_COLUMN).setCellEditor(new TableService.RemoveButtonCellEditor());
+        table.getColumn(TableService.REMOVE_COLUMN).setCellRenderer(new TableService.ButtonCellRenderer());
     }
 
 }
