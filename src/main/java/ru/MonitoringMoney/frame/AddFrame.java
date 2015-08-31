@@ -233,7 +233,7 @@ public class AddFrame extends JFrame implements Serializable {
 
         if (checkParams) {
             PayObject pay = new PayObject();
-            pay.setDate(DateUtils.truncate((Date) dateText.getValue(), Calendar.DATE));
+            pay.setDate((Date) dateText.getValue());
             pay.setDescription(textDescription.getText());
             pay.setImportance((ImportanceType) importanceSelect.getSelectedItem());
             pay.setPayType((PayType) payTypeSelect.getSelectedItem());

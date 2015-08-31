@@ -52,7 +52,7 @@ public class PayObject implements Serializable {
     }
 
     public void setDate(Date date) {
-        this.date = DateUtils.truncate(date, Calendar.DATE);
+        this.date = DateUtils.addHours(DateUtils.truncate(date, Calendar.DATE), 12);
     }
 
     public PayType getPayType() {
