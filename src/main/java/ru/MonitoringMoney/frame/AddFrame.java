@@ -7,14 +7,12 @@ import ru.MonitoringMoney.services.ApplicationService;
 import ru.MonitoringMoney.services.CalendarService;
 import ru.MonitoringMoney.services.ImageService;
 import ru.MonitoringMoney.types.*;
-import org.apache.commons.lang.time.DateUtils;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.Serializable;
 import java.text.ParseException;
-import java.util.Calendar;
 import java.util.Date;
 
 
@@ -81,7 +79,7 @@ public class AddFrame extends JFrame implements Serializable {
             setBorder(null);
             addActionListener(e -> {
                 disposePopup();
-                new FrameEditPropertyValues(ImportanceType.class);
+                new FrameAddPropertyValues(ImportanceType.class);
             });
             setIcon(ImageService.getPlusButtonIcon());
         }};
@@ -101,7 +99,7 @@ public class AddFrame extends JFrame implements Serializable {
             setBorder(null);
             addActionListener(e -> {
                 disposePopup();
-                new FrameEditPropertyValues(PayType.class);
+                new FrameAddPropertyValues(PayType.class);
             });
             setIcon(ImageService.getPlusButtonIcon());
         }};
@@ -130,7 +128,7 @@ public class AddFrame extends JFrame implements Serializable {
         }};
         panel.add(labelFromDate);
 
-        dateText = new JFormattedTextField(ApplicationService.FORMAT_DATE) {{
+        dateText = new JFormattedTextField(ApplicationProperties.FORMAT_DATE) {{
             setBounds(145, 100, 90, 20);
             setValue(new Date());
             addMouseListener(new MouseListener() {
@@ -172,7 +170,7 @@ public class AddFrame extends JFrame implements Serializable {
             setBounds(210, 220, 30, 30);
             addActionListener(e -> {
                 disposePopup();
-                new FrameEditPropertyValues(Users.class);
+                new FrameAddPropertyValues(Users.class);
             });
             setIcon(ImageService.getPlusButtonIcon());
         }};
@@ -195,7 +193,7 @@ public class AddFrame extends JFrame implements Serializable {
     public void addPayObject() {
         boolean checkParams = true;
         disposePopup();
-        if (ApplicationService.EMPTY.equals(((ImportanceType) importanceSelect.getSelectedItem()).getCode())) {
+        if (ApplicationProperties.EMPTY.equals(((ImportanceType) importanceSelect.getSelectedItem()).getCode())) {
             JLabel label = new JLabel("<html><font color=\"red\">Необходимо выбрать уровень важности</font></html>") {{
                 setBounds(10, 0, 260, 30);
             }};
@@ -204,7 +202,7 @@ public class AddFrame extends JFrame implements Serializable {
             checkParams = false;
         }
 
-        if (ApplicationService.EMPTY.equals(((PayType) payTypeSelect.getSelectedItem()).getCode())) {
+        if (ApplicationProperties.EMPTY.equals(((PayType) payTypeSelect.getSelectedItem()).getCode())) {
             JLabel label = new JLabel("<html><font color=\"red\">Необходимо выбрать тип покупки</font></html>") {{
                 setBounds(10, 0, 240, 30);
             }};
@@ -213,7 +211,7 @@ public class AddFrame extends JFrame implements Serializable {
             checkParams = false;
         }
 
-        if (ApplicationService.EMPTY.equals(((Users) userSelect.getSelectedItem()).getCode())) {
+        if (ApplicationProperties.EMPTY.equals(((Users) userSelect.getSelectedItem()).getCode())) {
             JLabel label = new JLabel("<html><font color=\"red\">Необходимо выбрать пользователя</font></html>") {{
                 setBounds(10, 0, 240, 30);
             }};

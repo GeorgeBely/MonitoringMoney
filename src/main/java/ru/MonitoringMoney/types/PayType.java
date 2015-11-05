@@ -6,7 +6,7 @@ import java.io.Serializable;
 import java.util.Objects;
 
 /**
- *
+ * объект типа покупки
  */
 public class PayType implements TypeValue, Serializable {
 
@@ -22,10 +22,6 @@ public class PayType implements TypeValue, Serializable {
         this.name = name;
     }
 
-    public PayType(PayTypeDefault typeDefault) {
-        code = typeDefault.toString().toLowerCase();
-        name = typeDefault.getName().toLowerCase();
-    }
 
     public String getCode() {
         return code;

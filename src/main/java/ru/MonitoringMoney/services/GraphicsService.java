@@ -15,6 +15,7 @@ import org.jfree.data.general.DefaultPieDataset;
 import org.jfree.data.time.Minute;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
+import ru.MonitoringMoney.ApplicationProperties;
 import ru.MonitoringMoney.PayObject;
 import ru.MonitoringMoney.main.MonitoringMoney;
 
@@ -149,7 +150,7 @@ public class GraphicsService {
 
         for (Map.Entry<Date, Map<Object, Integer>> entry : sortDataMap.entrySet()) {
             for (Map.Entry<Object, Integer> value : entry.getValue().entrySet()) {
-                String monthName = ApplicationService.FORMAT_MONTH_AND_YEAR.format(entry.getKey());
+                String monthName = ApplicationProperties.FORMAT_MONTH_AND_YEAR.format(entry.getKey());
                 dataSet.addValue(value.getValue(), value.getKey().toString(), monthName);
             }
         }

@@ -1,5 +1,6 @@
 package ru.MonitoringMoney.frame;
 
+import ru.MonitoringMoney.ApplicationProperties;
 import ru.MonitoringMoney.PayObject;
 import ru.MonitoringMoney.main.MonitoringMoney;
 import ru.MonitoringMoney.services.ApplicationService;
@@ -222,7 +223,7 @@ public class EditFrame extends JFrame implements Serializable {
             }
             if (vector.get(4) instanceof String) {
                 try {
-                    payObject.setDate(ApplicationService.FORMAT_DATE.parse((String) vector.get(4)));
+                    payObject.setDate(ApplicationProperties.FORMAT_DATE.parse((String) vector.get(4)));
                 } catch (ParseException ignore) {}
             }
             payObject.setDescription((String) vector.get(5));
@@ -333,8 +334,8 @@ public class EditFrame extends JFrame implements Serializable {
         editPayObjectTable.setModel(TableService.getPayObjectTableData());
         addRemoveColumnView(editPayObjectTable);
         editPayObjectTable.getColumn(TableService.DESCRIPTION_COLUMN).setCellEditor(new TableService.TextAreaCellEditor(new JTextField()));
-        editPayObjectTable.getColumn(TableService.DATE_COLUMN).setCellRenderer(new TableService.DateCellRenderer(ApplicationService.FORMAT_DATE));
-        editPayObjectTable.getColumn(TableService.DATE_COLUMN).setCellEditor(new TableService.DateCellEditor(new JTextField(), ApplicationService.FORMAT_DATE));
+        editPayObjectTable.getColumn(TableService.DATE_COLUMN).setCellRenderer(new TableService.DateCellRenderer(ApplicationProperties.FORMAT_DATE));
+        editPayObjectTable.getColumn(TableService.DATE_COLUMN).setCellEditor(new TableService.DateCellEditor(new JTextField(), ApplicationProperties.FORMAT_DATE));
         editPayObjectTable.getColumn(TableService.USER_COLUMN).setCellEditor(new TableService.SelectCellEditor(new JComboBox<>(), TableService.USER_COLUMN));
         editPayObjectTable.getColumn(TableService.IMPORTANCE_COLUMN).setCellEditor(new TableService.SelectCellEditor(new JComboBox<>(), TableService.IMPORTANCE_COLUMN));
         editPayObjectTable.getColumn(TableService.PAY_TYPE_COLUMN).setCellEditor(new TableService.SelectCellEditor(new JComboBox<>(), TableService.PAY_TYPE_COLUMN));

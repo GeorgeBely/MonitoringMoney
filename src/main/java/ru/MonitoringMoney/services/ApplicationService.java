@@ -1,10 +1,8 @@
 package ru.MonitoringMoney.services;
 
+import ru.MonitoringMoney.ApplicationProperties;
 import ru.MonitoringMoney.ImageCanvas;
 import ru.MonitoringMoney.PayObject;
-import ru.MonitoringMoney.frame.AddFrame;
-import ru.MonitoringMoney.frame.EditFrame;
-import ru.MonitoringMoney.frame.GraphicsFrame;
 import ru.MonitoringMoney.frame.MainFrame;
 import ru.MonitoringMoney.main.MonitoringMoney;
 import ru.MonitoringMoney.types.*;
@@ -12,8 +10,6 @@ import org.apache.commons.lang.StringUtils;
 
 import java.awt.*;
 import java.io.*;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,26 +20,6 @@ import java.util.stream.Collectors;
 public class ApplicationService implements Serializable {
 
     private static final long serialVersionUID = -2808789219515984025L;
-
-    /** Файл с данными о покупках */
-    public static final File buyFile = new File("MoneyData.mm");
-
-    /** Формат даты для поля ввода даты */
-    public static final DateFormat FORMAT_DATE = DateFormat.getDateInstance(DateFormat.SHORT);
-
-    /** Формат даты отображающий только название месяца и год*/
-    public static final DateFormat FORMAT_MONTH_AND_YEAR = new SimpleDateFormat("LLLL yyyy");
-
-    /** Код пустого поля свойства покупки */
-    public static final String EMPTY = "empty";
-
-    /** Карта со значениями размера фрейма по умолчанию. Ключ объект класса фрейма, значение размер фрейма */
-    private static final Map<Class, Dimension> DEFAULT_FRAME_SIZE = new HashMap<Class, Dimension>() {{
-        put(AddFrame.class, new Dimension(250, 320));
-        put(MainFrame.class, new Dimension(510, 260));
-        put(GraphicsFrame.class, new Dimension(515, 335));
-        put(EditFrame.class, new Dimension(660, 390));
-    }};
 
 
     /** Список покупок */
@@ -103,14 +79,9 @@ public class ApplicationService implements Serializable {
         users = new ArrayList<>();
         payObjects = new ArrayList<>();
 
-        for (ImportanceTypeDefault defaultType : ImportanceTypeDefault.values()) {
-            importanceTypes.add(new ImportanceType(defaultType));
-        }
-        for (PayTypeDefault defaultType : PayTypeDefault.values()) {
-            payTypes.add(new PayType(defaultType));
-        }
-
-        users.add(new Users(EMPTY, ""));
+        importanceTypes.addAll(ApplicationProperties.DEFAULT_IMPORTANCE);
+        payTypes.addAll(ApplicationProperties.DEFAULT_PAY_TYPES);
+        users.add(new Users(ApplicationProperties.EMPTY, ""));
     }
 
     /** Обновляет все данные о частоте использования типов */
@@ -164,9 +135,9 @@ public class ApplicationService implements Serializable {
             Integer o1Count = frequencyUseImportance.get(o1);
             Integer o2Count = frequencyUseImportance.get(o2);
             if (o1Count != null || o2Count != null) {
-                if (o1Count == null || EMPTY.equals(o2.getCode()))
+                if (o1Count == null || ApplicationProperties.EMPTY.equals(o2.getCode()))
                     return 1;
-                if (o2Count == null || EMPTY.equals(o1.getCode()))
+                if (o2Count == null || ApplicationProperties.EMPTY.equals(o1.getCode()))
                     return -1;
                 return o2Count.compareTo(o1Count);
             }
@@ -187,9 +158,9 @@ public class ApplicationService implements Serializable {
             Integer o1Count = frequencyUsePayType.get(o1);
             Integer o2Count = frequencyUsePayType.get(o2);
             if (o1Count != null || o2Count != null) {
-                if (o1Count == null || EMPTY.equals(o2.getCode()))
+                if (o1Count == null || ApplicationProperties.EMPTY.equals(o2.getCode()))
                     return 1;
-                if (o2Count == null || EMPTY.equals(o1.getCode()))
+                if (o2Count == null || ApplicationProperties.EMPTY.equals(o1.getCode()))
                     return -1;
                 return o2Count.compareTo(o1Count);
             }
@@ -210,9 +181,9 @@ public class ApplicationService implements Serializable {
             Integer o1Count = frequencyUseUser.get(o1);
             Integer o2Count = frequencyUseUser.get(o2);
             if (o1Count != null || o2Count != null) {
-                if (o1Count == null || EMPTY.equals(o2.getCode()))
+                if (o1Count == null || ApplicationProperties.EMPTY.equals(o2.getCode()))
                     return 1;
-                if (o2Count == null || EMPTY.equals(o1.getCode()))
+                if (o2Count == null || ApplicationProperties.EMPTY.equals(o1.getCode()))
                     return -1;
                 return o2Count.compareTo(o1Count);
             }
@@ -225,15 +196,15 @@ public class ApplicationService implements Serializable {
 
     /** Создаёт новый файл для хранения долговременной информации */
     public static void createNewData() throws IOException {
-        if (buyFile.createNewFile()) {
-            ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream(buyFile));
+        if (ApplicationProperties.BUY_FILE.createNewFile()) {
+            ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream(ApplicationProperties.BUY_FILE));
             os.writeObject(new ApplicationService());
         }
     }
 
     /** Прочитывает файл, который хранит долговременную информацию */
     public static void readData() throws IOException, ClassNotFoundException {
-        ObjectInputStream ois = new ObjectInputStream(new FileInputStream(buyFile));
+        ObjectInputStream ois = new ObjectInputStream(new FileInputStream(ApplicationProperties.BUY_FILE));
         instance = (ApplicationService) ois.readObject();
         if (instance.images == null)
             instance.images = new HashMap<>();
@@ -242,7 +213,7 @@ public class ApplicationService implements Serializable {
     /** Записыввает данные в файл долговременной информации */
     public static void writeData() {
         try {
-            ObjectOutputStream bin = new ObjectOutputStream(new FileOutputStream(ApplicationService.buyFile));
+            ObjectOutputStream bin = new ObjectOutputStream(new FileOutputStream(ApplicationProperties.BUY_FILE));
             bin.writeObject(getInstance());
         } catch (IOException e) {
             e.printStackTrace();
@@ -317,7 +288,7 @@ public class ApplicationService implements Serializable {
     public boolean checkValue(TypeValue value, List<TypeValue> values) {
         return values == null
                 || values.isEmpty()
-                || (values.size() == 1 && EMPTY.equals((values.get(0)).getCode()))
+                || (values.size() == 1 && ApplicationProperties.EMPTY.equals((values.get(0)).getCode()))
                 || values.contains(value);
     }
 
@@ -398,7 +369,7 @@ public class ApplicationService implements Serializable {
             sizeWindows = new HashMap<>();
 
         if (!sizeWindows.containsKey(className)) {
-            sizeWindows.put(className, DEFAULT_FRAME_SIZE.get(className));
+            sizeWindows.put(className, ApplicationProperties.DEFAULT_FRAME_SIZE.get(className));
         }
         return sizeWindows.get(className);
     }

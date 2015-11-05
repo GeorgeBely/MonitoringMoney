@@ -26,7 +26,7 @@ public class PopupDialog {
      * @param components    компоненты, которые нужно добавить в диалог
      * @param useCloseCross при {true}, добавить крестик скрывающий диалог
      */
-    public PopupDialog(JComponent source, Dimension size, Component[] components, boolean useCloseCross, boolean closeUnfocus) {
+    public PopupDialog(JComponent source, Dimension size, Component[] components, boolean useCloseCross, boolean closeUnfocused) {
         if (dialog != null) {
             dialog.setVisible(false);
         }
@@ -159,7 +159,7 @@ public class PopupDialog {
         dialog.getContentPane().add(contentPanel, BorderLayout.CENTER);
 
         // Закрытие окна при потере фокуса
-        if (closeUnfocus) {
+        if (closeUnfocused) {
             dialog.addWindowFocusListener(new WindowFocusListener() {
                 public void windowGainedFocus(WindowEvent e) {
                 }

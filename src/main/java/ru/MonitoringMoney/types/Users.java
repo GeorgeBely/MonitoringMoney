@@ -6,7 +6,7 @@ import java.io.Serializable;
 import java.util.Objects;
 
 /**
- *
+ * Объект пользователя
  */
 public class Users implements TypeValue, Serializable {
 

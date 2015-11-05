@@ -6,6 +6,7 @@ import com.javaswingcomponents.calendar.cellrenderers.CellRendererComponentParam
 import com.javaswingcomponents.calendar.listeners.CalendarSelectionEventType;
 import com.javaswingcomponents.calendar.model.DayOfWeek;
 import com.javaswingcomponents.calendar.plaf.darksteel.*;
+import ru.MonitoringMoney.ApplicationProperties;
 import ru.MonitoringMoney.frame.PopupDialog;
 import ru.MonitoringMoney.main.MonitoringMoney;
 
@@ -38,7 +39,7 @@ public class CalendarService {
 
     public static void addPopupCalendarDialog(JTextField textField, String action) throws ParseException {
         JSCCalendar calendar = CalendarService.getCalendarComponent(new Rectangle(10, 5, 200, 200));
-        Date date = ApplicationService.FORMAT_DATE.parse(textField.getText());
+        Date date = ApplicationProperties.FORMAT_DATE.parse(textField.getText());
         calendar.getCalendarModel().setDisplayDate(date);
         calendar.getCalendarModel().setSelectedDate(date);
         PopupDialog popupDialog = new PopupDialog(textField, new Dimension(220, 225), new Component[]{calendar}, false, true);
@@ -47,7 +48,7 @@ public class CalendarService {
                 if (textField instanceof JFormattedTextField)
                     ((JFormattedTextField) textField).setValue(e.getSelectedDates().get(0));
                 else
-                    textField.setText(ApplicationService.FORMAT_DATE.format(e.getSelectedDates().get(0)));
+                    textField.setText(ApplicationProperties.FORMAT_DATE.format(e.getSelectedDates().get(0)));
                 if (!TABLE_EDIT_CALENDAR_ACTION.equals(action))
                     MonitoringMoney.mainFrame.refreshText();
                 popupDialog.closeDialog();

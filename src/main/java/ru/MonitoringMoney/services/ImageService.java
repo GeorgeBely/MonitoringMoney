@@ -27,11 +27,6 @@ public class ImageService {
         return getImage("graphicsButton.png");
     }
 
-    /** @return изображение иконки календаря. */
-    public static Image getCalendarImage() {
-        return getImage("calendar.png");
-    }
-
     /** @return изображение иконки редактирования. */
     public static Image getEditImage() {
         return getImage("edit.png");

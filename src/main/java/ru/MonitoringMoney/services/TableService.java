@@ -1,6 +1,7 @@
 package ru.MonitoringMoney.services;
 
 
+import ru.MonitoringMoney.ApplicationProperties;
 import ru.MonitoringMoney.PayObject;
 import ru.MonitoringMoney.frame.PopupDialog;
 import ru.MonitoringMoney.main.MonitoringMoney;
@@ -55,7 +56,7 @@ public class TableService {
 
         int index = 0;
         for (TypeValue value : values) {
-            if (!ApplicationService.EMPTY.equals(value.getCode())) {
+            if (!ApplicationProperties.EMPTY.equals(value.getCode())) {
                 data[index][0] = value.getName();
                 data[index][1] = value;
                 index++;

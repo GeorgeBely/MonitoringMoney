@@ -1,5 +1,6 @@
 package ru.MonitoringMoney.frame;
 
+import ru.MonitoringMoney.ApplicationProperties;
 import ru.MonitoringMoney.PayObject;
 import ru.MonitoringMoney.main.MonitoringMoney;
 import ru.MonitoringMoney.services.ApplicationService;
@@ -185,9 +186,9 @@ public class MainFrame extends JFrame implements Serializable {
         }};
         panel.add(labelFromDate);
 
-        dateFromText = new JFormattedTextField(ApplicationService.FORMAT_DATE) {{
+        dateFromText = new JFormattedTextField(ApplicationProperties.FORMAT_DATE) {{
             setBounds(85, 135, 65, 20);
-            setValue(new Date());
+            setValue(DateUtils.truncate(new Date(), Calendar.MONTH));
             addMouseListener(new MouseListener() {
                 public void mouseReleased(MouseEvent e) {}
                 public void mouseExited(MouseEvent e) {}
@@ -205,9 +206,9 @@ public class MainFrame extends JFrame implements Serializable {
         }};
         panel.add(labelDateTo);
 
-        dateToText = new JFormattedTextField(ApplicationService.FORMAT_DATE) {{
+        dateToText = new JFormattedTextField(ApplicationProperties.FORMAT_DATE) {{
             setBounds(180, 135, 65, 20);
-            setValue(new Date());
+            setValue(DateUtils.addDays(DateUtils.addMonths(DateUtils.truncate(new Date(), Calendar.MONTH), 1), -1));
             addMouseListener(new MouseListener() {
                 public void mouseReleased(MouseEvent e) {}
                 public void mouseExited(MouseEvent e) {}
@@ -313,18 +314,18 @@ public class MainFrame extends JFrame implements Serializable {
     public boolean isUsePayType() {
         List<TypeValue> selectedPayTypes = getSelectedValues((DefaultComboBoxModel) payTypeSelect.getModel());
         return selectedPayTypes.size() == 0 ||
-                (selectedPayTypes.size() == 1 && !ApplicationService.EMPTY.equals(selectedPayTypes.get(0).getCode()));
+                (selectedPayTypes.size() == 1 && !ApplicationProperties.EMPTY.equals(selectedPayTypes.get(0).getCode()));
     }
 
     public boolean isUseImportant() {
         List<TypeValue> selectedPayTypes = getSelectedValues((DefaultComboBoxModel) importanceSelect.getModel());
         return selectedPayTypes.size() == 0 ||
-                (selectedPayTypes.size() == 1 && !ApplicationService.EMPTY.equals(selectedPayTypes.get(0).getCode()));
+                (selectedPayTypes.size() == 1 && !ApplicationProperties.EMPTY.equals(selectedPayTypes.get(0).getCode()));
     }
     public boolean isUseUser() {
         List<TypeValue> selectedPayTypes = getSelectedValues((DefaultComboBoxModel) userSelect.getModel());
         return selectedPayTypes.size() == 0 ||
-                (selectedPayTypes.size() == 1 && !ApplicationService.EMPTY.equals(selectedPayTypes.get(0).getCode()));
+                (selectedPayTypes.size() == 1 && !ApplicationProperties.EMPTY.equals(selectedPayTypes.get(0).getCode()));
     }
 
     /**

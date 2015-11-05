@@ -6,7 +6,7 @@ import java.io.Serializable;
 import java.util.Objects;
 
 /**
- *
+ * объект уровня важности
  */
 public class ImportanceType implements TypeValue, Serializable {
 
@@ -21,10 +21,6 @@ public class ImportanceType implements TypeValue, Serializable {
         this.name = name;
     }
 
-    public ImportanceType(ImportanceTypeDefault typeDefault) {
-        code = typeDefault.toString().toLowerCase();
-        name = typeDefault.getName().toLowerCase();
-    }
 
     public String getCode() {
         return code;

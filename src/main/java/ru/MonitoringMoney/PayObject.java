@@ -1,7 +1,6 @@
 package ru.MonitoringMoney;
 
 import org.apache.commons.lang.time.DateUtils;
-import ru.MonitoringMoney.services.ApplicationService;
 import ru.MonitoringMoney.types.*;
 
 import java.io.Serializable;
@@ -9,6 +8,9 @@ import java.util.Calendar;
 import java.util.Date;
 
 
+/**
+ * Объект покупки
+ */
 public class PayObject implements Serializable {
 
     private static final long serialVersionUID = -2068955115954529140L;
@@ -33,7 +35,7 @@ public class PayObject implements Serializable {
         if (importance != null)
             builder.append(importance.getName()).append(" ");
         if (date != null)
-            builder.append(ApplicationService.FORMAT_DATE.format(date)).append(" ");
+            builder.append(ApplicationProperties.FORMAT_DATE.format(date)).append(" ");
         if (description != null)
             builder.append("\n").append(description);
         return builder.toString();
