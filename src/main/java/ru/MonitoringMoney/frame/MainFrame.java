@@ -7,10 +7,7 @@ import ru.MonitoringMoney.services.ApplicationService;
 import ru.MonitoringMoney.services.CalendarService;
 import ru.MonitoringMoney.services.CheckBoxListService;
 import ru.MonitoringMoney.services.ImageService;
-import ru.MonitoringMoney.types.ImportanceType;
-import ru.MonitoringMoney.types.PayType;
-import ru.MonitoringMoney.types.TypeValue;
-import ru.MonitoringMoney.types.Users;
+import ru.MonitoringMoney.types.*;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
 
@@ -53,6 +50,7 @@ public class MainFrame extends JFrame implements Serializable {
     private JLabel labelSumPrice;
     private GraphicsFrame graphicsFrame;
     public EditFrame editFrame;
+    public DesiredPurchaseFrame desiredPurchaseFrame;
 
 
     public MainFrame() {
@@ -86,7 +84,7 @@ public class MainFrame extends JFrame implements Serializable {
         }};
         JScrollPane textScrollPane = new JScrollPane() {{
             setViewportView(text);
-            setBounds(250, 5, 250, 186);
+            setBounds(250, 5, 285, 186);
         }};
         panel.add(textScrollPane);
 
@@ -258,6 +256,14 @@ public class MainFrame extends JFrame implements Serializable {
             setIcon(ImageService.getEditButtonIcon());
         }};
         panel.add(buttonEditPays);
+
+        JButton buttonEditDesiredPurchase = new JButton() {{
+            setBorder(null);
+            setBounds(505, 195, 30, 30);
+            addActionListener(e -> EventQueue.invokeLater(() -> desiredPurchaseFrame = new DesiredPurchaseFrame()));
+            setIcon(ImageService.getDesiredPurchase());
+        }};
+        panel.add(buttonEditDesiredPurchase);
 
         refreshText();
     }

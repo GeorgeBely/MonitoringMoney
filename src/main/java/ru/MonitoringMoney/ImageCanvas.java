@@ -9,7 +9,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 
 /**
- * Объект обёртка для хранения изображений в сериализованном виде
+ * РћР±СЉРµРєС‚ РѕР±С‘СЂС‚РєР° РґР»СЏ С…СЂР°РЅРµРЅРёСЏ РёР·РѕР±СЂР°Р¶РµРЅРёР№ РІ СЃРµСЂРёР°Р»РёР·РѕРІР°РЅРЅРѕРј РІРёРґРµ
  */
 public class ImageCanvas implements Serializable {
     transient BufferedImage image;

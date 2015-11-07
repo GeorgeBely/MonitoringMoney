@@ -5,10 +5,7 @@ import ru.MonitoringMoney.ApplicationProperties;
 import ru.MonitoringMoney.PayObject;
 import ru.MonitoringMoney.frame.PopupDialog;
 import ru.MonitoringMoney.main.MonitoringMoney;
-import ru.MonitoringMoney.types.ImportanceType;
-import ru.MonitoringMoney.types.PayType;
-import ru.MonitoringMoney.types.TypeValue;
-import ru.MonitoringMoney.types.Users;
+import ru.MonitoringMoney.types.*;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
@@ -33,6 +30,7 @@ public class TableService {
     public static final String DATE_COLUMN = "Дата";
     public static final String DESCRIPTION_COLUMN = "Описание";
     public static final String REMOVE_COLUMN = "X";
+    public static final String DESIRED_PURCHASE_COLUMN = "Желаемая покупка";
 
 
     public static DefaultTableModel getTypeValueTableData(Class className) {
@@ -41,26 +39,37 @@ public class TableService {
         String columnName = null;
         List<TypeValue> values = new ArrayList<>();
         if (className.equals(ImportanceType.class)) {
-            values.addAll(ApplicationService.getInstance().importanceTypes);
+            values.addAll(ApplicationService.getInstance().getImportanceTypes());
             columnName = IMPORTANCE_COLUMN;
         } else if (className.equals(PayType.class)) {
-            values.addAll(ApplicationService.getInstance().payTypes);
+            values.addAll(ApplicationService.getInstance().getPayTypes());
             columnName = PAY_TYPE_COLUMN;
         } else if (className.equals(Users.class)) {
-            values.addAll(ApplicationService.getInstance().users);
+            values.addAll(ApplicationService.getInstance().getUsers());
             columnName = USER_COLUMN;
+        } else if (className.equals(DesiredPurchase.class)) {
+            values.addAll(ApplicationService.getInstance().getDesiredPurchases());
+            columnName = DESIRED_PURCHASE_COLUMN;
         }
 
         Object[] header = new Object[]{columnName, REMOVE_COLUMN};
-        Object[][] data = new Object[values.size() - 1][2];
+        Object[][] data;
+        if (!values.isEmpty()) {
+            if (className.equals(DesiredPurchase.class))
+                data = new Object[values.size()][2];
+            else
+                data = new Object[values.size() - 1][2];
 
-        int index = 0;
-        for (TypeValue value : values) {
-            if (!ApplicationProperties.EMPTY.equals(value.getCode())) {
-                data[index][0] = value.getName();
-                data[index][1] = value;
-                index++;
+            int index = 0;
+            for (TypeValue value : values) {
+                if (!ApplicationProperties.EMPTY.equals(value.getCode())) {
+                    data[index][0] = value.getName();
+                    data[index][1] = value;
+                    index++;
+                }
             }
+        } else {
+            data = new Object[0][2];
         }
         dm.setDataVector(data, header);
         return dm;
@@ -230,6 +239,9 @@ public class TableService {
                 MonitoringMoney.mainFrame.editFrame.removePayTypeList.add((PayType) value);
             else if (value instanceof Users)
                 MonitoringMoney.mainFrame.editFrame.removeUserList.add((Users) value);
+            else if (value instanceof DesiredPurchase)
+                MonitoringMoney.mainFrame.desiredPurchaseFrame.removeDesiredPurchases.add((DesiredPurchase) value);
+
             ((DefaultTableModel) table.getModel()).removeRow(row);
             return true;
         }

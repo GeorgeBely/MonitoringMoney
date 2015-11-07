@@ -1,7 +1,7 @@
 package ru.MonitoringMoney.types;
 
 /**
- * интерфейс для работы с любым свойством покупки
+ * РРЅС‚РµСЂС„РµР№СЃ РґР»СЏ СЂР°Р±РѕС‚С‹ СЃ Р»СЋР±С‹Рј СЃРІРѕР№СЃС‚РІРѕРј РїРѕРєСѓРїРєРё
  */
 public interface TypeValue {
     String getCode();

@@ -34,6 +34,9 @@ public class ApplicationService implements Serializable {
     /** Список пользователей */
     public List<Users> users = new ArrayList<>();
 
+    /** Список желаемых покупок */
+    public List<DesiredPurchase> desiredPurchases = new ArrayList<>();
+
     /** Карта со значениями и колличеством использования уровней важности */
     public Map<ImportanceType, Integer> frequencyUseImportance = new HashMap<>();
 
@@ -70,6 +73,30 @@ public class ApplicationService implements Serializable {
             instance.initDefaultProperties();
         }
         return instance;
+    }
+
+    public List<ImportanceType> getImportanceTypes() {
+        if (importanceTypes == null)
+            importanceTypes = new ArrayList<>();
+        return importanceTypes;
+    }
+
+    public List<PayType> getPayTypes() {
+        if (payTypes == null)
+            payTypes = new ArrayList<>();
+        return payTypes;
+    }
+
+    public List<Users> getUsers() {
+        if (users == null)
+            users = new ArrayList<>();
+        return users;
+    }
+
+    public List<DesiredPurchase> getDesiredPurchases() {
+        if (desiredPurchases == null)
+            desiredPurchases = new ArrayList<>();
+        return desiredPurchases;
     }
 
     /** Инициализирует стандартные настройки приложения. Используется при первом запуске приложения */
@@ -368,9 +395,9 @@ public class ApplicationService implements Serializable {
         if (sizeWindows == null)
             sizeWindows = new HashMap<>();
 
-        if (!sizeWindows.containsKey(className)) {
+//        if (!sizeWindows.containsKey(className)) {
             sizeWindows.put(className, ApplicationProperties.DEFAULT_FRAME_SIZE.get(className));
-        }
+//        }
         return sizeWindows.get(className);
     }
 

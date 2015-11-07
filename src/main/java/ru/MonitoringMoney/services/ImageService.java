@@ -52,6 +52,11 @@ public class ImageService {
         return getIcon("edit.png");
     }
 
+    /** @return иконку для кнопки списка желаемых покупок */
+    public static ImageIcon getDesiredPurchase() {
+        return getIcon("desiredPurchase.png");
+    }
+
     /** @return иконку для кнопки удаления покупки. */
     public static ImageIcon getRemoveButtonIcon() {
         return getIcon("remove.png");

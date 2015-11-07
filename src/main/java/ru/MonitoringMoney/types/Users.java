@@ -27,10 +27,6 @@ public class Users implements TypeValue, Serializable {
         return code;
     }
 
-    public void setCode(String code) {
-        this.code = code;
-    }
-
     public String getName() {
         return name;
     }
