@@ -3,26 +3,21 @@ package ru.MonitoringMoney.services;
 
 import ru.MonitoringMoney.ApplicationProperties;
 import ru.MonitoringMoney.PayObject;
-import ru.MonitoringMoney.frame.PopupDialog;
 import ru.MonitoringMoney.main.MonitoringMoney;
 import ru.MonitoringMoney.types.*;
+import ru.mangeorge.awt.JButtonCellEditor;
 
-import javax.swing.*;
-import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
-import javax.swing.table.TableCellRenderer;
-import java.awt.*;
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.text.DateFormat;
-import java.text.ParseException;
 import java.util.*;
 import java.util.List;
 
+
+/**
+ * Сервис для работы с таблицей
+ */
 public class TableService {
 
+    /** Наименования столбцов в таблице */
     public static final String USER_COLUMN = "Платильщик";
     public static final String IMPORTANCE_COLUMN = "Уровень важности";
     public static final String PAY_TYPE_COLUMN = "Тип покупки";
@@ -33,6 +28,10 @@ public class TableService {
     public static final String DESIRED_PURCHASE_COLUMN = "Желаемая покупка";
 
 
+    /**
+     * @param className наименование класса, значения типа которого нужно получить
+     * @return модель данных со значениями указанного типа
+     */
     public static DefaultTableModel getTypeValueTableData(Class className) {
         DefaultTableModel dm = new DefaultTableModel();
 
@@ -75,6 +74,9 @@ public class TableService {
         return dm;
     }
 
+    /**
+     * @return данные для таблицы редактирования
+     */
     public static DefaultTableModel getPayObjectTableData() {
         DefaultTableModel dm = new DefaultTableModel();
         Object[] header = new Object[]{USER_COLUMN, IMPORTANCE_COLUMN, PAY_TYPE_COLUMN, PRICE_COLUMN, DATE_COLUMN, DESCRIPTION_COLUMN, REMOVE_COLUMN};
@@ -98,139 +100,26 @@ public class TableService {
         return dm;
     }
 
-
-    public static class SelectCellEditor extends DefaultCellEditor {
-        public SelectCellEditor(JComboBox<Object> comboBox, String columnName) {
-            super(comboBox);
-            if (TableService.IMPORTANCE_COLUMN.equals(columnName)) {
-                comboBox.setModel(new DefaultComboBoxModel<>(ApplicationService.getInstance().getSortedImportance()));
-            } else if (TableService.PAY_TYPE_COLUMN.equals(columnName)) {
-                comboBox.setModel(new DefaultComboBoxModel<>(ApplicationService.getInstance().getSortedPayTypes()));
-            } else if (TableService.USER_COLUMN.equals(columnName)) {
-                comboBox.setModel(new DefaultComboBoxModel<>(ApplicationService.getInstance().getSortedUsers()));
-            }
-            comboBox.addActionListener(e -> fireEditingStopped());
+    /**
+     * @param columnName наименование столбца в таблице
+     * @return массив типов для переданного столбца, или пустой массив в протином случае.
+     */
+    public static Object[] getFieldsByColumn(String columnName) {
+        if (TableService.IMPORTANCE_COLUMN.equals(columnName)) {
+            return ApplicationService.getInstance().getSortedImportance();
+        } else if (TableService.PAY_TYPE_COLUMN.equals(columnName)) {
+            return ApplicationService.getInstance().getSortedPayTypes();
+        } else if (TableService.USER_COLUMN.equals(columnName)) {
+            return ApplicationService.getInstance().getSortedUsers();
         }
+        return new Object[0];
     }
 
-    public static class DateCellEditor extends DefaultCellEditor {
-
-        public JTextField textField;
-        private DateFormat dateFormat;
-
-        public DateCellEditor(JTextField textField, DateFormat dateFormat) {
-            super(textField);
-            textField.addMouseListener(new MouseListener() {
-                public void mouseReleased(MouseEvent e) { }
-                public void mouseExited(MouseEvent e) { }
-                public void mouseEntered(MouseEvent e) { }
-                public void mouseClicked(MouseEvent e) { }
-                public void mousePressed(MouseEvent e) {
-                    try { CalendarService.addPopupCalendarDialog(textField, CalendarService.TABLE_EDIT_CALENDAR_ACTION); } catch (ParseException ignore) { }
-                }
-            });
-            textField.setEditable(false);
-            this.dateFormat = dateFormat;
-        }
-
-        public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
-            textField = (JTextField) super.getTableCellEditorComponent(table, value, isSelected, row, column);
-            if (value instanceof Date)
-                textField.setText(dateFormat.format((Date) value));
-            return textField;
-        }
-    }
-
-    public static class DateCellRenderer extends DefaultTableCellRenderer {
-
-        private DateFormat dateFormat;
-
-        public DateCellRenderer(DateFormat dateFormat) {
-            super();
-            this.dateFormat = dateFormat;
-        }
-
-        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-            Component component = super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-            if (value instanceof Date)
-                ((DateCellRenderer) component).setText(dateFormat.format((Date) value));
-            return component;
-        }
-    }
-
-    public static class TextAreaCellEditor extends DefaultCellEditor {
-
-        public TextAreaCellEditor(JTextField textField) {
-            super(textField);
-            textField.addMouseListener(new MouseListener() {
-                public void mouseReleased(MouseEvent e) { }
-                public void mouseExited(MouseEvent e) { }
-                public void mouseEntered(MouseEvent e) { }
-                public void mouseClicked(MouseEvent e) { }
-                public void mousePressed(MouseEvent e) {
-
-                    JTextArea textArea = new JTextArea() {{
-                        setLineWrap(true);
-                        setWrapStyleWord(true);
-                        setText(textField.getText());
-                    }};
-                    textArea.addKeyListener(new KeyListener() {
-                        public void keyTyped(KeyEvent e) { }
-                        public void keyPressed(KeyEvent e) { }
-                        public void keyReleased(KeyEvent e) {
-                            textField.setText(textArea.getText());
-                        }
-                    });
-                    JScrollPane textScrollPane = new JScrollPane() {{
-                        setViewportView(textArea);
-                        setBounds(10, 5, 279, 90);
-                    }};
-
-                    new PopupDialog(textField, new Dimension(300, 110), new Component[]{textScrollPane}, false, true);
-                }
-            });
-            textField.setEditable(false);
-        }
-    }
-
-
-    public static class ButtonCellRenderer extends JButton implements TableCellRenderer {
-
-        public ButtonCellRenderer() {
-            setOpaque(true);
-            setIcon(ImageService.getRemoveButtonIcon());
-        }
-
-        public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-            return this;
-        }
-    }
-
-    public static class RemoveButtonCellEditor extends DefaultCellEditor {
-
-        protected JButton button;
-        private Object value;
-        private JTable table;
-        private int row;
-        private int column;
-
-        public RemoveButtonCellEditor() {
-            super(new JCheckBox());
-            button = new JButton();
-            button.setOpaque(true);
-            button.addActionListener(e -> fireEditingStopped());
-            button.setIcon(ImageService.getRemoveButtonIcon());
-        }
-
-        public Component getTableCellEditorComponent(JTable table, Object value, boolean isSelected, int row, int column) {
-            this.value = value;
-            this.table = table;
-            this.row = row;
-            this.column = column;
-            return button;
-        }
-
-        public boolean shouldSelectCell(EventObject anEvent) {
+    /**
+     * @return Объект ячейки с заданной функцией при клике
+     */
+    public static JButtonCellEditor getJButtonCellEditor() {
+        JButtonCellEditor.ButtonClickFunction buttonClickFunction = (value, jTable, row) -> {
             if (value instanceof PayObject)
                 MonitoringMoney.mainFrame.editFrame.removePayObjectList.add((PayObject) value);
             else if (value instanceof ImportanceType)
@@ -242,16 +131,9 @@ public class TableService {
             else if (value instanceof DesiredPurchase)
                 MonitoringMoney.mainFrame.desiredPurchaseFrame.removeDesiredPurchases.add((DesiredPurchase) value);
 
-            ((DefaultTableModel) table.getModel()).removeRow(row);
-            return true;
-        }
-
-        public Object getCellEditorValue() {
-            if (((DefaultTableModel) table.getModel()).getDataVector().size() > row) {
-                return ((Vector) ((DefaultTableModel) table.getModel()).getDataVector().get(row)).get(column);
-            }
-            return null;
-        }
+            ((DefaultTableModel) jTable.getModel()).removeRow(row);
+        };
+        return new JButtonCellEditor(ImageService.getRemoveButtonIcon(), buttonClickFunction);
     }
 }
 

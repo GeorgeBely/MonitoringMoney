@@ -4,9 +4,10 @@ package ru.MonitoringMoney.frame;
 import org.apache.commons.lang.StringUtils;
 import ru.MonitoringMoney.*;
 import ru.MonitoringMoney.services.ApplicationService;
-import ru.MonitoringMoney.services.CalendarService;
 import ru.MonitoringMoney.services.ImageService;
 import ru.MonitoringMoney.types.*;
+import ru.mangeorge.swing.graphics.PopupDialog;
+import ru.mangeorge.awt.service.CalendarService;
 
 import javax.swing.*;
 import java.awt.*;
@@ -138,7 +139,7 @@ public class AddFrame extends JFrame implements Serializable {
                 public void mouseClicked(MouseEvent e) {}
                 public void mousePressed(MouseEvent e) {
                     disposePopup();
-                    try { CalendarService.addPopupCalendarDialog(dateText, ""); } catch (ParseException ignore) { }
+                    try { CalendarService.addPopupCalendarDialog(dateText, ApplicationProperties.FORMAT_DATE, null); } catch (ParseException ignore) { }
                 }
             });
         }};

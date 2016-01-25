@@ -1,11 +1,16 @@
 package ru.MonitoringMoney.frame;
 
 
+import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.CategoryPlot;
+import org.jfree.chart.plot.PiePlot;
+import org.jfree.chart.plot.XYPlot;
 import ru.MonitoringMoney.services.ApplicationService;
 import ru.MonitoringMoney.services.GraphicsService;
 import ru.MonitoringMoney.services.ImageService;
+import ru.mangeorge.swing.service.PieService;
 
 import javax.swing.*;
 import java.awt.*;
@@ -65,33 +70,34 @@ public class GraphicsFrame extends JFrame {
         }};
         panel.add(selectViewData);
 
-        pieChart = GraphicsService.getPieComponent("Процентное соотношение покупок", this.getBackground());
+        pieChart = PieService.createChart("Процентное соотношение покупок", GraphicsService.getCountMoneyPieData(""));
+        pieChart.setBackgroundPaint(this.getBackground());
+        PiePlot plot = (PiePlot) pieChart.getPlot();
+        plot.setBackgroundPaint(this.getBackground());
+
         piePanel = new ChartPanel(pieChart) {{
             setLocation(5, 50);
             setSize(super.getWidth() - 30, super.getHeight()  - 55);
             setVisible(false);
         }};
-        GraphicsService.updatePieData(pieChart, "");
         panel.add(piePanel);
 
-        timeSerialChart = (GraphicsService.getTimeSeriesComponent("График затрат по времени",
-                "Дата покупок", "колличество", this.getBackground()));
+        timeSerialChart = ChartFactory.createTimeSeriesChart("График затрат по времени", "Дата покупок", "колличество", GraphicsService.getTimeSeriesData(""));
+        timeSerialChart.setBackgroundPaint(this.getBackground());
         categoryPanel = new ChartPanel(timeSerialChart) {{
             setLocation(5, 50);
             setSize(super.getWidth() - 30, super.getHeight()  - 55);
             setVisible(false);
         }};
-        GraphicsService.updateTimeSeriesData(timeSerialChart, "");
         panel.add(categoryPanel);
 
-        barChart = (GraphicsService.getBatChartsComponent("Суммарные затраты по времени",
-                "Месяц", "колличество", this.getBackground()));
+        barChart = ChartFactory.createBarChart("Суммарные затраты по времени", "Месяц", "колличество", GraphicsService.getBarChartData(""));
+        barChart.setBackgroundPaint(this.getBackground());
         barPanel = new ChartPanel(barChart) {{
             setLocation(5, 50);
             setSize(super.getWidth() - 30, super.getHeight()  - 55);
             setVisible(false);
         }};
-        GraphicsService.updateBarData(barChart, "");
         panel.add(barPanel);
 
 
@@ -107,9 +113,9 @@ public class GraphicsFrame extends JFrame {
 
     public void updateData() {
         String selectDataValue = (String) selectViewData.getSelectedItem();
-        GraphicsService.updatePieData(pieChart, selectDataValue);
-        GraphicsService.updateTimeSeriesData(timeSerialChart, selectDataValue);
-        GraphicsService.updateBarData(barChart, selectDataValue);
+        PieService.updatePieData(pieChart, GraphicsService.getCountMoneyPieData(selectDataValue));
+        ((CategoryPlot) barChart.getPlot()).setDataset(GraphicsService.getBarChartData(selectDataValue));
+        ((XYPlot) timeSerialChart.getPlot()).setDataset(GraphicsService.getTimeSeriesData(selectDataValue));
     }
 
     private void useSelectGraphic() {

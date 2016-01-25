@@ -5,6 +5,7 @@ import ru.MonitoringMoney.services.ApplicationService;
 import ru.MonitoringMoney.services.ImageService;
 import ru.MonitoringMoney.services.TableService;
 import ru.MonitoringMoney.types.DesiredPurchase;
+import ru.mangeorge.awt.JButtonCellRenderer;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -111,7 +112,7 @@ public class DesiredPurchaseFrame extends JFrame {
         table.getColumn(TableService.REMOVE_COLUMN).setMaxWidth(20);
         table.getColumn(TableService.REMOVE_COLUMN).setMinWidth(20);
         table.getColumn(TableService.REMOVE_COLUMN).setMaxWidth(20);
-        table.getColumn(TableService.REMOVE_COLUMN).setCellEditor(new TableService.RemoveButtonCellEditor());
-        table.getColumn(TableService.REMOVE_COLUMN).setCellRenderer(new TableService.ButtonCellRenderer());
+        table.getColumn(TableService.REMOVE_COLUMN).setCellEditor(TableService.getJButtonCellEditor());
+        table.getColumn(TableService.REMOVE_COLUMN).setCellRenderer(new JButtonCellRenderer(ImageService.getRemoveButtonIcon()));
     }
 }

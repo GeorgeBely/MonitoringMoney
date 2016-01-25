@@ -4,12 +4,12 @@ import ru.MonitoringMoney.ApplicationProperties;
 import ru.MonitoringMoney.PayObject;
 import ru.MonitoringMoney.main.MonitoringMoney;
 import ru.MonitoringMoney.services.ApplicationService;
-import ru.MonitoringMoney.services.CalendarService;
 import ru.MonitoringMoney.services.CheckBoxListService;
 import ru.MonitoringMoney.services.ImageService;
 import ru.MonitoringMoney.types.*;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
+import ru.mangeorge.awt.service.CalendarService;
 
 import javax.swing.*;
 import java.awt.*;
@@ -193,7 +193,7 @@ public class MainFrame extends JFrame implements Serializable {
                 public void mouseEntered(MouseEvent e) {}
                 public void mouseClicked(MouseEvent e) {}
                 public void mousePressed(MouseEvent e) {
-                    try { CalendarService.addPopupCalendarDialog(dateFromText, ""); } catch (ParseException ignore) { }
+                    try { CalendarService.addPopupCalendarDialog(dateFromText, ApplicationProperties.FORMAT_DATE, val -> refreshText()); } catch (ParseException ignore) { }
                 }
             });
         }};
@@ -213,7 +213,7 @@ public class MainFrame extends JFrame implements Serializable {
                 public void mouseEntered(MouseEvent e) {}
                 public void mouseClicked(MouseEvent e) {}
                 public void mousePressed(MouseEvent e) {
-                    try { CalendarService.addPopupCalendarDialog(dateToText, ""); } catch (ParseException ignore) { }
+                    try { CalendarService.addPopupCalendarDialog(dateToText, ApplicationProperties.FORMAT_DATE, val -> refreshText()); } catch (ParseException ignore) { }
                 }
             });
         }};

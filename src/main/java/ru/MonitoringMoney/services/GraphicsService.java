@@ -2,24 +2,17 @@ package ru.MonitoringMoney.services;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
-import org.jfree.chart.ChartFactory;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.labels.StandardPieSectionLabelGenerator;
-import org.jfree.chart.plot.CategoryPlot;
-import org.jfree.chart.plot.PieLabelLinkStyle;
-import org.jfree.chart.plot.PiePlot;
-import org.jfree.chart.plot.XYPlot;
 import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.category.DefaultCategoryDataset;
-import org.jfree.data.general.DefaultPieDataset;
+import org.jfree.data.general.PieDataset;
 import org.jfree.data.time.Minute;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
 import ru.MonitoringMoney.ApplicationProperties;
 import ru.MonitoringMoney.PayObject;
 import ru.MonitoringMoney.main.MonitoringMoney;
+import ru.mangeorge.swing.service.PieService;
 
-import java.awt.*;
 import java.util.*;
 
 /**
@@ -27,93 +20,20 @@ import java.util.*;
  */
 public class GraphicsService {
 
-    private static final String ANOTHER_BLOCK_NAME = "Другие";
-
     public static final String ALL_COAST = "Всего затрат";
 
+    /** Данные отображающиеся в выпадающем списке выбора графика */
     public static final String[] GRAPHICS_NAMES = new String[]{"Процентное соотношение покупок", "График затрат по времени", "Суммарные затраты по времени"};
 
+    /** Данные отображающиеся в выпадающем списке выбора данных по типу */
     public static final String[] VIEW_DATA_NAMES = new String[]{"", "Тип покупки", "Уровень важности", "Платильщик"};
 
 
     /**
-     * Создание компонента графика "Пирог"
-     *
-     * @param name       наименование графика
-     * @param background цвет панели графика
-     * @return компонент графика "Пирог".
+     * Подготавливает данные для графика "Категории", по заданному типу.
+     * @param selectData наименование данных, которые нужно отобразить. Берутся из массива {VIEW_DATA_NAMES}
+     * @return данные для графика "Категории"
      */
-    public static JFreeChart getPieComponent(String name, Color background) {
-        JFreeChart chart = ChartFactory.createPieChart(name, null);
-        chart.setBackgroundPaint(background);
-
-        PiePlot plot = (PiePlot) chart.getPlot();
-        plot.setLabelGenerator(new StandardPieSectionLabelGenerator("{0}-{1}-({2})"));
-        plot.setBackgroundPaint(background);
-        plot.setLabelLinkStyle(PieLabelLinkStyle.STANDARD);
-
-        String noDataMessage = "No data available";
-        if (Locale.getDefault().equals(new Locale("ru", "RU")))
-            noDataMessage = "Нет данных";
-        plot.setNoDataMessage(noDataMessage);
-
-        return chart;
-    }
-
-    /**
-     * Создание компонента графика "График изминения значений по датам"
-     *
-     * @param name       наименование графика
-     * @param nameX      наименование значения по абсцисе
-     * @param nameY      наименование значения
-     * @param background цвет панели графика
-     * @return компонент графика "График изминения значений по датам".
-     */
-    public static JFreeChart getTimeSeriesComponent(String name, String nameX, String nameY, Color background) {
-        JFreeChart chartCategory = ChartFactory.createTimeSeriesChart(name, nameX, nameY, getTimeSeriesData(""));
-        chartCategory.setBackgroundPaint(background);
-
-        return chartCategory;
-    }
-
-    public static JFreeChart getBatChartsComponent(String name, String nameX, String nameY, Color background) {
-        JFreeChart chartBar = ChartFactory.createBarChart(name, nameX, nameY, getBarChartData(""));
-        chartBar.setBackgroundPaint(background);
-
-        return chartBar;
-    }
-
-    public static void updatePieData(JFreeChart pie, String selectData) {
-        DefaultPieDataset data = getCountMoneyPieData(selectData);
-        PiePlot plot = (PiePlot) pie.getPlot();
-
-        plot.setExplodePercent((String) data.getKeys().get(0), 0.20);
-        plot.setDataset(data);
-
-        int greenCount = 255;
-        int redCount = 0;
-        int blueCount = 0;
-        int step = 511/data.getKeys().size();
-        for (Object keyObj : data.getKeys()) {
-            plot.setSectionPaint(keyObj.toString(), new Color(redCount, greenCount, blueCount));
-            if (greenCount > step) {
-                greenCount -= step;
-                redCount += step;
-            } else if (blueCount < 255 - step) {
-                blueCount += step;
-                redCount -= step;
-            }
-        }
-    }
-
-    public static void updateTimeSeriesData(JFreeChart timeSeries, String selectData) {
-        ((XYPlot) timeSeries.getPlot()).setDataset(getTimeSeriesData(selectData));
-    }
-
-    public static void updateBarData(JFreeChart timeSeries, String selectData) {
-        ((CategoryPlot) timeSeries.getPlot()).setDataset(getBarChartData(selectData));
-    }
-
     public static CategoryDataset getBarChartData(String selectData) {
         DefaultCategoryDataset dataSet = new DefaultCategoryDataset();
 
@@ -147,7 +67,6 @@ public class GraphicsService {
             }
         }
 
-
         for (Map.Entry<Date, Map<Object, Integer>> entry : sortDataMap.entrySet()) {
             for (Map.Entry<Object, Integer> value : entry.getValue().entrySet()) {
                 String monthName = ApplicationProperties.FORMAT_MONTH_AND_YEAR.format(entry.getKey());
@@ -157,6 +76,11 @@ public class GraphicsService {
         return dataSet;
     }
 
+    /**
+     * Подготавливает данные для графика "Временные линии", по заданному типу.
+     * @param selectData наименование данных, которые нужно отобразить. Берутся из массива {VIEW_DATA_NAMES}
+     * @return данные для графика "Временные линии"
+     */
     public static TimeSeriesCollection getTimeSeriesData(String selectData) {
         Map<String, Map<Date, Integer>> valueMap = new HashMap<>();
 
@@ -204,12 +128,16 @@ public class GraphicsService {
             dataSet.addSeries(series);
         }
 
-
         return dataSet;
     }
 
-    public static DefaultPieDataset getCountMoneyPieData(String selectData) {
-        Map<String, Integer> valueMap = new HashMap<>();
+    /**
+     * Подготавливает данные для графика пирожок, по заданному типу.
+     * @param selectData наименование данных, которые нужно отобразить. Берутся из массива {VIEW_DATA_NAMES}
+     * @return данные для графика "пирожок"
+     */
+    public static PieDataset getCountMoneyPieData(String selectData) {
+        Map<String, Number> valueMap = new HashMap<>();
         for (PayObject payObject : ApplicationService.getPayObjects()) {
             String name;
             Integer coast;
@@ -228,45 +156,12 @@ public class GraphicsService {
             }
 
             if (valueMap.containsKey(name)) {
-                valueMap.put(name, valueMap.get(name) + coast);
+                valueMap.put(name, valueMap.get(name).intValue() + coast);
             } else {
                 valueMap.put(name, coast);
             }
         }
-
-        Map<String, Integer> sortedValueMap = new TreeMap<>((s1, s2) -> {
-            if (ANOTHER_BLOCK_NAME.equals(s1))
-                return 1;
-            if (ANOTHER_BLOCK_NAME.equals(s2))
-                return -1;
-            return valueMap.get(s2).compareTo(valueMap.get(s1));
-        });
-        sortedValueMap.putAll(valueMap);
-
-        if (valueMap.size() > 10) {
-            Map<String, Integer> shortValueMap = new HashMap<>();
-            int count = 0;
-            for (Map.Entry<String, Integer> value : sortedValueMap.entrySet()) {
-                if (count < 9) {
-                    shortValueMap.put(value.getKey(), value.getValue());
-                } else {
-                    if (shortValueMap.get(ANOTHER_BLOCK_NAME) == null) {
-                        shortValueMap.put(ANOTHER_BLOCK_NAME, value.getValue());
-                    } else {
-                        shortValueMap.put(ANOTHER_BLOCK_NAME, shortValueMap.get(ANOTHER_BLOCK_NAME) + value.getValue());
-                    }
-                }
-                count++;
-            }
-            sortedValueMap.clear();
-            sortedValueMap.putAll(shortValueMap);
-        }
-
-        DefaultPieDataset defaultPieDataset = new DefaultPieDataset();
-        for (Map.Entry<String, Integer> value : sortedValueMap.entrySet()) {
-            defaultPieDataset.setValue(value.getKey(), value.getValue());
-        }
-        return defaultPieDataset;
+        return PieService.getCountMoneyPieData(valueMap);
     }
 
 }
