@@ -58,6 +58,9 @@ public class ApplicationService implements Serializable {
     /** Карта со значениями размера окон. Ключ класс фрейма, значение размер окна */
     public Map<Class, Dimension> sizeWindows = new HashMap<>();
 
+    /** Список покупок, которые отображются в данный момент */
+    public static List<PayObject> viewPayObjects = new ArrayList<>();
+
 
     /**
      * Экземпляр данного класса. Может быть только один на протяжение всего жизненного цикла приложения.
@@ -365,6 +368,7 @@ public class ApplicationService implements Serializable {
         if (payObjects.isEmpty()) {
             payObjects = ApplicationService.getInstance().getPayObjectsWithFilters(null, null, null, null, null, null, null,null);
         }
+        viewPayObjects = payObjects;
         return payObjects;
     }
 

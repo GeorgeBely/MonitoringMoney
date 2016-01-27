@@ -18,6 +18,9 @@ import java.util.Map;
  */
 public class ApplicationProperties {
 
+    /** Максимальное колличество символов во всплывающей информацие на графиках */
+    public static final Integer MAX_INFORM_GRAPHICS_MESSAGE_CHAR = 100;
+
     /** Код пустого поля свойства покупки */
     public static final String EMPTY = "empty";
 

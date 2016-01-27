@@ -1,12 +1,14 @@
 package ru.MonitoringMoney.frame;
 
 
-import org.jfree.chart.ChartFactory;
-import org.jfree.chart.ChartPanel;
-import org.jfree.chart.JFreeChart;
+import org.apache.commons.lang.StringUtils;
+import org.jfree.chart.*;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PiePlot;
 import org.jfree.chart.plot.XYPlot;
+import ru.MonitoringMoney.ApplicationProperties;
+import ru.MonitoringMoney.PayObject;
+import ru.MonitoringMoney.main.MonitoringMoney;
 import ru.MonitoringMoney.services.ApplicationService;
 import ru.MonitoringMoney.services.GraphicsService;
 import ru.MonitoringMoney.services.ImageService;
@@ -14,8 +16,10 @@ import ru.mangeorge.swing.service.PieService;
 
 import javax.swing.*;
 import java.awt.*;
+import java.util.List;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
+import java.util.ArrayList;
 
 /**
  * Фрейм с графической информацией
@@ -74,6 +78,42 @@ public class GraphicsFrame extends JFrame {
         pieChart.setBackgroundPaint(this.getBackground());
         PiePlot plot = (PiePlot) pieChart.getPlot();
         plot.setBackgroundPaint(this.getBackground());
+        plot.setToolTipGenerator((pieDataset, comparable) -> {
+            List<String> texts = new ArrayList<>();
+            for (PayObject payObject : ApplicationService.viewPayObjects) {
+                String selectData = (String) selectViewData.getSelectedItem();
+                if (((StringUtils.isBlank(selectData) && !MonitoringMoney.mainFrame.isUseImportant()) || GraphicsService.VIEW_DATA_NAMES[2].equals(selectData))
+                        && payObject.getImportance().getName().equals(comparable)) {
+                    if (!texts.contains(payObject.getPayType().getName())) {
+                        texts.add(payObject.getPayType().getName());
+                    }
+                } else if (((StringUtils.isBlank(selectData) && !MonitoringMoney.mainFrame.isUseUser()) || GraphicsService.VIEW_DATA_NAMES[3].equals(selectData))
+                        && payObject.getUser().getName().equals(comparable)) {
+                    if (!texts.contains(payObject.getPayType().getName())) {
+                        texts.add(payObject.getPayType().getName());
+                    }
+                } else if (payObject.getPayType().getName().equals(comparable)) {
+                    texts.add(payObject.getDescription());
+                }
+            }
+            String result = "";
+            for (String text : texts) {
+                if (result.length() < ApplicationProperties.MAX_INFORM_GRAPHICS_MESSAGE_CHAR) {
+                    if (!result.isEmpty()) {
+                        result += " ";
+                    }
+                    if (result.length() + text.length() > ApplicationProperties.MAX_INFORM_GRAPHICS_MESSAGE_CHAR) {
+                        if (ApplicationProperties.MAX_INFORM_GRAPHICS_MESSAGE_CHAR - result.length() > 3) {
+                            result += text.substring(0, ApplicationProperties.MAX_INFORM_GRAPHICS_MESSAGE_CHAR - result.length() - 3);
+                        }
+                        result += "...";
+                    } else {
+                        result += text;
+                    }
+                }
+            }
+            return result;
+        });
 
         piePanel = new ChartPanel(pieChart) {{
             setLocation(5, 50);
