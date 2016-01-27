@@ -120,6 +120,17 @@ public class GraphicsFrame extends JFrame {
             setSize(super.getWidth() - 30, super.getHeight()  - 55);
             setVisible(false);
         }};
+//        piePanel.addChartMouseListener(new ChartMouseListener() {
+//            @Override
+//            public void chartMouseClicked(ChartMouseEvent chartMouseEvent) {
+//                System.out.println(chartMouseEvent);
+//            }
+//
+//            @Override
+//            public void chartMouseMoved(ChartMouseEvent chartMouseEvent) {
+//                System.out.println(chartMouseEvent);
+//            }
+//        });
         panel.add(piePanel);
 
         timeSerialChart = ChartFactory.createTimeSeriesChart("График затрат по времени", "Дата покупок", "колличество", GraphicsService.getTimeSeriesData(""));
