@@ -3,6 +3,7 @@ package ru.MonitoringMoney.frame;
 
 import org.apache.commons.lang.StringUtils;
 import org.jfree.chart.*;
+import org.jfree.chart.entity.PieSectionEntity;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PiePlot;
 import org.jfree.chart.plot.XYPlot;
@@ -25,6 +26,8 @@ import java.util.ArrayList;
  * Фрейм с графической информацией
  */
 public class GraphicsFrame extends JFrame {
+
+    private static final long serialVersionUID = 2295386769890035598L;
 
     private static final String FRAME_NAME = "Графики затрат";
 
@@ -80,8 +83,8 @@ public class GraphicsFrame extends JFrame {
         plot.setBackgroundPaint(this.getBackground());
         plot.setToolTipGenerator((pieDataset, comparable) -> {
             List<String> texts = new ArrayList<>();
+            String selectData = (String) selectViewData.getSelectedItem();
             for (PayObject payObject : ApplicationService.viewPayObjects) {
-                String selectData = (String) selectViewData.getSelectedItem();
                 if (((StringUtils.isBlank(selectData) && !MonitoringMoney.mainFrame.isUseImportant()) || GraphicsService.VIEW_DATA_NAMES[2].equals(selectData))
                         && payObject.getImportance().getName().equals(comparable)) {
                     if (!texts.contains(payObject.getPayType().getName())) {
@@ -120,17 +123,39 @@ public class GraphicsFrame extends JFrame {
             setSize(super.getWidth() - 30, super.getHeight()  - 55);
             setVisible(false);
         }};
-//        piePanel.addChartMouseListener(new ChartMouseListener() {
-//            @Override
-//            public void chartMouseClicked(ChartMouseEvent chartMouseEvent) {
-//                System.out.println(chartMouseEvent);
-//            }
-//
-//            @Override
-//            public void chartMouseMoved(ChartMouseEvent chartMouseEvent) {
-//                System.out.println(chartMouseEvent);
-//            }
-//        });
+        piePanel.addChartMouseListener(new ChartMouseListener() {
+            public void chartMouseClicked(ChartMouseEvent chartMouseEvent) {
+                if (chartMouseEvent.getEntity() instanceof PieSectionEntity) {
+                    String name = ((PieSectionEntity) chartMouseEvent.getEntity()).getSectionKey().toString();
+
+                    String selectData = (String) selectViewData.getSelectedItem();
+                    if (((StringUtils.isBlank(selectData) && !MonitoringMoney.mainFrame.isUseImportant()) || GraphicsService.VIEW_DATA_NAMES[2].equals(selectData))) {
+                        MonitoringMoney.mainFrame.selectImportanceValue(name);
+                        if (!MonitoringMoney.mainFrame.isUseImportant()) {
+                            selectViewData.setSelectedItem(GraphicsService.VIEW_DATA_NAMES[1]);
+                        } else {
+                            selectViewData.setSelectedItem(GraphicsService.VIEW_DATA_NAMES[3]);
+                        }
+                    } else if (((StringUtils.isBlank(selectData) && !MonitoringMoney.mainFrame.isUseUser()) || GraphicsService.VIEW_DATA_NAMES[3].equals(selectData))) {
+                        MonitoringMoney.mainFrame.selectUserValue(name);
+                        if (!MonitoringMoney.mainFrame.isUsePayType()) {
+                            selectViewData.setSelectedItem(GraphicsService.VIEW_DATA_NAMES[1]);
+                        } else {
+                            selectViewData.setSelectedItem(GraphicsService.VIEW_DATA_NAMES[2]);
+                        }
+                    } else {
+                        MonitoringMoney.mainFrame.selectPayTypeValue(name);
+                        if (!MonitoringMoney.mainFrame.isUseUser()) {
+                            selectViewData.setSelectedItem(GraphicsService.VIEW_DATA_NAMES[3]);
+                        } else {
+                            selectViewData.setSelectedItem(GraphicsService.VIEW_DATA_NAMES[2]);
+                        }
+                    }
+                    MonitoringMoney.mainFrame.refreshText();
+                }
+            }
+            public void chartMouseMoved(ChartMouseEvent chartMouseEvent) { }
+        });
         panel.add(piePanel);
 
         timeSerialChart = ChartFactory.createTimeSeriesChart("График затрат по времени", "Дата покупок", "колличество", GraphicsService.getTimeSeriesData(""));

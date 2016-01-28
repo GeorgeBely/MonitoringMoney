@@ -41,7 +41,7 @@ public class MainFrame extends JFrame implements Serializable {
     private JTextArea text;
     public JTextField termInput;
     private JComboBox<CheckBoxListService.CheckComboValue>  importanceSelect;
-    private JComboBox<CheckBoxListService.CheckComboValue> payTypeSelect;
+    public JComboBox<CheckBoxListService.CheckComboValue> payTypeSelect;
     public JTextField priceFromText;
     public JTextField priceToText;
     public JFormattedTextField dateFromText;
@@ -315,6 +315,49 @@ public class MainFrame extends JFrame implements Serializable {
             }
         }
         return selected;
+    }
+
+    public void selectPayTypeValue(String payTypeName) {
+        PayType type = null;
+        for (PayType payType : ApplicationService.getInstance().getPayTypes()) {
+            if (payType.getName().equals(payTypeName)) {
+                type = payType;
+            }
+        }
+
+        selectValue((DefaultComboBoxModel) payTypeSelect.getModel(), type);
+    }
+
+    public void selectImportanceValue(String importanceName) {
+        ImportanceType type = null;
+        for (ImportanceType importance : ApplicationService.getInstance().getImportanceTypes()) {
+            if (importance.getName().equals(importanceName)) {
+                type = importance;
+            }
+        }
+
+        selectValue((DefaultComboBoxModel) importanceSelect.getModel(), type);
+    }
+
+    public void selectUserValue(String userName) {
+        Users type = null;
+        for (Users payType : ApplicationService.getInstance().getUsers()) {
+            if (payType.getName().equals(userName)) {
+                type = payType;
+            }
+        }
+
+        selectValue((DefaultComboBoxModel) userSelect.getModel(), type);
+    }
+
+    private void selectValue(DefaultComboBoxModel defaultModel, TypeValue typeValue) {
+        for (int i = 0; i < defaultModel.getSize(); i++) {
+            CheckBoxListService.CheckComboValue value = (CheckBoxListService.CheckComboValue) defaultModel.getElementAt(i);
+            if (value.getType().equals(typeValue)) {
+                defaultModel.setSelectedItem(value);
+                value.setState(true);
+            }
+        }
     }
 
     public boolean isUsePayType() {
