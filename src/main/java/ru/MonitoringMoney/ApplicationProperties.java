@@ -32,6 +32,7 @@ public class ApplicationProperties {
 
     /** Формат даты отображающий только название месяца и год*/
     public static final DateFormat FORMAT_MONTH_AND_YEAR = new SimpleDateFormat("LLLL yyyy");
+    public static final DateFormat FORMAT_MONTH_AND_YEAR_FOR_PARSE = new SimpleDateFormat("MMMM yyyy");
 
     /** Карта со значениями размера фрейма по умолчанию. Ключ объект класса фрейма, значение размер фрейма */
     public static final Map<Class, Dimension> DEFAULT_FRAME_SIZE = new HashMap<Class, Dimension>() {{
