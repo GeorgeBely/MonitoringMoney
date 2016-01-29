@@ -12,7 +12,7 @@ import java.io.*;
 public class MonitoringMoney implements Serializable {
 
     /** Версия приложения */
-    public static final String VERSION = "1.4.18";
+    public static final String VERSION = "1.4.19";
 
 
     /** Основной фрейм приложения */

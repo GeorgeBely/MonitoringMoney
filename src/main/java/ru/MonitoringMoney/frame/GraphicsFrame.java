@@ -9,6 +9,7 @@ import org.jfree.chart.entity.PieSectionEntity;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PiePlot;
 import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.xy.XYItemRenderer;
 import ru.MonitoringMoney.ApplicationProperties;
 import ru.MonitoringMoney.PayObject;
 import ru.MonitoringMoney.main.MonitoringMoney;
@@ -20,12 +21,10 @@ import ru.mangeorge.swing.service.PieService;
 import javax.swing.*;
 import java.awt.*;
 import java.text.ParseException;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 import java.awt.event.ComponentEvent;
 import java.awt.event.ComponentListener;
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Фрейм с графической информацией
@@ -92,13 +91,13 @@ public class GraphicsFrame extends JFrame {
             for (PayObject payObject : ApplicationService.viewPayObjects) {
                 if (((StringUtils.isBlank(selectData) && !MonitoringMoney.mainFrame.isUseImportant()) || GraphicsService.VIEW_DATA_NAMES[2].equals(selectData))
                         && payObject.getImportance().getName().equals(comparable)) {
-                    if (!texts.contains(payObject.getPayType().getName())) {
-                        texts.add(payObject.getPayType().getName());
+                    if (!texts.contains(payObject.getDescription())) {
+                        texts.add(payObject.getDescription());
                     }
                 } else if (((StringUtils.isBlank(selectData) && !MonitoringMoney.mainFrame.isUseUser()) || GraphicsService.VIEW_DATA_NAMES[3].equals(selectData))
                         && payObject.getUser().getName().equals(comparable)) {
-                    if (!texts.contains(payObject.getPayType().getName())) {
-                        texts.add(payObject.getPayType().getName());
+                    if (!texts.contains(payObject.getDescription())) {
+                        texts.add(payObject.getDescription());
                     }
                 } else if (payObject.getPayType().getName().equals(comparable)) {
                     texts.add(payObject.getDescription());
@@ -141,6 +140,36 @@ public class GraphicsFrame extends JFrame {
 
         timeSerialChart = ChartFactory.createTimeSeriesChart("График затрат по времени", "Дата покупок", "колличество", GraphicsService.getTimeSeriesData(""));
         timeSerialChart.setBackgroundPaint(this.getBackground());
+        XYPlot timeSerialPlot = (XYPlot) timeSerialChart.getPlot();
+        XYItemRenderer renderer = timeSerialPlot.getRenderer();
+        renderer.setToolTipGenerator((xyDataset, i, j) -> {
+            Date date = new Date();
+            date.setTime(xyDataset.getX(i, j).longValue());
+            Number value = xyDataset.getY(i, j);
+            String categoryName = xyDataset.getSeriesKey(i).toString();
+
+            String selectData = (String) selectViewData.getSelectedItem();
+            List<PayObject> categoryPayObjects = new ArrayList<>();
+            for (PayObject payObject : ApplicationService.viewPayObjects) {
+                if (((StringUtils.isBlank(selectData) && !MonitoringMoney.mainFrame.isUseImportant()) || GraphicsService.VIEW_DATA_NAMES[2].equals(selectData))
+                        && payObject.getImportance().getName().equals(categoryName)) {
+                    categoryPayObjects.add(payObject);
+                } else if (((StringUtils.isBlank(selectData) && !MonitoringMoney.mainFrame.isUseUser()) || GraphicsService.VIEW_DATA_NAMES[3].equals(selectData))
+                        && payObject.getUser().getName().equals(categoryName)) {
+                    categoryPayObjects.add(payObject);
+                } else if (payObject.getPayType().getName().equals(categoryName)) {
+                    categoryPayObjects.add(payObject);
+                }
+            }
+            Collections.sort(categoryPayObjects, (s1, s2) -> s1.getDate().compareTo(s2.getDate()));
+            PayObject selectPayObject = categoryPayObjects.get(j);
+
+            String result = categoryName + ": (" + ApplicationProperties.FORMAT_DATE.format(date) + ", " + value + ")";
+            if (StringUtils.isNotBlank(selectPayObject.getDescription())) {
+                result += " - " + selectPayObject.getDescription();
+            }
+            return result;
+        });
         categoryPanel = new ChartPanel(timeSerialChart) {{
             setLocation(5, 50);
             setSize(super.getWidth() - 30, super.getHeight()  - 55);
@@ -176,36 +205,56 @@ public class GraphicsFrame extends JFrame {
                 }
             }
 
-            public void chartMouseMoved(ChartMouseEvent chartMouseEvent) { }
+            public void chartMouseMoved(ChartMouseEvent chartMouseEvent) {
+            }
         });
         panel.add(barPanel);
 
-
+        updatePieData("");
         useSelectGraphic();
     }
 
     private void updatePieData(String name) {
         String selectData = (String) selectViewData.getSelectedItem();
         if (((StringUtils.isBlank(selectData) && !MonitoringMoney.mainFrame.isUseImportant()) || GraphicsService.VIEW_DATA_NAMES[2].equals(selectData))) {
-            MonitoringMoney.mainFrame.selectImportanceValue(name);
+            if (StringUtils.isNotBlank(name)) {
+                MonitoringMoney.mainFrame.selectImportanceValue(name);
+            }
             if (MonitoringMoney.mainFrame.isUsePayType()) {
                 selectViewData.setSelectedItem(GraphicsService.VIEW_DATA_NAMES[1]);
-            } else {
+            } else if (MonitoringMoney.mainFrame.isUseUser()) {
                 selectViewData.setSelectedItem(GraphicsService.VIEW_DATA_NAMES[3]);
+            } else {
+                selectViewData.setSelectedItem(GraphicsService.VIEW_DATA_NAMES[1]);
+                selectGraphic.setSelectedItem(GraphicsService.GRAPHICS_NAMES[1]);
             }
         } else if (((StringUtils.isBlank(selectData) && !MonitoringMoney.mainFrame.isUseUser()) || GraphicsService.VIEW_DATA_NAMES[3].equals(selectData))) {
-            MonitoringMoney.mainFrame.selectUserValue(name);
+            if (StringUtils.isNotBlank(name)) {
+                MonitoringMoney.mainFrame.selectUserValue(name);
+            }
             if (MonitoringMoney.mainFrame.isUsePayType()) {
                 selectViewData.setSelectedItem(GraphicsService.VIEW_DATA_NAMES[1]);
-            } else {
+            } else if (MonitoringMoney.mainFrame.isUseImportant()) {
                 selectViewData.setSelectedItem(GraphicsService.VIEW_DATA_NAMES[2]);
+            } else {
+                selectViewData.setSelectedItem(GraphicsService.VIEW_DATA_NAMES[1]);
+                selectGraphic.setSelectedItem(GraphicsService.GRAPHICS_NAMES[1]);
             }
         } else {
-            MonitoringMoney.mainFrame.selectPayTypeValue(name);
-            if (MonitoringMoney.mainFrame.isUseUser()) {
-                selectViewData.setSelectedItem(GraphicsService.VIEW_DATA_NAMES[3]);
+            if (StringUtils.isBlank(name) && MonitoringMoney.mainFrame.isUsePayType()) {
+                selectViewData.setSelectedItem(GraphicsService.VIEW_DATA_NAMES[1]);
             } else {
-                selectViewData.setSelectedItem(GraphicsService.VIEW_DATA_NAMES[2]);
+                if (StringUtils.isNotBlank(name)) {
+                    MonitoringMoney.mainFrame.selectPayTypeValue(name);
+                }
+                if (MonitoringMoney.mainFrame.isUseUser()) {
+                    selectViewData.setSelectedItem(GraphicsService.VIEW_DATA_NAMES[3]);
+                } else if (MonitoringMoney.mainFrame.isUseImportant()) {
+                    selectViewData.setSelectedItem(GraphicsService.VIEW_DATA_NAMES[2]);
+                } else {
+                    selectViewData.setSelectedItem(GraphicsService.VIEW_DATA_NAMES[1]);
+                    selectGraphic.setSelectedItem(GraphicsService.GRAPHICS_NAMES[1]);
+                }
             }
         }
         MonitoringMoney.mainFrame.refreshText();

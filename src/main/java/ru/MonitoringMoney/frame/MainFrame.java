@@ -363,18 +363,18 @@ public class MainFrame extends JFrame implements Serializable {
     public boolean isUsePayType() {
         List<TypeValue> selectedPayTypes = getSelectedValues((DefaultComboBoxModel) payTypeSelect.getModel());
         return selectedPayTypes.size() == 0 ||
-                (selectedPayTypes.size() == 1 && !ApplicationProperties.EMPTY.equals(selectedPayTypes.get(0).getCode()));
+                (selectedPayTypes.size() == 1 && ApplicationProperties.EMPTY.equals(selectedPayTypes.get(0).getCode()));
     }
 
     public boolean isUseImportant() {
         List<TypeValue> selectedPayTypes = getSelectedValues((DefaultComboBoxModel) importanceSelect.getModel());
         return selectedPayTypes.size() == 0 ||
-                (selectedPayTypes.size() == 1 && !ApplicationProperties.EMPTY.equals(selectedPayTypes.get(0).getCode()));
+                (selectedPayTypes.size() == 1 && ApplicationProperties.EMPTY.equals(selectedPayTypes.get(0).getCode()));
     }
     public boolean isUseUser() {
         List<TypeValue> selectedPayTypes = getSelectedValues((DefaultComboBoxModel) userSelect.getModel());
         return selectedPayTypes.size() == 0 ||
-                (selectedPayTypes.size() == 1 && !ApplicationProperties.EMPTY.equals(selectedPayTypes.get(0).getCode()));
+                (selectedPayTypes.size() == 1 && ApplicationProperties.EMPTY.equals(selectedPayTypes.get(0).getCode()));
     }
 
     /**
