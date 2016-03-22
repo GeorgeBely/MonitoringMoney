@@ -320,7 +320,7 @@ public class MainFrame extends JFrame implements Serializable {
     public void selectPayTypeValue(String payTypeName) {
         PayType type = null;
         for (PayType payType : ApplicationService.getInstance().getPayTypes()) {
-            if (payType.getName().equals(payTypeName)) {
+            if (payType.toString().equals(payTypeName)) {
                 type = payType;
             }
         }
