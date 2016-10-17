@@ -381,14 +381,24 @@ public class ApplicationService implements Serializable {
         if (locationWindows == null)
             locationWindows = new HashMap<>();
 
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        Dimension frameSize = getWindowSize(className);
         if (!locationWindows.containsKey(className)) {
-            Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-            Dimension frameSize = getWindowSize(className);
             Integer x = (int) (screenSize.width / 2 - frameSize.getWidth() / 2);
             Integer y = (int) (screenSize.height / 2 - frameSize.getHeight() / 2);
             locationWindows.put(className, new Point(x, y));
         }
-        return locationWindows.get(className);
+
+        Point point = locationWindows.get(className);
+        if (screenSize.getWidth() < point.getX() + frameSize.getWidth()
+                || screenSize.getHeight() < point.getY() + frameSize.getHeight()) {
+            Integer x = (int) (screenSize.width / 2 - frameSize.getWidth() / 2);
+            Integer y = (int) (screenSize.height / 2 - frameSize.getHeight() / 2);
+            point = new Point(x, y);
+            locationWindows.put(className, point);
+        }
+
+        return point;
     }
 
     /**
@@ -399,9 +409,9 @@ public class ApplicationService implements Serializable {
         if (sizeWindows == null)
             sizeWindows = new HashMap<>();
 
-//        if (!sizeWindows.containsKey(className)) {
+        if (!sizeWindows.containsKey(className)) {
             sizeWindows.put(className, ApplicationProperties.DEFAULT_FRAME_SIZE.get(className));
-//        }
+        }
         return sizeWindows.get(className);
     }
 
