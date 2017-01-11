@@ -21,11 +21,11 @@ public class TableService {
     public static final String USER_COLUMN = "Платильщик";
     public static final String IMPORTANCE_COLUMN = "Уровень важности";
     public static final String PAY_TYPE_COLUMN = "Тип покупки";
-    public static final String PRICE_COLUMN = "Стоимость";
+    private static final String PRICE_COLUMN = "Стоимость";
     public static final String DATE_COLUMN = "Дата";
     public static final String DESCRIPTION_COLUMN = "Описание";
-    public static final String REMOVE_COLUMN = "X";
-    public static final String DESIRED_PURCHASE_COLUMN = "Желаемая покупка";
+    static final String REMOVE_COLUMN = "X";
+    private static final String DESIRED_PURCHASE_COLUMN = "Желаемая покупка";
 
 
     /**
@@ -118,7 +118,7 @@ public class TableService {
     /**
      * @return Объект ячейки с заданной функцией при клике
      */
-    public static JButtonCellEditor getJButtonCellEditor() {
+    static JButtonCellEditor getJButtonCellEditor() {
         JButtonCellEditor.ButtonClickFunction buttonClickFunction = (value, jTable, row) -> {
             if (value instanceof PayObject)
                 MonitoringMoney.mainFrame.editFrame.removePayObjectList.add((PayObject) value);

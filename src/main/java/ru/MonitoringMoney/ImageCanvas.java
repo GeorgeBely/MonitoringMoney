@@ -12,7 +12,11 @@ import java.io.Serializable;
  * Объект обёртка для хранения изображений в сериализованном виде
  */
 public class ImageCanvas implements Serializable {
-    transient BufferedImage image;
+
+    private static final long serialVersionUID = 4746590529115680608L;
+
+
+    private transient BufferedImage image;
 
     public ImageCanvas(BufferedImage image) {
         this.image = image;

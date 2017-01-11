@@ -13,7 +13,7 @@ import java.awt.*;
 /**
  * Фрейм для добавления нового типа покупки
  */
-public class FrameAddPropertyValues extends JFrame {
+class FrameAddPropertyValues extends JFrame {
 
     /** Ширина фрейма */
     private static final int FRAME_WIDTH = 250;
@@ -24,7 +24,7 @@ public class FrameAddPropertyValues extends JFrame {
     private static final String FRAME_NAME = "Добавление нового значения";
 
 
-    public FrameAddPropertyValues(Class className) {
+    FrameAddPropertyValues(Class className) {
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
         setLocation(screenSize.width / 2 - FRAME_WIDTH / 2, screenSize.height / 2 - FRAME_HEIGHT / 2);
         setSize(FRAME_WIDTH, FRAME_HEIGHT);

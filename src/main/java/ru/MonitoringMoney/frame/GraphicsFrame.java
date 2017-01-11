@@ -45,7 +45,7 @@ public class GraphicsFrame extends JFrame {
     private JComboBox selectGraphic;
     private JComboBox selectViewData;
 
-    public GraphicsFrame() {
+    GraphicsFrame() {
         setLocation(ApplicationService.getInstance().getWindowLocation(GraphicsFrame.class));
         setSize(ApplicationService.getInstance().getWindowSize(GraphicsFrame.class));
         setVisible(true);
@@ -161,7 +161,7 @@ public class GraphicsFrame extends JFrame {
                     categoryPayObjects.add(payObject);
                 }
             }
-            Collections.sort(categoryPayObjects, (s1, s2) -> s1.getDate().compareTo(s2.getDate()));
+            categoryPayObjects.sort(Comparator.comparing(PayObject::getDate));
             PayObject selectPayObject = categoryPayObjects.get(j);
 
             String result = categoryName + ": (" + ApplicationProperties.FORMAT_DATE.format(date) + ", " + value + ")";
@@ -267,7 +267,7 @@ public class GraphicsFrame extends JFrame {
         barPanel.setSize(frame.getWidth() - 15, frame.getHeight() - 55);
     }
 
-    public void updateData() {
+    void updateData() {
         String selectDataValue = (String) selectViewData.getSelectedItem();
         PieService.updatePieData(pieChart, GraphicsService.getCountMoneyPieData(selectDataValue));
         ((CategoryPlot) barChart.getPlot()).setDataset(GraphicsService.getBarChartData(selectDataValue));

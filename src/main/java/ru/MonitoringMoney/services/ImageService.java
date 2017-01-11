@@ -58,7 +58,7 @@ public class ImageService {
     }
 
     /** @return иконку для кнопки удаления покупки. */
-    public static ImageIcon getRemoveButtonIcon() {
+    static ImageIcon getRemoveButtonIcon() {
         return getIcon("remove.png");
     }
 
@@ -67,7 +67,7 @@ public class ImageService {
      * @param name имя файла иконки
      * @return объект иконки
      */
-    public static ImageIcon getIcon(String name) {
+    private static ImageIcon getIcon(String name) {
         Image image = getImage(name);
         if (image == null)
             return null;
@@ -78,7 +78,7 @@ public class ImageService {
      * @param imageName имя файла изображения
      * @return объект изображения
      */
-    public static Image getImage(String imageName) {
+    private static Image getImage(String imageName) {
         try {
             ImageCanvas image = ApplicationService.getInstance().images.get(imageName);
             if (image != null && image.getImage() != null)

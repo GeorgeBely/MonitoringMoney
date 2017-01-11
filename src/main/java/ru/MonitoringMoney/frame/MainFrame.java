@@ -39,13 +39,13 @@ public class MainFrame extends JFrame implements Serializable {
 
 
     private JTextArea text;
-    public JTextField termInput;
+    private JTextField termInput;
     private JComboBox<CheckBoxListService.CheckComboValue>  importanceSelect;
-    public JComboBox<CheckBoxListService.CheckComboValue> payTypeSelect;
-    public JTextField priceFromText;
-    public JTextField priceToText;
-    public JFormattedTextField dateFromText;
-    public JFormattedTextField dateToText;
+    private JComboBox<CheckBoxListService.CheckComboValue> payTypeSelect;
+    private JTextField priceFromText;
+    private JTextField priceToText;
+    JFormattedTextField dateFromText;
+    JFormattedTextField dateToText;
     private JComboBox<CheckBoxListService.CheckComboValue> userSelect;
     private JLabel labelSumPrice;
     private GraphicsFrame graphicsFrame;
@@ -317,7 +317,7 @@ public class MainFrame extends JFrame implements Serializable {
         return selected;
     }
 
-    public void selectPayTypeValue(String payTypeName) {
+    void selectPayTypeValue(String payTypeName) {
         PayType type = null;
         for (PayType payType : ApplicationService.getInstance().getPayTypes()) {
             if (payType.toString().equals(payTypeName)) {
@@ -328,7 +328,7 @@ public class MainFrame extends JFrame implements Serializable {
         selectValue((DefaultComboBoxModel) payTypeSelect.getModel(), type);
     }
 
-    public void selectImportanceValue(String importanceName) {
+    void selectImportanceValue(String importanceName) {
         ImportanceType type = null;
         for (ImportanceType importance : ApplicationService.getInstance().getImportanceTypes()) {
             if (importance.getName().equals(importanceName)) {
@@ -339,7 +339,7 @@ public class MainFrame extends JFrame implements Serializable {
         selectValue((DefaultComboBoxModel) importanceSelect.getModel(), type);
     }
 
-    public void selectUserValue(String userName) {
+    void selectUserValue(String userName) {
         Users type = null;
         for (Users payType : ApplicationService.getInstance().getUsers()) {
             if (payType.getName().equals(userName)) {
@@ -383,7 +383,7 @@ public class MainFrame extends JFrame implements Serializable {
      *
      * @param item      новое значение
      */
-    public void addSelectElement(Object item) {
+    void addSelectElement(Object item) {
         if (item instanceof PayType)
             payTypeSelect.addItem(new CheckBoxListService.CheckComboValue((PayType) item, false));
         else if (item instanceof ImportanceType)
@@ -392,7 +392,7 @@ public class MainFrame extends JFrame implements Serializable {
             userSelect.addItem(new CheckBoxListService.CheckComboValue((Users) item, false));
     }
 
-    public void removeSelectElement(Object item) {
+    void removeSelectElement(Object item) {
         if (item instanceof PayType) {
             CheckBoxListService.CheckComboValue value = getSelectValue((TypeValue) item, payTypeSelect);
             if (value != null) {
@@ -411,7 +411,7 @@ public class MainFrame extends JFrame implements Serializable {
         }
     }
 
-    public CheckBoxListService.CheckComboValue getSelectValue(TypeValue value, JComboBox comboBox) {
+    private CheckBoxListService.CheckComboValue getSelectValue(TypeValue value, JComboBox comboBox) {
         for (int i = 0; i < comboBox.getItemCount(); i++) {
             CheckBoxListService.CheckComboValue comboValue = (CheckBoxListService.CheckComboValue) comboBox.getItemAt(i);
             if (comboValue.getType().equals(value))

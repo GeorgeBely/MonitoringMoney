@@ -38,25 +38,25 @@ public class ApplicationService implements Serializable {
     public List<DesiredPurchase> desiredPurchases = new ArrayList<>();
 
     /** Карта со значениями и колличеством использования уровней важности */
-    public Map<ImportanceType, Integer> frequencyUseImportance = new HashMap<>();
+    private Map<ImportanceType, Integer> frequencyUseImportance = new HashMap<>();
 
     /** Карта со значениями и колличеством использования типов покупки */
-    public Map<PayType, Integer> frequencyUsePayType = new HashMap<>();
+    private Map<PayType, Integer> frequencyUsePayType = new HashMap<>();
 
     /** Карта со значениями и колличеством использования платильщика */
-    public Map<Users, Integer> frequencyUseUser = new HashMap<>();
+    private Map<Users, Integer> frequencyUseUser = new HashMap<>();
 
     /** Иконки и картинки в приложение */
-    public Map<String, ImageCanvas> images = new HashMap<>();
+    Map<String, ImageCanvas> images = new HashMap<>();
 
     /** Уникальный для id нового типа объекта TypeValue. обавляется в поле code */
-    public Integer uniqueId;
+    private Integer uniqueId;
 
     /** Карта со значениями расположений окон. Ключ класс фрейма, значение координата */
-    public Map<Class, Point> locationWindows = new HashMap<>();
+    private Map<Class, Point> locationWindows = new HashMap<>();
 
     /** Карта со значениями размера окон. Ключ класс фрейма, значение размер окна */
-    public Map<Class, Dimension> sizeWindows = new HashMap<>();
+    private Map<Class, Dimension> sizeWindows = new HashMap<>();
 
     /** Список покупок, которые отображются в данный момент */
     public static List<PayObject> viewPayObjects = new ArrayList<>();
@@ -103,7 +103,7 @@ public class ApplicationService implements Serializable {
     }
 
     /** Инициализирует стандартные настройки приложения. Используется при первом запуске приложения */
-    public void initDefaultProperties() {
+    private void initDefaultProperties() {
         importanceTypes = new ArrayList<>();
         payTypes = new ArrayList<>();
         users = new ArrayList<>();
@@ -159,20 +159,7 @@ public class ApplicationService implements Serializable {
      * @return Отсортированный список уровней важности
      */
     public ImportanceType[] getSortedImportance() {
-        List<ImportanceType> sortedList = new ArrayList<>();
-        sortedList.addAll(importanceTypes);
-        Collections.sort(sortedList, (o1, o2) -> {
-            Integer o1Count = frequencyUseImportance.get(o1);
-            Integer o2Count = frequencyUseImportance.get(o2);
-            if (o1Count != null || o2Count != null) {
-                if (o1Count == null || ApplicationProperties.EMPTY.equals(o2.getCode()))
-                    return 1;
-                if (o2Count == null || ApplicationProperties.EMPTY.equals(o1.getCode()))
-                    return -1;
-                return o2Count.compareTo(o1Count);
-            }
-            return o1.getName().compareTo(o2.getName());
-        });
+        List<ImportanceType> sortedList = sortTypes(importanceTypes, frequencyUseImportance);
 
         ImportanceType[] items = new ImportanceType[sortedList.size()];
         return sortedList.toArray(items);
@@ -182,20 +169,7 @@ public class ApplicationService implements Serializable {
      * @return Отсортированные список типов покупок
      */
     public PayType[] getSortedPayTypes() {
-        List<PayType> sortedList = new ArrayList<>();
-        sortedList.addAll(payTypes);
-        Collections.sort(sortedList, (o1, o2) -> {
-            Integer o1Count = frequencyUsePayType.get(o1);
-            Integer o2Count = frequencyUsePayType.get(o2);
-            if (o1Count != null || o2Count != null) {
-                if (o1Count == null || ApplicationProperties.EMPTY.equals(o2.getCode()))
-                    return 1;
-                if (o2Count == null || ApplicationProperties.EMPTY.equals(o1.getCode()))
-                    return -1;
-                return o2Count.compareTo(o1Count);
-            }
-            return o1.getName().compareTo(o2.getName());
-        });
+        List<PayType> sortedList = sortTypes(payTypes, frequencyUsePayType);
 
         PayType[] items = new PayType[sortedList.size()];
         return sortedList.toArray(items);
@@ -205,23 +179,30 @@ public class ApplicationService implements Serializable {
      * @return Отсортированный список платильщиков
      */
     public Users[] getSortedUsers() {
-        List<Users> sortedList = new ArrayList<>();
-        sortedList.addAll(users);
-        Collections.sort(sortedList, (o1, o2) -> {
-            Integer o1Count = frequencyUseUser.get(o1);
-            Integer o2Count = frequencyUseUser.get(o2);
+        List<Users> sortedList = sortTypes(users, frequencyUseUser);
+
+        Users[] items = new Users[sortedList.size()];
+        return sortedList.toArray(items);
+    }
+
+    private <T extends TypeValue> List<T> sortTypes(List<T> list, Map<T, Integer> map) {
+        List<T> sortedList = new ArrayList<>();
+        sortedList.addAll(list);
+
+        sortedList.sort((o1, o2) -> {
+            Integer o1Count = map.get(o1);
+            Integer o2Count = map.get(o2);
             if (o1Count != null || o2Count != null) {
-                if (o1Count == null || ApplicationProperties.EMPTY.equals(o2.getCode()))
+                if (o1Count == null || ApplicationProperties.EMPTY.equals(o1.getCode()))
                     return 1;
-                if (o2Count == null || ApplicationProperties.EMPTY.equals(o1.getCode()))
+                if (o2Count == null || ApplicationProperties.EMPTY.equals(o2.getCode()))
                     return -1;
                 return o2Count.compareTo(o1Count);
             }
             return o1.getName().compareTo(o2.getName());
         });
 
-        Users[] items = new Users[sortedList.size()];
-        return sortedList.toArray(items);
+        return sortedList;
     }
 
     /** Создаёт новый файл для хранения долговременной информации */
@@ -260,9 +241,7 @@ public class ApplicationService implements Serializable {
                 .map(PayObject::toString)
                 .reduce((s1, s2) -> s1 + "\n\n" + s2);
 
-        if (optional.isPresent())
-            return optional.get();
-        return "";
+        return optional.orElse("");
     }
 
     /**
@@ -275,9 +254,7 @@ public class ApplicationService implements Serializable {
                 .map(PayObject::getPrice)
                 .reduce((s1, s2) -> s1 + s2);
 
-        if (optional.isPresent())
-            return optional.get();
-        return 0;
+        return optional.orElse(0);
     }
 
     /**
@@ -315,7 +292,7 @@ public class ApplicationService implements Serializable {
      * @return {true} - если объект <code>value</code> пуст или его код равен <code>EMPTY</code>
      *                  или если этот объект есть в списке
      */
-    public boolean checkValue(TypeValue value, List<TypeValue> values) {
+    private boolean checkValue(TypeValue value, List<TypeValue> values) {
         return values == null
                 || values.isEmpty()
                 || (values.size() == 1 && ApplicationProperties.EMPTY.equals((values.get(0)).getCode()))
@@ -363,7 +340,7 @@ public class ApplicationService implements Serializable {
      *
      * @return все покупки по выбранным фильтрам в основном окне <code>MainFrame</code>
      */
-    public static List<PayObject> getPayObjects() {
+    static List<PayObject> getPayObjects() {
         List<PayObject> payObjects = MonitoringMoney.mainFrame.getPayObjectWithCurrentFilters();
         if (payObjects.isEmpty()) {
             payObjects = ApplicationService.getInstance().getPayObjectsWithFilters(null, null, null, null, null, null, null,null);

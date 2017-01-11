@@ -2,10 +2,10 @@ package ru.MonitoringMoney.frame;
 
 
 import ru.MonitoringMoney.services.ApplicationService;
+import ru.MonitoringMoney.services.FrameService;
 import ru.MonitoringMoney.services.ImageService;
 import ru.MonitoringMoney.services.TableService;
 import ru.MonitoringMoney.types.DesiredPurchase;
-import ru.mangeorge.awt.JButtonCellRenderer;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
@@ -20,13 +20,16 @@ import java.util.Vector;
  */
 public class DesiredPurchaseFrame extends JFrame {
 
+    private static final long serialVersionUID = -1405498408839775613L;
+
+
     private static final String FRAME_NAME = "Список желаемых покупок";
 
     private JTable desiredPurchaseTable;
     public List<DesiredPurchase> removeDesiredPurchases = new ArrayList<>();
 
 
-    public DesiredPurchaseFrame() {
+    DesiredPurchaseFrame() {
         setLocation(ApplicationService.getInstance().getWindowLocation(DesiredPurchaseFrame.class));
         setSize(ApplicationService.getInstance().getWindowSize(DesiredPurchaseFrame.class));
         setResizable(false);
@@ -34,9 +37,15 @@ public class DesiredPurchaseFrame extends JFrame {
         setTitle(FRAME_NAME);
 
         addComponentListener(new ComponentListener() {
-            public void componentResized(ComponentEvent e) { }
-            public void componentMoved(ComponentEvent e) { }
-            public void componentShown(ComponentEvent e) { }
+            public void componentResized(ComponentEvent e) {
+            }
+
+            public void componentMoved(ComponentEvent e) {
+            }
+
+            public void componentShown(ComponentEvent e) {
+            }
+
             public void componentHidden(ComponentEvent e) {
                 ApplicationService.getInstance().updateSizeWindow(DesiredPurchaseFrame.class, getSize());
                 ApplicationService.getInstance().updateLocationWindow(DesiredPurchaseFrame.class, getLocation());
@@ -85,10 +94,10 @@ public class DesiredPurchaseFrame extends JFrame {
     }
 
 
-    public void updateData() {
+    private void updateData() {
         removeDesiredPurchases.stream()
-            .filter(ApplicationService.getInstance().desiredPurchases::contains)
-            .forEach(ApplicationService.getInstance().desiredPurchases::remove);
+                .filter(ApplicationService.getInstance().desiredPurchases::contains)
+                .forEach(ApplicationService.getInstance().desiredPurchases::remove);
         removeDesiredPurchases.clear();
         for (Object obj : ((DefaultTableModel) desiredPurchaseTable.getModel()).getDataVector()) {
             Vector vector = (Vector) obj;
@@ -102,17 +111,8 @@ public class DesiredPurchaseFrame extends JFrame {
     }
 
 
-    public void updateTypeValueTable() {
+    private void updateTypeValueTable() {
         desiredPurchaseTable.setModel(TableService.getTypeValueTableData(DesiredPurchase.class));
-        addRemoveColumnView(desiredPurchaseTable);
-    }
-
-    private void addRemoveColumnView(JTable table) {
-        table.getColumn(TableService.REMOVE_COLUMN).setMinWidth(20);
-        table.getColumn(TableService.REMOVE_COLUMN).setMaxWidth(20);
-        table.getColumn(TableService.REMOVE_COLUMN).setMinWidth(20);
-        table.getColumn(TableService.REMOVE_COLUMN).setMaxWidth(20);
-        table.getColumn(TableService.REMOVE_COLUMN).setCellEditor(TableService.getJButtonCellEditor());
-        table.getColumn(TableService.REMOVE_COLUMN).setCellRenderer(new JButtonCellRenderer(ImageService.getRemoveButtonIcon()));
+        FrameService.addRemoveColumnView(desiredPurchaseTable);
     }
 }

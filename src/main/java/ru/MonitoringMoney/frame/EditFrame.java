@@ -4,6 +4,7 @@ import ru.MonitoringMoney.ApplicationProperties;
 import ru.MonitoringMoney.PayObject;
 import ru.MonitoringMoney.main.MonitoringMoney;
 import ru.MonitoringMoney.services.ApplicationService;
+import ru.MonitoringMoney.services.FrameService;
 import ru.MonitoringMoney.services.ImageService;
 import ru.MonitoringMoney.services.TableService;
 import ru.MonitoringMoney.types.*;
@@ -51,7 +52,7 @@ public class EditFrame extends JFrame implements Serializable {
     public List<Users> removeUserList = new ArrayList<>();
 
 
-    public EditFrame() {
+    EditFrame() {
         setLocation(ApplicationService.getInstance().getWindowLocation(EditFrame.class));
         setSize(ApplicationService.getInstance().getWindowSize(EditFrame.class));
         setResizable(false);
@@ -205,7 +206,7 @@ public class EditFrame extends JFrame implements Serializable {
         panel.add(cancelButton);
     }
 
-    public void updateData() {
+    private void updateData() {
         ApplicationService.getInstance().payObjects.removeAll(removePayObjectList);
         removePayObjectList.clear();
 
@@ -320,18 +321,18 @@ public class EditFrame extends JFrame implements Serializable {
         ApplicationService.writeData();
     }
 
-    public void updateTypeValueTable() {
+    private void updateTypeValueTable() {
         editImportanceTable.setModel(TableService.getTypeValueTableData(ImportanceType.class));
         editPayTypeTable.setModel(TableService.getTypeValueTableData(PayType.class));
         editUserTable.setModel(TableService.getTypeValueTableData(Users.class));
-        addRemoveColumnView(editImportanceTable);
-        addRemoveColumnView(editPayTypeTable);
-        addRemoveColumnView(editUserTable);
+        FrameService.addRemoveColumnView(editImportanceTable);
+        FrameService.addRemoveColumnView(editPayTypeTable);
+        FrameService.addRemoveColumnView(editUserTable);
     }
 
-    public void updatePayObjectTable() {
+    void updatePayObjectTable() {
         editPayObjectTable.setModel(TableService.getPayObjectTableData());
-        addRemoveColumnView(editPayObjectTable);
+        FrameService.addRemoveColumnView(editPayObjectTable);
         editPayObjectTable.getColumn(TableService.DESCRIPTION_COLUMN).setCellEditor(JTableService.getJTextAreaCellEditor(new Dimension(300, 110)));
         editPayObjectTable.getColumn(TableService.DATE_COLUMN).setCellEditor(new DateCellEditor(new JTextField(), ApplicationProperties.FORMAT_DATE, null));
         editPayObjectTable.getColumn(TableService.DATE_COLUMN).setCellRenderer(new DateCellRenderer(ApplicationProperties.FORMAT_DATE));
@@ -339,14 +340,4 @@ public class EditFrame extends JFrame implements Serializable {
         editPayObjectTable.getColumn(TableService.IMPORTANCE_COLUMN).setCellEditor(new SelectCellEditor(new JComboBox<>(), TableService.getFieldsByColumn(TableService.IMPORTANCE_COLUMN)));
         editPayObjectTable.getColumn(TableService.PAY_TYPE_COLUMN).setCellEditor(new SelectCellEditor(new JComboBox<>(), TableService.getFieldsByColumn(TableService.PAY_TYPE_COLUMN)));
     }
-
-    private void addRemoveColumnView(JTable table) {
-        table.getColumn(TableService.REMOVE_COLUMN).setMinWidth(20);
-        table.getColumn(TableService.REMOVE_COLUMN).setMaxWidth(20);
-        table.getColumn(TableService.REMOVE_COLUMN).setMinWidth(20);
-        table.getColumn(TableService.REMOVE_COLUMN).setMaxWidth(20);
-        table.getColumn(TableService.REMOVE_COLUMN).setCellEditor(TableService.getJButtonCellEditor());
-        table.getColumn(TableService.REMOVE_COLUMN).setCellRenderer(new JButtonCellRenderer(ImageService.getRemoveButtonIcon()));
-    }
-
 }

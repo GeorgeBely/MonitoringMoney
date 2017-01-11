@@ -117,7 +117,9 @@ public class AddFrame extends JFrame implements Serializable {
                 public void keyTyped(KeyEvent e) { }
                 public void keyPressed(KeyEvent e) { }
                 public void keyReleased(KeyEvent e) {
-                    priceText.setText(priceText.getText().replaceAll("[^0-9]", ""));
+                    String price = priceText.getText().replaceAll("[^0-9]", "");
+                    if (!price.equals(priceText.getText()))
+                        priceText.setText(price);
                 }
             });
             addMouseListener(createPopupCloseMouseListener());
@@ -191,7 +193,7 @@ public class AddFrame extends JFrame implements Serializable {
     }
 
 
-    public void addPayObject() {
+    private void addPayObject() {
         boolean checkParams = true;
         disposePopup();
         if (ApplicationProperties.EMPTY.equals(((ImportanceType) importanceSelect.getSelectedItem()).getCode())) {
@@ -263,7 +265,7 @@ public class AddFrame extends JFrame implements Serializable {
      *
      * @param item      новое значение
      */
-    public void addSelectElement(Object item) {
+    void addSelectElement(Object item) {
         if (item instanceof PayType) {
             payTypeSelect.addItem((PayType) item);
             payTypeSelect.setSelectedItem(item);
@@ -276,7 +278,7 @@ public class AddFrame extends JFrame implements Serializable {
         }
     }
 
-    public void removeSelectElement(Object item) {
+    void removeSelectElement(Object item) {
         if (item instanceof PayType) {
             payTypeSelect.removeItem(item);
         } else if (item instanceof ImportanceType) {
@@ -286,17 +288,17 @@ public class AddFrame extends JFrame implements Serializable {
         }
     }
 
-    public void showFrame() {
+    void showFrame() {
         textDescription.setText("");
         setVisible(true);
     }
 
-    public void hideFrame() {
+    private void hideFrame() {
         disposePopup();
         setVisible(false);
     }
 
-    public void disposePopup() {
+    private void disposePopup() {
         if (importancePopup != null) {
             importancePopup.closeDialog();
         }
