@@ -142,7 +142,7 @@ public class GraphicsFrame extends JFrame {
         timeSerialChart.setBackgroundPaint(this.getBackground());
         XYPlot timeSerialPlot = (XYPlot) timeSerialChart.getPlot();
         XYItemRenderer renderer = timeSerialPlot.getRenderer();
-        renderer.setToolTipGenerator((xyDataset, i, j) -> {
+        renderer.setBaseToolTipGenerator((xyDataset, i, j) -> {
             Date date = new Date();
             date.setTime(xyDataset.getX(i, j).longValue());
             Number value = xyDataset.getY(i, j);
@@ -205,8 +205,7 @@ public class GraphicsFrame extends JFrame {
                 }
             }
 
-            public void chartMouseMoved(ChartMouseEvent chartMouseEvent) {
-            }
+            public void chartMouseMoved(ChartMouseEvent chartMouseEvent) { }
         });
         panel.add(barPanel);
 
@@ -215,49 +214,36 @@ public class GraphicsFrame extends JFrame {
     }
 
     private void updatePieData(String name) {
-        String selectData = (String) selectViewData.getSelectedItem();
-        if (((StringUtils.isBlank(selectData) && !MonitoringMoney.mainFrame.isUseImportant()) || GraphicsService.VIEW_DATA_NAMES[2].equals(selectData))) {
-            if (StringUtils.isNotBlank(name)) {
-                MonitoringMoney.mainFrame.selectImportanceValue(name);
-            }
-            if (MonitoringMoney.mainFrame.isUsePayType()) {
-                selectViewData.setSelectedItem(GraphicsService.VIEW_DATA_NAMES[1]);
-            } else if (MonitoringMoney.mainFrame.isUseUser()) {
-                selectViewData.setSelectedItem(GraphicsService.VIEW_DATA_NAMES[3]);
+        if (StringUtils.isNotBlank(name)) {
+            String selectData = (String) selectViewData.getSelectedItem();
+            List graphicValues = ((PiePlot) piePanel.getChart().getPlot()).getDataset().getKeys();
+
+            if ((StringUtils.isBlank(selectData) && !MonitoringMoney.mainFrame.isUsePayType()) || GraphicsService.VIEW_DATA_NAMES[1].equals(selectData)) {
+                MonitoringMoney.mainFrame.selectPayTypeValue(name, graphicValues);
+            } else if ((StringUtils.isBlank(selectData) && !MonitoringMoney.mainFrame.isUseImportant()) || GraphicsService.VIEW_DATA_NAMES[2].equals(selectData)) {
+                MonitoringMoney.mainFrame.selectImportanceValue(name, graphicValues);
             } else {
-                selectViewData.setSelectedItem(GraphicsService.VIEW_DATA_NAMES[1]);
-                selectGraphic.setSelectedItem(GraphicsService.GRAPHICS_NAMES[1]);
-            }
-        } else if (((StringUtils.isBlank(selectData) && !MonitoringMoney.mainFrame.isUseUser()) || GraphicsService.VIEW_DATA_NAMES[3].equals(selectData))) {
-            if (StringUtils.isNotBlank(name)) {
-                MonitoringMoney.mainFrame.selectUserValue(name);
-            }
-            if (MonitoringMoney.mainFrame.isUsePayType()) {
-                selectViewData.setSelectedItem(GraphicsService.VIEW_DATA_NAMES[1]);
-            } else if (MonitoringMoney.mainFrame.isUseImportant()) {
-                selectViewData.setSelectedItem(GraphicsService.VIEW_DATA_NAMES[2]);
-            } else {
-                selectViewData.setSelectedItem(GraphicsService.VIEW_DATA_NAMES[1]);
-                selectGraphic.setSelectedItem(GraphicsService.GRAPHICS_NAMES[1]);
-            }
-        } else {
-            if (StringUtils.isBlank(name) && MonitoringMoney.mainFrame.isUsePayType()) {
-                selectViewData.setSelectedItem(GraphicsService.VIEW_DATA_NAMES[1]);
-            } else {
-                if (StringUtils.isNotBlank(name)) {
-                    MonitoringMoney.mainFrame.selectPayTypeValue(name);
-                }
-                if (MonitoringMoney.mainFrame.isUseUser()) {
-                    selectViewData.setSelectedItem(GraphicsService.VIEW_DATA_NAMES[3]);
-                } else if (MonitoringMoney.mainFrame.isUseImportant()) {
-                    selectViewData.setSelectedItem(GraphicsService.VIEW_DATA_NAMES[2]);
-                } else {
-                    selectViewData.setSelectedItem(GraphicsService.VIEW_DATA_NAMES[1]);
-                    selectGraphic.setSelectedItem(GraphicsService.GRAPHICS_NAMES[1]);
-                }
+                MonitoringMoney.mainFrame.selectUserValue(name, graphicValues);
             }
         }
+        if (!PieService.ANOTHER_BLOCK_NAME.equals(name)) {
+            setSelectViewData();
+        }
+
         MonitoringMoney.mainFrame.refreshText();
+    }
+
+    private void setSelectViewData() {
+        String selectData = (String) selectViewData.getSelectedItem();
+        if (MonitoringMoney.mainFrame.isUsePayType() && !GraphicsService.VIEW_DATA_NAMES[1].equals(selectData)) {
+            selectViewData.setSelectedItem(GraphicsService.VIEW_DATA_NAMES[1]);
+        } else if (MonitoringMoney.mainFrame.isUseImportant() && !GraphicsService.VIEW_DATA_NAMES[2].equals(selectData)) {
+            selectViewData.setSelectedItem(GraphicsService.VIEW_DATA_NAMES[2]);
+        } else if (MonitoringMoney.mainFrame.isUseUser() && !GraphicsService.VIEW_DATA_NAMES[3].equals(selectData)) {
+            selectViewData.setSelectedItem(GraphicsService.VIEW_DATA_NAMES[3]);
+        } else {
+            selectGraphic.setSelectedItem(GraphicsService.GRAPHICS_NAMES[1]);
+        }
     }
 
     private void resizeFrame() {

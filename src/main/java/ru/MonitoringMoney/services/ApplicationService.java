@@ -194,9 +194,9 @@ public class ApplicationService implements Serializable {
             Integer o2Count = map.get(o2);
             if (o1Count != null || o2Count != null) {
                 if (o1Count == null || ApplicationProperties.EMPTY.equals(o1.getCode()))
-                    return 1;
-                if (o2Count == null || ApplicationProperties.EMPTY.equals(o2.getCode()))
                     return -1;
+                if (o2Count == null || ApplicationProperties.EMPTY.equals(o2.getCode()))
+                    return 1;
                 return o2Count.compareTo(o1Count);
             }
             return o1.getName().compareTo(o2.getName());

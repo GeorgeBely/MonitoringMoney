@@ -65,17 +65,17 @@ public class CheckBoxListService {
         }
     }
 
-    public static class CheckComboRenderer implements ListCellRenderer {
+    public static class CheckComboRenderer implements ListCellRenderer<CheckComboValue> {
         private JCheckBox checkBox;
 
         public CheckComboRenderer() {
             checkBox = new JCheckBox();
         }
 
-        public Component getListCellRendererComponent(JList list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-            CheckComboValue store = (CheckComboValue) value;
-            checkBox.setText(store.id);
-            checkBox.setSelected(store.state);
+        @Override
+        public Component getListCellRendererComponent(JList<? extends CheckComboValue> list, CheckComboValue value, int index, boolean isSelected, boolean cellHasFocus) {
+            checkBox.setText(value.id);
+            checkBox.setSelected(value.state);
             if (isSelected) {
                 checkBox.setBackground(list.getSelectionBackground());
                 checkBox.setForeground(list.getSelectionForeground());

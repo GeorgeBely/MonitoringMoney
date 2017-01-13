@@ -27,7 +27,7 @@ public class ImportanceType implements TypeValue, Serializable {
     }
 
     public String getName() {
-        return name;
+        return StringUtils.capitalize(name);
     }
 
     public void setName(String name) {

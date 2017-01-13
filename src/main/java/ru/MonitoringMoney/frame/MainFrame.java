@@ -10,6 +10,7 @@ import ru.MonitoringMoney.types.*;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
 import ru.mangeorge.awt.service.CalendarService;
+import ru.mangeorge.swing.service.PieService;
 
 import javax.swing.*;
 import java.awt.*;
@@ -317,37 +318,51 @@ public class MainFrame extends JFrame implements Serializable {
         return selected;
     }
 
-    void selectPayTypeValue(String payTypeName) {
-        PayType type = null;
-        for (PayType payType : ApplicationService.getInstance().getPayTypes()) {
-            if (payType.toString().equals(payTypeName)) {
+    void selectPayTypeValue(String name, List graphicValues) {
+        selectType(name, ApplicationService.getInstance().getPayTypes(), (DefaultComboBoxModel) payTypeSelect.getModel(), graphicValues);
+    }
+
+    void selectImportanceValue(String name, List graphicValues) {
+        selectType(name, ApplicationService.getInstance().getImportanceTypes(), (DefaultComboBoxModel) importanceSelect.getModel(), graphicValues);
+    }
+
+    void selectUserValue(String name, List graphicValues) {
+        selectType(name, ApplicationService.getInstance().getUsers(), (DefaultComboBoxModel) userSelect.getModel(), graphicValues);
+    }
+
+    private <T> void selectType(String name, List<T> types, DefaultComboBoxModel model, List graphicValues) {
+        if (PieService.ANOTHER_BLOCK_NAME.equals(name)) {
+            if (getSelectedValues(model).isEmpty()) {
+                selectAllValues(model, true);
+            }
+
+            for (int i = 0; i < model.getSize(); i++) {
+                CheckBoxListService.CheckComboValue value = (CheckBoxListService.CheckComboValue) model.getElementAt(i);
+                if (value.isSelected() && graphicValues.contains(value.getType().getName())) {
+                    model.setSelectedItem(value);
+                    value.setState(false);
+                }
+            }
+            return;
+        }
+        selectAllValues(model, false);
+
+
+        T type = null;
+        for (T payType : types) {
+            if (((TypeValue) payType).getName().equals(name)) {
                 type = payType;
             }
         }
 
-        selectValue((DefaultComboBoxModel) payTypeSelect.getModel(), type);
+        selectValue(model, (TypeValue) type);
     }
 
-    void selectImportanceValue(String importanceName) {
-        ImportanceType type = null;
-        for (ImportanceType importance : ApplicationService.getInstance().getImportanceTypes()) {
-            if (importance.getName().equals(importanceName)) {
-                type = importance;
-            }
+    private void selectAllValues(DefaultComboBoxModel model, boolean state) {
+        for (int i = 0; i < model.getSize(); i++) {
+            CheckBoxListService.CheckComboValue value = (CheckBoxListService.CheckComboValue) model.getElementAt(i);
+            value.setState(state);
         }
-
-        selectValue((DefaultComboBoxModel) importanceSelect.getModel(), type);
-    }
-
-    void selectUserValue(String userName) {
-        Users type = null;
-        for (Users payType : ApplicationService.getInstance().getUsers()) {
-            if (payType.getName().equals(userName)) {
-                type = payType;
-            }
-        }
-
-        selectValue((DefaultComboBoxModel) userSelect.getModel(), type);
     }
 
     private void selectValue(DefaultComboBoxModel defaultModel, TypeValue typeValue) {
@@ -362,18 +377,18 @@ public class MainFrame extends JFrame implements Serializable {
 
     public boolean isUsePayType() {
         List<TypeValue> selectedPayTypes = getSelectedValues((DefaultComboBoxModel) payTypeSelect.getModel());
-        return selectedPayTypes.size() == 0 ||
+        return selectedPayTypes.isEmpty() ||
                 (selectedPayTypes.size() == 1 && ApplicationProperties.EMPTY.equals(selectedPayTypes.get(0).getCode()));
     }
 
     public boolean isUseImportant() {
         List<TypeValue> selectedPayTypes = getSelectedValues((DefaultComboBoxModel) importanceSelect.getModel());
-        return selectedPayTypes.size() == 0 ||
+        return selectedPayTypes.isEmpty() ||
                 (selectedPayTypes.size() == 1 && ApplicationProperties.EMPTY.equals(selectedPayTypes.get(0).getCode()));
     }
     public boolean isUseUser() {
         List<TypeValue> selectedPayTypes = getSelectedValues((DefaultComboBoxModel) userSelect.getModel());
-        return selectedPayTypes.size() == 0 ||
+        return selectedPayTypes.isEmpty() ||
                 (selectedPayTypes.size() == 1 && ApplicationProperties.EMPTY.equals(selectedPayTypes.get(0).getCode()));
     }
 

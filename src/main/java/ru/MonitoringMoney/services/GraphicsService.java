@@ -31,6 +31,7 @@ public class GraphicsService {
 
     /**
      * Подготавливает данные для графика "Категории", по заданному типу.
+     *
      * @param selectData наименование данных, которые нужно отобразить. Берутся из массива {VIEW_DATA_NAMES}
      * @return данные для графика "Категории"
      */
@@ -78,6 +79,7 @@ public class GraphicsService {
 
     /**
      * Подготавливает данные для графика "Временные линии", по заданному типу.
+     *
      * @param selectData наименование данных, которые нужно отобразить. Берутся из массива {VIEW_DATA_NAMES}
      * @return данные для графика "Временные линии"
      */
@@ -85,26 +87,9 @@ public class GraphicsService {
         Map<String, Map<Date, Integer>> valueMap = new HashMap<>();
 
         for (PayObject payObject : ApplicationService.getPayObjects()) {
-            String name;
-            Integer coast;
-            Date date;
-            if ((StringUtils.isBlank(selectData) && !MonitoringMoney.mainFrame.isUsePayType()) || VIEW_DATA_NAMES[1].equals(selectData)) {
-                name = payObject.getPayType().toString();
-                coast = payObject.getPrice();
-                date = payObject.getDate();
-            } else if ((StringUtils.isBlank(selectData) && !MonitoringMoney.mainFrame.isUseImportant()) || VIEW_DATA_NAMES[2].equals(selectData)) {
-                name = payObject.getImportance().toString();
-                coast = payObject.getPrice();
-                date = payObject.getDate();
-            } else if ((StringUtils.isBlank(selectData) && !MonitoringMoney.mainFrame.isUseUser()) || VIEW_DATA_NAMES[3].equals(selectData)) {
-                name = payObject.getUser().toString();
-                coast = payObject.getPrice();
-                date = payObject.getDate();
-            } else {
-                name = payObject.getPayType().toString();
-                coast = payObject.getPrice();
-                date = payObject.getDate();
-            }
+            String name = getPayObjectName(payObject, selectData);
+            Integer coast = payObject.getPrice();
+            Date date = payObject.getDate();
 
             if (valueMap.containsKey(name)) {
                 if (valueMap.get(name).containsKey(date)) {
@@ -133,27 +118,15 @@ public class GraphicsService {
 
     /**
      * Подготавливает данные для графика пирожок, по заданному типу.
+     *
      * @param selectData наименование данных, которые нужно отобразить. Берутся из массива {VIEW_DATA_NAMES}
      * @return данные для графика "пирожок"
      */
     public static PieDataset getCountMoneyPieData(String selectData) {
         Map<String, Number> valueMap = new HashMap<>();
         for (PayObject payObject : ApplicationService.getPayObjects()) {
-            String name;
-            Integer coast;
-            if ((StringUtils.isBlank(selectData) && !MonitoringMoney.mainFrame.isUsePayType()) || VIEW_DATA_NAMES[1].equals(selectData)) {
-                name = payObject.getPayType().toString();
-                coast = payObject.getPrice();
-            } else if ((StringUtils.isBlank(selectData) && !MonitoringMoney.mainFrame.isUseImportant()) || VIEW_DATA_NAMES[2].equals(selectData)) {
-                name = payObject.getImportance().toString();
-                coast = payObject.getPrice();
-            } else if ((StringUtils.isBlank(selectData) && !MonitoringMoney.mainFrame.isUseUser()) || VIEW_DATA_NAMES[3].equals(selectData)) {
-                name = payObject.getUser().toString();
-                coast = payObject.getPrice();
-            } else {
-                name = payObject.getPayType().toString();
-                coast = payObject.getPrice();
-            }
+            String name = getPayObjectName(payObject, selectData);
+            Integer coast = payObject.getPrice();
 
             if (valueMap.containsKey(name)) {
                 valueMap.put(name, valueMap.get(name).intValue() + coast);
@@ -162,6 +135,16 @@ public class GraphicsService {
             }
         }
         return PieService.getCountMoneyPieData(valueMap);
+    }
+
+    private static String getPayObjectName(PayObject payObject, String selectData) {
+        if ((StringUtils.isBlank(selectData) && !MonitoringMoney.mainFrame.isUsePayType()) || VIEW_DATA_NAMES[1].equals(selectData)) {
+            return payObject.getPayType().toString();
+        } else if ((StringUtils.isBlank(selectData) && !MonitoringMoney.mainFrame.isUseImportant()) || VIEW_DATA_NAMES[2].equals(selectData)) {
+            return payObject.getImportance().toString();
+        } else {
+            return payObject.getUser().toString();
+        }
     }
 
 }
