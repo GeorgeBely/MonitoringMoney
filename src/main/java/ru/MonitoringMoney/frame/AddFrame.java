@@ -4,16 +4,15 @@ package ru.MonitoringMoney.frame;
 import org.apache.commons.lang.StringUtils;
 import ru.MonitoringMoney.*;
 import ru.MonitoringMoney.services.ApplicationService;
+import ru.MonitoringMoney.services.FrameService;
 import ru.MonitoringMoney.services.ImageService;
 import ru.MonitoringMoney.types.*;
 import ru.mangeorge.swing.graphics.PopupDialog;
-import ru.mangeorge.awt.service.CalendarService;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.Serializable;
-import java.text.ParseException;
 import java.util.Date;
 
 
@@ -24,10 +23,8 @@ public class AddFrame extends JFrame implements Serializable {
 
     private static final long serialVersionUID = -5105213622223281168L;
 
-
     /** Заголовок фрейма */
     private static final String FRAME_NAME = "Добавление покупки";
-
 
     private JFormattedTextField dateText;
     private JComboBox<ImportanceType> importanceSelect;
@@ -35,10 +32,12 @@ public class AddFrame extends JFrame implements Serializable {
     private JComboBox<Users> userSelect;
     private JTextArea textDescription;
     private JTextField priceText;
-    private PopupDialog importancePopup;
-    private PopupDialog payTypePopup;
-    private PopupDialog userPopup;
-    private PopupDialog pricePopup;
+
+    /** Всплывающие окна ошибок валидиции */
+    private PopupDialog importanceErrorPopup;
+    private PopupDialog payTypeErrorPopup;
+    private PopupDialog userErrorPopup;
+    private PopupDialog priceErrorPopup;
 
 
     public AddFrame() {
@@ -62,49 +61,13 @@ public class AddFrame extends JFrame implements Serializable {
         JPanel panel = new JPanel() {{
             setFocusable(true);
             setLayout(null);
-            addMouseListener(createPopupCloseMouseListener());
+            addMouseListener(FrameService.createPopupCloseMouseListener(AddFrame.this::disposePopup));
         }};
         add(panel);
 
-        importanceSelect = new JComboBox<ImportanceType>() {{
-            setModel(new DefaultComboBoxModel<>(ApplicationService.getInstance().getSortedImportance()));
-            if (getModel().getSize() == 2)
-                setSelectedIndex(1);
-            setBounds(5, 5, 200, 30);
-            addMouseListener(createPopupCloseMouseListener());
-        }};
-        panel.add(importanceSelect);
-
-        JButton importanceButton = new JButton() {{
-            setBounds(210, 5, 30, 30);
-            setBorder(null);
-            addActionListener(e -> {
-                disposePopup();
-                new FrameAddPropertyValues(ImportanceType.class);
-            });
-            setIcon(ImageService.getPlusButtonIcon());
-        }};
-        panel.add(importanceButton);
-
-        payTypeSelect = new JComboBox<PayType>() {{
-            setModel(new DefaultComboBoxModel<>(ApplicationService.getInstance().getSortedPayTypes()));
-            if (getModel().getSize() == 2)
-                setSelectedIndex(1);
-            setBounds(5, 40, 200, 30);
-            addMouseListener(createPopupCloseMouseListener());
-        }};
-        panel.add(payTypeSelect);
-
-        JButton payTypeButton = new JButton() {{
-            setBounds(210, 40, 30, 30);
-            setBorder(null);
-            addActionListener(e -> {
-                disposePopup();
-                new FrameAddPropertyValues(PayType.class);
-            });
-            setIcon(ImageService.getPlusButtonIcon());
-        }};
-        panel.add(payTypeButton);
+        importanceSelect = createSelectTypeValue(panel, new Rectangle(5, 5, 200, 30), ApplicationService.getInstance().getSortedImportance());
+        payTypeSelect = createSelectTypeValue(panel, new Rectangle(5, 40, 200, 30), ApplicationService.getInstance().getSortedPayTypes());
+        userSelect = createSelectTypeValue(panel, new Rectangle(5, 220, 200, 30), ApplicationService.getInstance().getSortedUsers());
 
         JLabel priceLabel = new JLabel("Стоимость покупки") {{
             setBounds(5, 75, 140, 20);
@@ -113,16 +76,8 @@ public class AddFrame extends JFrame implements Serializable {
 
         priceText = new JTextField() {{
             setBounds(145, 75, 90, 20);
-            addKeyListener(new KeyListener() {
-                public void keyTyped(KeyEvent e) { }
-                public void keyPressed(KeyEvent e) { }
-                public void keyReleased(KeyEvent e) {
-                    String price = priceText.getText().replaceAll("[^0-9]", "");
-                    if (!price.equals(priceText.getText()))
-                        priceText.setText(price);
-                }
-            });
-            addMouseListener(createPopupCloseMouseListener());
+            addKeyListener(FrameService.createPriceKeyListener(this));
+            addMouseListener(FrameService.createPopupCloseMouseListener(AddFrame.this::disposePopup));
         }};
         panel.add(priceText);
 
@@ -134,50 +89,11 @@ public class AddFrame extends JFrame implements Serializable {
         dateText = new JFormattedTextField(ApplicationProperties.FORMAT_DATE) {{
             setBounds(145, 100, 90, 20);
             setValue(new Date());
-            addMouseListener(new MouseListener() {
-                public void mouseReleased(MouseEvent e) {}
-                public void mouseExited(MouseEvent e) {}
-                public void mouseEntered(MouseEvent e) {}
-                public void mouseClicked(MouseEvent e) {}
-                public void mousePressed(MouseEvent e) {
-                    disposePopup();
-                    try { CalendarService.addPopupCalendarDialog(dateText, ApplicationProperties.FORMAT_DATE, null); } catch (ParseException ignore) { }
-                }
-            });
+            addMouseListener(FrameService.getMouseListenerPopupCalendarDialog(this, AddFrame.this::disposePopup));
         }};
         panel.add(dateText);
 
-        textDescription = new JTextArea() {{
-            setLineWrap(true);
-            setWrapStyleWord(true);
-            addMouseListener(createPopupCloseMouseListener());
-        }};
-
-        JScrollPane textScrollPane = new JScrollPane() {{
-            setViewportView(textDescription);
-            setBounds(5, 130, 235, 80);
-        }};
-        panel.add(textScrollPane);
-
-        userSelect = new JComboBox<Users>() {{
-            setModel(new DefaultComboBoxModel<>(ApplicationService.getInstance().getSortedUsers()));
-            if (getModel().getSize() == 2)
-                setSelectedIndex(1);
-            setBounds(5, 220, 200, 30);
-            addActionListener(e -> disposePopup());
-        }};
-        panel.add(userSelect);
-
-        JButton userButton = new JButton() {{
-            setBorder(null);
-            setBounds(210, 220, 30, 30);
-            addActionListener(e -> {
-                disposePopup();
-                new FrameAddPropertyValues(Users.class);
-            });
-            setIcon(ImageService.getPlusButtonIcon());
-        }};
-        panel.add(userButton);
+        textDescription = FrameService.createJTextArea(panel, new Rectangle(5, 130, 235, 80), this::disposePopup);
 
         JButton okButton = new JButton("Добавить") {{
             setBounds(5, 255, 115, 30);
@@ -192,43 +108,64 @@ public class AddFrame extends JFrame implements Serializable {
         panel.add(cancelButton);
     }
 
+    /**
+     * Создаёт выпадающий список для определённого типа и добавляет его на панель
+     *
+     * @param panel   панель
+     * @param bonds   размеры списка и расположение
+     * @param values  набор значений
+     * @param <T>     тип списка
+     * @return сформированные компонент список, с кнопкой добавления нового значения
+     */
+    private <T> JComboBox<T> createSelectTypeValue(JPanel panel, Rectangle bonds, T[] values) {
+        JButton addButton = new JButton() {{
+            setBounds((int) (bonds.getX() + bonds.getWidth()) + 5, (int) bonds.getY(), 30, 30);
+            setBorder(null);
+            addActionListener(e -> {
+                disposePopup();
+                new FrameAddPropertyValues(values[0].getClass());
+            });
+            setIcon(ImageService.getPlusButtonIcon());
+        }};
+        panel.add(addButton);
+
+        JComboBox<T> select =  new JComboBox<T>() {{
+            setModel(new DefaultComboBoxModel<>(values));
+            if (getModel().getSize() == 2)
+                setSelectedIndex(1);
+            setBounds(bonds);
+            addMouseListener(FrameService.createPopupCloseMouseListener(AddFrame.this::disposePopup));
+        }};
+        panel.add(select);
+
+        return select;
+    }
+
+
+    private PopupDialog createErrorDialog(String title, JComponent select) {
+        JLabel label = new JLabel("<html><font color=\"red\">" + title + "</font></html>") {{
+            setBounds(10, 0, title.length() * 8, 30);
+        }};
+        return new PopupDialog(select, new Dimension(title.length() * 8, 40), new Component[]{label}, true, false);
+    }
 
     private void addPayObject() {
         boolean checkParams = true;
         disposePopup();
         if (ApplicationProperties.EMPTY.equals(((ImportanceType) importanceSelect.getSelectedItem()).getCode())) {
-            JLabel label = new JLabel("<html><font color=\"red\">Необходимо выбрать уровень важности</font></html>") {{
-                setBounds(10, 0, 260, 30);
-            }};
-            importancePopup = new PopupDialog(importanceSelect, new Dimension(270, 40), new Component[]{label}, true, false);
-
+            importanceErrorPopup = createErrorDialog("Необходимо выбрать уровень важности", importanceSelect);
             checkParams = false;
         }
-
         if (ApplicationProperties.EMPTY.equals(((PayType) payTypeSelect.getSelectedItem()).getCode())) {
-            JLabel label = new JLabel("<html><font color=\"red\">Необходимо выбрать тип покупки</font></html>") {{
-                setBounds(10, 0, 240, 30);
-            }};
-            payTypePopup = new PopupDialog(payTypeSelect, new Dimension(250, 40), new Component[]{label}, true, false);
-
+            payTypeErrorPopup = createErrorDialog("Необходимо выбрать тип покупки", payTypeSelect);
             checkParams = false;
         }
-
         if (ApplicationProperties.EMPTY.equals(((Users) userSelect.getSelectedItem()).getCode())) {
-            JLabel label = new JLabel("<html><font color=\"red\">Необходимо выбрать пользователя</font></html>") {{
-                setBounds(10, 0, 240, 30);
-            }};
-            userPopup = new PopupDialog(userSelect, new Dimension(250, 40), new Component[]{label}, true, false);
-
+            userErrorPopup = createErrorDialog("Необходимо выбрать пользователя", userSelect);
             checkParams = false;
         }
-
         if (StringUtils.isBlank(priceText.getText())) {
-            JLabel label = new JLabel("<html><font color=\"red\">Необходимо указать цену</font></html>") {{
-                setBounds(10, 0, 190, 30);
-            }};
-            pricePopup = new PopupDialog(priceText, new Dimension(200, 40), new Component[]{label}, true, false);
-
+            priceErrorPopup = createErrorDialog("Необходимо указать цену", priceText);
             checkParams = false;
         }
 
@@ -244,18 +181,6 @@ public class AddFrame extends JFrame implements Serializable {
 
             hideFrame();
         }
-    }
-
-    private MouseListener createPopupCloseMouseListener() {
-        return new MouseListener() {
-            public void mouseReleased(MouseEvent e) {}
-            public void mouseExited(MouseEvent e) {}
-            public void mouseEntered(MouseEvent e) {}
-            public void mouseClicked(MouseEvent e) {}
-            public void mousePressed(MouseEvent e) {
-                disposePopup();
-            }
-        };
     }
 
     /**
@@ -299,17 +224,17 @@ public class AddFrame extends JFrame implements Serializable {
     }
 
     private void disposePopup() {
-        if (importancePopup != null) {
-            importancePopup.closeDialog();
+        if (importanceErrorPopup != null) {
+            importanceErrorPopup.closeDialog();
         }
-        if (payTypePopup != null) {
-            payTypePopup.closeDialog();
+        if (payTypeErrorPopup != null) {
+            payTypeErrorPopup.closeDialog();
         }
-        if (userPopup != null) {
-            userPopup.closeDialog();
+        if (userErrorPopup != null) {
+            userErrorPopup.closeDialog();
         }
-        if (pricePopup != null) {
-            pricePopup.closeDialog();
+        if (priceErrorPopup != null) {
+            priceErrorPopup.closeDialog();
         }
     }
 }
