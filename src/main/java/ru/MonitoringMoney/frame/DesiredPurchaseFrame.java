@@ -9,21 +9,19 @@ import ru.MonitoringMoney.types.DesiredPurchase;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
 /**
- * Фрейм для добавления нового типа покупки
+ * Фрейм для добавления и отображения желаемых покупок
  */
 public class DesiredPurchaseFrame extends JFrame {
 
     private static final long serialVersionUID = -1405498408839775613L;
 
-
     private static final String FRAME_NAME = "Список желаемых покупок";
+
 
     private JTable desiredPurchaseTable;
     public List<DesiredPurchase> removeDesiredPurchases = new ArrayList<>();
@@ -35,22 +33,7 @@ public class DesiredPurchaseFrame extends JFrame {
         setResizable(false);
         setVisible(true);
         setTitle(FRAME_NAME);
-
-        addComponentListener(new ComponentListener() {
-            public void componentResized(ComponentEvent e) {
-            }
-
-            public void componentMoved(ComponentEvent e) {
-            }
-
-            public void componentShown(ComponentEvent e) {
-            }
-
-            public void componentHidden(ComponentEvent e) {
-                ApplicationService.getInstance().updateSizeWindow(DesiredPurchaseFrame.class, getSize());
-                ApplicationService.getInstance().updateLocationWindow(DesiredPurchaseFrame.class, getLocation());
-            }
-        });
+        addComponentListener(FrameService.addComponentListener(DesiredPurchaseFrame.class, getSize(), getLocation(), () -> {}));
 
         JPanel panel = new JPanel() {{
             setFocusable(true);
@@ -93,7 +76,6 @@ public class DesiredPurchaseFrame extends JFrame {
         updateTypeValueTable();
     }
 
-
     private void updateData() {
         removeDesiredPurchases.stream()
                 .filter(ApplicationService.getInstance().desiredPurchases::contains)
@@ -109,7 +91,6 @@ public class DesiredPurchaseFrame extends JFrame {
         }
         ApplicationService.writeData();
     }
-
 
     private void updateTypeValueTable() {
         desiredPurchaseTable.setModel(TableService.getTypeValueTableData(DesiredPurchase.class));

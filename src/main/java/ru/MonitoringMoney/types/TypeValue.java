@@ -6,4 +6,5 @@ package ru.MonitoringMoney.types;
 public interface TypeValue {
     String getCode();
     String getName();
+    void setName(String name);
 }

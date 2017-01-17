@@ -1,5 +1,6 @@
 package ru.MonitoringMoney;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
 import ru.MonitoringMoney.types.*;
 
@@ -36,7 +37,7 @@ public class PayObject implements Serializable {
             builder.append(importance.getName()).append(" ");
         if (date != null)
             builder.append(ApplicationProperties.FORMAT_DATE.format(date)).append(" ");
-        if (description != null)
+        if (StringUtils.isNotBlank(description))
             builder.append("\n").append(description);
         return builder.toString();
     }

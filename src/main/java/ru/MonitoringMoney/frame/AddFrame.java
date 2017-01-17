@@ -11,7 +11,6 @@ import ru.mangeorge.swing.graphics.PopupDialog;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.*;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -47,27 +46,24 @@ public class AddFrame extends JFrame implements Serializable {
         setTitle(FRAME_NAME);
         setIconImage(ImageService.getPlusImage());
         toFront();
-        addComponentListener(new ComponentListener() {
-            public void componentResized(ComponentEvent e) { }
-            public void componentMoved(ComponentEvent e) { disposePopup(); }
-            public void componentShown(ComponentEvent e) { }
-            public void componentHidden(ComponentEvent e) {
-                ApplicationService.getInstance().updateSizeWindow(AddFrame.class, getSize());
-                ApplicationService.getInstance().updateLocationWindow(AddFrame.class, getLocation());
-                disposePopup();
-            }
-        });
+        addComponentListener(FrameService.addComponentListener(AddFrame.class, getSize(), getLocation(), () -> {}));
 
         JPanel panel = new JPanel() {{
             setFocusable(true);
             setLayout(null);
-            addMouseListener(FrameService.createPopupCloseMouseListener(AddFrame.this::disposePopup));
+            addMouseListener(FrameService.createMouseListener(AddFrame.this::disposePopup));
         }};
         add(panel);
 
-        importanceSelect = createSelectTypeValue(panel, new Rectangle(5, 5, 200, 30), ApplicationService.getInstance().getSortedImportance());
-        payTypeSelect = createSelectTypeValue(panel, new Rectangle(5, 40, 200, 30), ApplicationService.getInstance().getSortedPayTypes());
-        userSelect = createSelectTypeValue(panel, new Rectangle(5, 220, 200, 30), ApplicationService.getInstance().getSortedUsers());
+        importanceSelect = FrameService.createSelectTypeValue(panel, new Rectangle(5, 5, 200, 30),
+                ApplicationService.getInstance().getSortedImportance(), () -> { disposePopup(); new FrameAddPropertyValues(ImportanceType.class); },
+                AddFrame.this::disposePopup);
+        payTypeSelect = FrameService.createSelectTypeValue(panel, new Rectangle(5, 40, 200, 30),
+                ApplicationService.getInstance().getSortedPayTypes(), () -> { disposePopup(); new FrameAddPropertyValues(PayType.class); },
+                AddFrame.this::disposePopup);
+        userSelect = FrameService.createSelectTypeValue(panel, new Rectangle(5, 220, 200, 30),
+                ApplicationService.getInstance().getSortedUsers(), () -> { disposePopup(); new FrameAddPropertyValues(Users.class); },
+                AddFrame.this::disposePopup);
 
         JLabel priceLabel = new JLabel("Стоимость покупки") {{
             setBounds(5, 75, 140, 20);
@@ -76,8 +72,8 @@ public class AddFrame extends JFrame implements Serializable {
 
         priceText = new JTextField() {{
             setBounds(145, 75, 90, 20);
-            addKeyListener(FrameService.createPriceKeyListener(this));
-            addMouseListener(FrameService.createPopupCloseMouseListener(AddFrame.this::disposePopup));
+            addKeyListener(FrameService.createPriceKeyListener(this, () -> {}));
+            addMouseListener(FrameService.createMouseListener(AddFrame.this::disposePopup));
         }};
         panel.add(priceText);
 
@@ -89,7 +85,7 @@ public class AddFrame extends JFrame implements Serializable {
         dateText = new JFormattedTextField(ApplicationProperties.FORMAT_DATE) {{
             setBounds(145, 100, 90, 20);
             setValue(new Date());
-            addMouseListener(FrameService.getMouseListenerPopupCalendarDialog(this, AddFrame.this::disposePopup));
+            addMouseListener(FrameService.getMouseListenerPopupCalendarDialog(this, null, AddFrame.this::disposePopup));
         }};
         panel.add(dateText);
 
@@ -106,39 +102,6 @@ public class AddFrame extends JFrame implements Serializable {
             addActionListener(e -> hideFrame());
         }};
         panel.add(cancelButton);
-    }
-
-    /**
-     * Создаёт выпадающий список для определённого типа и добавляет его на панель
-     *
-     * @param panel   панель
-     * @param bonds   размеры списка и расположение
-     * @param values  набор значений
-     * @param <T>     тип списка
-     * @return сформированные компонент список, с кнопкой добавления нового значения
-     */
-    private <T> JComboBox<T> createSelectTypeValue(JPanel panel, Rectangle bonds, T[] values) {
-        JButton addButton = new JButton() {{
-            setBounds((int) (bonds.getX() + bonds.getWidth()) + 5, (int) bonds.getY(), 30, 30);
-            setBorder(null);
-            addActionListener(e -> {
-                disposePopup();
-                new FrameAddPropertyValues(values[0].getClass());
-            });
-            setIcon(ImageService.getPlusButtonIcon());
-        }};
-        panel.add(addButton);
-
-        JComboBox<T> select =  new JComboBox<T>() {{
-            setModel(new DefaultComboBoxModel<>(values));
-            if (getModel().getSize() == 2)
-                setSelectedIndex(1);
-            setBounds(bonds);
-            addMouseListener(FrameService.createPopupCloseMouseListener(AddFrame.this::disposePopup));
-        }};
-        panel.add(select);
-
-        return select;
     }
 
 
@@ -203,7 +166,7 @@ public class AddFrame extends JFrame implements Serializable {
         }
     }
 
-    void removeSelectElement(Object item) {
+    public void removeSelectElement(Object item) {
         if (item instanceof PayType) {
             payTypeSelect.removeItem(item);
         } else if (item instanceof ImportanceType) {

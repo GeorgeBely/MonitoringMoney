@@ -10,9 +10,13 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+
+/**
+ * Сервис для работы с выподающим списоком с множественным выбором
+ */
 public class CheckBoxListService {
 
-    public static DefaultComboBoxModel<CheckBoxListService.CheckComboValue> getModel(TypeValue[] values) {
+    static DefaultComboBoxModel<CheckBoxListService.CheckComboValue> getModel(TypeValue[] values) {
         CheckBoxListService.CheckComboValue[] stores = new CheckBoxListService.CheckComboValue[values.length];
         int i = 0;
         for (Object type : values) {
@@ -61,14 +65,14 @@ public class CheckBoxListService {
             } else {
                 ccr.checkBox.setSelected((store.state = !store.state));
             }
-            MonitoringMoney.mainFrame.refreshText();
+            MonitoringMoney.mainFrame.updateData();
         }
     }
 
     public static class CheckComboRenderer implements ListCellRenderer<CheckComboValue> {
         private JCheckBox checkBox;
 
-        public CheckComboRenderer() {
+        CheckComboRenderer() {
             checkBox = new JCheckBox();
         }
 

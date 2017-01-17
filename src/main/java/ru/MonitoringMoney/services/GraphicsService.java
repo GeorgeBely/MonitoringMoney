@@ -1,6 +1,5 @@
 package ru.MonitoringMoney.services;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.category.DefaultCategoryDataset;
@@ -10,7 +9,6 @@ import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
 import ru.MonitoringMoney.ApplicationProperties;
 import ru.MonitoringMoney.PayObject;
-import ru.MonitoringMoney.main.MonitoringMoney;
 import ru.mangeorge.swing.service.PieService;
 
 import java.util.*;
@@ -137,13 +135,20 @@ public class GraphicsService {
         return PieService.getCountMoneyPieData(valueMap);
     }
 
+    /**
+     * Возвращает наименование значения заданного атрибута {selectData} у переданной покупки {payObject}
+     *
+     * @param payObject  покупка
+     * @param selectData наименование данных, которые нужно отобразить. Берутся из массива {VIEW_DATA_NAMES}
+     * @return Наименование значения атрибута
+     */
     private static String getPayObjectName(PayObject payObject, String selectData) {
-        if ((StringUtils.isBlank(selectData) && !MonitoringMoney.mainFrame.isUsePayType()) || VIEW_DATA_NAMES[1].equals(selectData)) {
-            return payObject.getPayType().toString();
-        } else if ((StringUtils.isBlank(selectData) && !MonitoringMoney.mainFrame.isUseImportant()) || VIEW_DATA_NAMES[2].equals(selectData)) {
+        if (VIEW_DATA_NAMES[3].equals(selectData)) {
+            return payObject.getUser().toString();
+        } else if (VIEW_DATA_NAMES[2].equals(selectData)) {
             return payObject.getImportance().toString();
         } else {
-            return payObject.getUser().toString();
+            return payObject.getPayType().toString();
         }
     }
 

@@ -14,6 +14,7 @@ import ru.MonitoringMoney.ApplicationProperties;
 import ru.MonitoringMoney.PayObject;
 import ru.MonitoringMoney.main.MonitoringMoney;
 import ru.MonitoringMoney.services.ApplicationService;
+import ru.MonitoringMoney.services.FrameService;
 import ru.MonitoringMoney.services.GraphicsService;
 import ru.MonitoringMoney.services.ImageService;
 import ru.mangeorge.swing.service.PieService;
@@ -22,8 +23,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.text.ParseException;
 import java.util.*;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
 import java.util.List;
 
 /**
@@ -36,14 +35,22 @@ public class GraphicsFrame extends JFrame {
     private static final String FRAME_NAME = "Графики затрат";
 
 
+    /** график "пирожок" */
     private ChartPanel piePanel;
-    private ChartPanel categoryPanel;
-    private ChartPanel barPanel;
     private JFreeChart pieChart;
+
+    /** график "временнные линии" */
+    private ChartPanel categoryPanel;
     private JFreeChart timeSerialChart;
+
+    /** график "Категории" */
+    private ChartPanel barPanel;
     private JFreeChart barChart;
+
+    /** общие компоненты*/
     private JComboBox selectGraphic;
     private JComboBox selectViewData;
+
 
     GraphicsFrame() {
         setLocation(ApplicationService.getInstance().getWindowLocation(GraphicsFrame.class));
@@ -52,16 +59,7 @@ public class GraphicsFrame extends JFrame {
         setTitle(FRAME_NAME);
         setIconImage(ImageService.getGraphicsImage());
         toFront();
-        addComponentListener(new ComponentListener() {
-            public void componentResized(ComponentEvent e) { resizeFrame(); }
-            public void componentMoved(ComponentEvent e) { }
-            public void componentShown(ComponentEvent e) {}
-            public void componentHidden(ComponentEvent e) {
-                ApplicationService.getInstance().updateSizeWindow(GraphicsFrame.class, getSize());
-                ApplicationService.getInstance().updateLocationWindow(GraphicsFrame.class, getLocation());
-            }
-        });
-
+        addComponentListener(FrameService.addComponentListener(GraphicsFrame.class, getSize(), getLocation(), () -> {}, this::resizeFrame));
 
         JPanel panel = new JPanel() {{
             setFocusable(true);
@@ -87,20 +85,13 @@ public class GraphicsFrame extends JFrame {
         plot.setBackgroundPaint(this.getBackground());
         plot.setToolTipGenerator((pieDataset, comparable) -> {
             List<String> texts = new ArrayList<>();
-            String selectData = (String) selectViewData.getSelectedItem();
             for (PayObject payObject : ApplicationService.viewPayObjects) {
-                if (((StringUtils.isBlank(selectData) && !MonitoringMoney.mainFrame.isUseImportant()) || GraphicsService.VIEW_DATA_NAMES[2].equals(selectData))
-                        && payObject.getImportance().getName().equals(comparable)) {
-                    if (!texts.contains(payObject.getDescription())) {
-                        texts.add(payObject.getDescription());
+                if (StringUtils.isNotBlank(payObject.getDescription()) && !texts.contains(payObject.getDescription())) {
+                    if (payObject.getImportance().getName().equals(comparable)
+                        || payObject.getUser().getName().equals(comparable)
+                        || payObject.getPayType().getName().equals(comparable)) {
+                            texts.add(payObject.getDescription());
                     }
-                } else if (((StringUtils.isBlank(selectData) && !MonitoringMoney.mainFrame.isUseUser()) || GraphicsService.VIEW_DATA_NAMES[3].equals(selectData))
-                        && payObject.getUser().getName().equals(comparable)) {
-                    if (!texts.contains(payObject.getDescription())) {
-                        texts.add(payObject.getDescription());
-                    }
-                } else if (payObject.getPayType().getName().equals(comparable)) {
-                    texts.add(payObject.getDescription());
                 }
             }
             String result = "";
@@ -138,7 +129,7 @@ public class GraphicsFrame extends JFrame {
         });
         panel.add(piePanel);
 
-        timeSerialChart = ChartFactory.createTimeSeriesChart("График затрат по времени", "Дата покупок", "колличество", GraphicsService.getTimeSeriesData(""));
+        timeSerialChart = ChartFactory.createTimeSeriesChart("График затрат по времени", "Дата покупок", "колличество", null);
         timeSerialChart.setBackgroundPaint(this.getBackground());
         XYPlot timeSerialPlot = (XYPlot) timeSerialChart.getPlot();
         XYItemRenderer renderer = timeSerialPlot.getRenderer();
@@ -148,25 +139,33 @@ public class GraphicsFrame extends JFrame {
             Number value = xyDataset.getY(i, j);
             String categoryName = xyDataset.getSeriesKey(i).toString();
 
-            String selectData = (String) selectViewData.getSelectedItem();
-            List<PayObject> categoryPayObjects = new ArrayList<>();
+            List<String> texts = new ArrayList<>();
             for (PayObject payObject : ApplicationService.viewPayObjects) {
-                if (((StringUtils.isBlank(selectData) && !MonitoringMoney.mainFrame.isUseImportant()) || GraphicsService.VIEW_DATA_NAMES[2].equals(selectData))
-                        && payObject.getImportance().getName().equals(categoryName)) {
-                    categoryPayObjects.add(payObject);
-                } else if (((StringUtils.isBlank(selectData) && !MonitoringMoney.mainFrame.isUseUser()) || GraphicsService.VIEW_DATA_NAMES[3].equals(selectData))
-                        && payObject.getUser().getName().equals(categoryName)) {
-                    categoryPayObjects.add(payObject);
-                } else if (payObject.getPayType().getName().equals(categoryName)) {
-                    categoryPayObjects.add(payObject);
+                if (StringUtils.isNotBlank(payObject.getDescription()) && !texts.contains(payObject.getDescription())) {
+                    if (ApplicationProperties.FORMAT_DATE.format(payObject.getDate()).equals(ApplicationProperties.FORMAT_DATE.format(date))) {
+                        if (payObject.getImportance().getName().equals(categoryName)
+                                || payObject.getUser().getName().equals(categoryName)
+                                || payObject.getPayType().getName().equals(categoryName)) {
+                            texts.add(payObject.getDescription());
+                        }
+                    }
                 }
             }
-            categoryPayObjects.sort(Comparator.comparing(PayObject::getDate));
-            PayObject selectPayObject = categoryPayObjects.get(j);
-
             String result = categoryName + ": (" + ApplicationProperties.FORMAT_DATE.format(date) + ", " + value + ")";
-            if (StringUtils.isNotBlank(selectPayObject.getDescription())) {
-                result += " - " + selectPayObject.getDescription();
+            for (String text : texts) {
+                if (result.length() < ApplicationProperties.MAX_INFORM_GRAPHICS_MESSAGE_CHAR) {
+                    if (!result.isEmpty()) {
+                        result += " ";
+                    }
+                    if (result.length() + text.length() > ApplicationProperties.MAX_INFORM_GRAPHICS_MESSAGE_CHAR) {
+                        if (ApplicationProperties.MAX_INFORM_GRAPHICS_MESSAGE_CHAR - result.length() > 3) {
+                            result += text.substring(0, ApplicationProperties.MAX_INFORM_GRAPHICS_MESSAGE_CHAR - result.length() - 3);
+                        }
+                        result += "...";
+                    } else {
+                        result += text;
+                    }
+                }
             }
             return result;
         });
@@ -191,15 +190,15 @@ public class GraphicsFrame extends JFrame {
                     String rowName = entity.getRowKey().toString();
                     Date month = ApplicationProperties.FORMAT_MONTH_AND_YEAR_FOR_PARSE.parse(entity.getColumnKey().toString());
                     Date endMonth = DateUtils.addDays(DateUtils.addMonths(DateUtils.truncate(month, Calendar.MONTH), 1), -1);
-                    MonitoringMoney.mainFrame.dateFromText.setValue(month);
-                    MonitoringMoney.mainFrame.dateToText.setValue(endMonth);
+                    MonitoringMoney.mainFrame.setDateFromText(month);
+                    MonitoringMoney.mainFrame.setDateToText(endMonth);
                     selectGraphic.setSelectedItem(GraphicsService.GRAPHICS_NAMES[0]);
 
                     if (!GraphicsService.ALL_COAST.equals(rowName)) {
                         updatePieData(rowName);
                     }
 
-                    MonitoringMoney.mainFrame.refreshText();
+                    MonitoringMoney.mainFrame.updateData();
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
@@ -213,39 +212,50 @@ public class GraphicsFrame extends JFrame {
         useSelectGraphic();
     }
 
+    /**
+     * Обновляет данные графика "Пирожок"
+     *
+     * @param name наименование выбранного атрибута.
+     */
     private void updatePieData(String name) {
         if (StringUtils.isNotBlank(name)) {
             String selectData = (String) selectViewData.getSelectedItem();
             List graphicValues = ((PiePlot) piePanel.getChart().getPlot()).getDataset().getKeys();
 
-            if ((StringUtils.isBlank(selectData) && !MonitoringMoney.mainFrame.isUsePayType()) || GraphicsService.VIEW_DATA_NAMES[1].equals(selectData)) {
-                MonitoringMoney.mainFrame.selectPayTypeValue(name, graphicValues);
-            } else if ((StringUtils.isBlank(selectData) && !MonitoringMoney.mainFrame.isUseImportant()) || GraphicsService.VIEW_DATA_NAMES[2].equals(selectData)) {
+            if (GraphicsService.VIEW_DATA_NAMES[3].equals(selectData)) {
+                MonitoringMoney.mainFrame.selectUserValue(name, graphicValues);
+            } else if (GraphicsService.VIEW_DATA_NAMES[2].equals(selectData)) {
                 MonitoringMoney.mainFrame.selectImportanceValue(name, graphicValues);
             } else {
-                MonitoringMoney.mainFrame.selectUserValue(name, graphicValues);
+                MonitoringMoney.mainFrame.selectPayTypeValue(name, graphicValues);
             }
         }
         if (!PieService.ANOTHER_BLOCK_NAME.equals(name)) {
             setSelectViewData();
         }
 
-        MonitoringMoney.mainFrame.refreshText();
+        MonitoringMoney.mainFrame.updateData();
     }
 
+    /**
+     * Выбырает атрибут, по которому будет отображена информации на графиках.
+     */
     private void setSelectViewData() {
         String selectData = (String) selectViewData.getSelectedItem();
-        if (MonitoringMoney.mainFrame.isUsePayType() && !GraphicsService.VIEW_DATA_NAMES[1].equals(selectData)) {
+        if (MonitoringMoney.mainFrame.isNotUsePayType() && !GraphicsService.VIEW_DATA_NAMES[1].equals(selectData)) {
             selectViewData.setSelectedItem(GraphicsService.VIEW_DATA_NAMES[1]);
-        } else if (MonitoringMoney.mainFrame.isUseImportant() && !GraphicsService.VIEW_DATA_NAMES[2].equals(selectData)) {
+        } else if (MonitoringMoney.mainFrame.isNotUseImportant() && !GraphicsService.VIEW_DATA_NAMES[2].equals(selectData)) {
             selectViewData.setSelectedItem(GraphicsService.VIEW_DATA_NAMES[2]);
-        } else if (MonitoringMoney.mainFrame.isUseUser() && !GraphicsService.VIEW_DATA_NAMES[3].equals(selectData)) {
+        } else if (MonitoringMoney.mainFrame.isNotUseUser() && !GraphicsService.VIEW_DATA_NAMES[3].equals(selectData)) {
             selectViewData.setSelectedItem(GraphicsService.VIEW_DATA_NAMES[3]);
         } else {
             selectGraphic.setSelectedItem(GraphicsService.GRAPHICS_NAMES[1]);
         }
     }
 
+    /**
+     * При изменении размеров окна сжимаем или разворачиваем графики пропорционально окну.
+     */
     private void resizeFrame() {
         Container frame = piePanel.getParent();
         piePanel.setSize(frame.getWidth() - 15, frame.getHeight() - 55);
@@ -253,6 +263,9 @@ public class GraphicsFrame extends JFrame {
         barPanel.setSize(frame.getWidth() - 15, frame.getHeight() - 55);
     }
 
+    /**
+     * Обновляет данные на графике
+     */
     void updateData() {
         String selectDataValue = (String) selectViewData.getSelectedItem();
         PieService.updatePieData(pieChart, GraphicsService.getCountMoneyPieData(selectDataValue));
@@ -260,6 +273,9 @@ public class GraphicsFrame extends JFrame {
         ((XYPlot) timeSerialChart.getPlot()).setDataset(GraphicsService.getTimeSeriesData(selectDataValue));
     }
 
+    /**
+     * Выбор отображаемого графика
+     */
     private void useSelectGraphic() {
         setNotVisibleAllGraphics();
         String value = (String) selectGraphic.getSelectedItem();
@@ -271,6 +287,9 @@ public class GraphicsFrame extends JFrame {
             barPanel.setVisible(true);
     }
 
+    /**
+     * Скрывает все графики
+     */
     private void setNotVisibleAllGraphics() {
         piePanel.setVisible(false);
         categoryPanel.setVisible(false);

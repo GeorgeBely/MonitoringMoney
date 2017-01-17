@@ -9,10 +9,13 @@ import java.awt.*;
 import java.io.*;
 
 
+/**
+ * Запуск приложения. Хранит данные о основном фрейме приложения и фрейме добавления покупки. Загружает данные из файла.
+ */
 public class MonitoringMoney implements Serializable {
 
     /** Версия приложения */
-    public static final String VERSION = "1.4.22";
+    public static final String VERSION = "1.4.23";
 
 
     /** Основной фрейм приложения */

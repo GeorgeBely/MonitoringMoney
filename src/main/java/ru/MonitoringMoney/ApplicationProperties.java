@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *
+ * Характеристики приложения. Значения по умолчанию, и некоторые константы
  */
 public class ApplicationProperties {
 

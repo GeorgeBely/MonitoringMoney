@@ -5,18 +5,17 @@ import ru.MonitoringMoney.PayObject;
 import ru.MonitoringMoney.main.MonitoringMoney;
 import ru.MonitoringMoney.services.ApplicationService;
 import ru.MonitoringMoney.services.CheckBoxListService;
+import ru.MonitoringMoney.services.FrameService;
 import ru.MonitoringMoney.services.ImageService;
 import ru.MonitoringMoney.types.*;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
-import ru.mangeorge.awt.service.CalendarService;
 import ru.mangeorge.swing.service.PieService;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.io.Serializable;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -36,19 +35,23 @@ public class MainFrame extends JFrame implements Serializable {
     /** Фраза, которая отображается до суммы всех покупок отображаемым по заданным фильтрам */
     private static final String PREFIX_LABEL_SUM_PRICE = "Потрачено на сумму: ";
 
+    /** Наименование окна */
     private static final String FRAME_NAME = "MonitoringMoney";
 
 
+    /** Компоненты фрейма */
     private JTextArea text;
     private JTextField termInput;
     private JComboBox<CheckBoxListService.CheckComboValue>  importanceSelect;
     private JComboBox<CheckBoxListService.CheckComboValue> payTypeSelect;
+    private JComboBox<CheckBoxListService.CheckComboValue> userSelect;
     private JTextField priceFromText;
     private JTextField priceToText;
-    JFormattedTextField dateFromText;
-    JFormattedTextField dateToText;
-    private JComboBox<CheckBoxListService.CheckComboValue> userSelect;
+    private JFormattedTextField dateFromText;
+    private JFormattedTextField dateToText;
     private JLabel labelSumPrice;
+
+    /** Ссылка на другие окна приложения */
     private GraphicsFrame graphicsFrame;
     public EditFrame editFrame;
     public DesiredPurchaseFrame desiredPurchaseFrame;
@@ -62,16 +65,7 @@ public class MainFrame extends JFrame implements Serializable {
         setVisible(true);
         setTitle(FRAME_NAME + "_" + MonitoringMoney.VERSION);
         setIconImage(ImageService.getMoneyImage());
-
-        addComponentListener(new ComponentListener() {
-            public void componentResized(ComponentEvent e) { }
-            public void componentMoved(ComponentEvent e) { }
-            public void componentShown(ComponentEvent e) { }
-            public void componentHidden(ComponentEvent e) {
-                ApplicationService.getInstance().updateSizeWindow(MainFrame.class, getSize());
-                ApplicationService.getInstance().updateLocationWindow(MainFrame.class, getLocation());
-            }
-        });
+        addComponentListener(FrameService.addComponentListener(MainFrame.class, getSize(), getLocation(), () -> {}));
 
         JPanel panel = new JPanel(){{
             setFocusable(true);
@@ -79,15 +73,7 @@ public class MainFrame extends JFrame implements Serializable {
         }};
         add(panel);
 
-        text = new JTextArea() {{
-            setLineWrap(true);
-            setWrapStyleWord(true);
-        }};
-        JScrollPane textScrollPane = new JScrollPane() {{
-            setViewportView(text);
-            setBounds(250, 5, 285, 186);
-        }};
-        panel.add(textScrollPane);
+        text = FrameService.createJTextArea(panel, new Rectangle(250, 5, 285, 186), () -> {});
 
         termInput = new JTextField() {{
             setBounds(5, 5, 240, 30);
@@ -95,21 +81,15 @@ public class MainFrame extends JFrame implements Serializable {
             setDisabledTextColor(Color.LIGHT_GRAY);
             setSelectedTextColor(Color.LIGHT_GRAY);
             setSelectionColor(Color.LIGHT_GRAY);
-            addMouseListener(new MouseListener() {
-                public void mouseReleased(MouseEvent e) {}
-                public void mouseExited(MouseEvent e) {}
-                public void mouseEntered(MouseEvent e) {}
-                public void mouseClicked(MouseEvent e) {}
-                public void mousePressed(MouseEvent e) {
-                    if (TERM_INPUT_DEFAULT_TEXT.equals(getText())) {
-                        setText("");
-                    }
+            addMouseListener(FrameService.createMouseListener(() -> {
+                if (TERM_INPUT_DEFAULT_TEXT.equals(getText())) {
+                    setText("");
                 }
-            });
+            }));
             addKeyListener(new KeyListener() {
                 public void keyPressed(KeyEvent e) {}
                 public void keyReleased(KeyEvent e) {
-                    refreshText();
+                    updateData();
                 }
                 public void keyTyped(KeyEvent e) {}
             });
@@ -123,27 +103,9 @@ public class MainFrame extends JFrame implements Serializable {
         }};
         panel.add(termInput);
 
-        importanceSelect = new JComboBox<CheckBoxListService.CheckComboValue>() {
-            public void setPopupVisible(boolean v) { }
-            {
-                setModel(CheckBoxListService.getModel(ApplicationService.getInstance().getSortedImportance()));
-                setBounds(5, 40, 240, 30);
-                setRenderer(new CheckBoxListService.CheckComboRenderer());
-                addActionListener(new CheckBoxListService.CheckBoxList());
-            }
-        };
-        panel.add(importanceSelect);
-
-        payTypeSelect = new JComboBox<CheckBoxListService.CheckComboValue>() {
-            public void setPopupVisible(boolean v) { }
-            {
-                setModel(CheckBoxListService.getModel(ApplicationService.getInstance().getSortedPayTypes()));
-                setBounds(5, 75, 240, 30);
-                setRenderer(new CheckBoxListService.CheckComboRenderer());
-                addActionListener(new CheckBoxListService.CheckBoxList());
-            }
-        };
-        panel.add(payTypeSelect);
+        importanceSelect = FrameService.createMultiSelectType(panel, ApplicationService.getInstance().getSortedImportance(), new Rectangle(5, 40, 240, 30));
+        payTypeSelect = FrameService.createMultiSelectType(panel, ApplicationService.getInstance().getSortedPayTypes(), new Rectangle(5, 75, 240, 30));
+        userSelect = FrameService.createMultiSelectType(panel, ApplicationService.getInstance().getSortedUsers(), new Rectangle(5, 160, 240, 30));
 
         JLabel priceFromLabel = new JLabel("Цена от") {{
             setBounds(5, 110, 60, 20);
@@ -152,13 +114,7 @@ public class MainFrame extends JFrame implements Serializable {
 
         priceFromText = new JTextField() {{
             setBounds(65, 110, 75, 20);
-            addKeyListener(new KeyListener() {
-                public void keyPressed(KeyEvent e) {}
-                public void keyReleased(KeyEvent e) {
-                    refreshText();
-                }
-                public void keyTyped(KeyEvent e) {}
-            });
+            addKeyListener(FrameService.createPriceKeyListener(this, MainFrame.this::updateData));
         }};
         panel.add(priceFromText);
 
@@ -169,14 +125,7 @@ public class MainFrame extends JFrame implements Serializable {
 
         priceToText = new JTextField() {{
             setBounds(170, 110, 75, 20);
-
-            addKeyListener(new KeyListener() {
-                public void keyPressed(KeyEvent e) {}
-                public void keyReleased(KeyEvent e) {
-                    refreshText();
-                }
-                public void keyTyped(KeyEvent e) {}
-            });
+            addKeyListener(FrameService.createPriceKeyListener(this, MainFrame.this::updateData));
         }};
         panel.add(priceToText);
 
@@ -188,15 +137,7 @@ public class MainFrame extends JFrame implements Serializable {
         dateFromText = new JFormattedTextField(ApplicationProperties.FORMAT_DATE) {{
             setBounds(85, 135, 65, 20);
             setValue(DateUtils.truncate(new Date(), Calendar.MONTH));
-            addMouseListener(new MouseListener() {
-                public void mouseReleased(MouseEvent e) {}
-                public void mouseExited(MouseEvent e) {}
-                public void mouseEntered(MouseEvent e) {}
-                public void mouseClicked(MouseEvent e) {}
-                public void mousePressed(MouseEvent e) {
-                    try { CalendarService.addPopupCalendarDialog(dateFromText, ApplicationProperties.FORMAT_DATE, val -> refreshText()); } catch (ParseException ignore) { }
-                }
-            });
+            addMouseListener(FrameService.getMouseListenerPopupCalendarDialog(this, val -> updateData(), () -> {}));
         }};
         panel.add(dateFromText);
 
@@ -208,28 +149,9 @@ public class MainFrame extends JFrame implements Serializable {
         dateToText = new JFormattedTextField(ApplicationProperties.FORMAT_DATE) {{
             setBounds(180, 135, 65, 20);
             setValue(DateUtils.addDays(DateUtils.addMonths(DateUtils.truncate(new Date(), Calendar.MONTH), 1), -1));
-            addMouseListener(new MouseListener() {
-                public void mouseReleased(MouseEvent e) {}
-                public void mouseExited(MouseEvent e) {}
-                public void mouseEntered(MouseEvent e) {}
-                public void mouseClicked(MouseEvent e) {}
-                public void mousePressed(MouseEvent e) {
-                    try { CalendarService.addPopupCalendarDialog(dateToText, ApplicationProperties.FORMAT_DATE, val -> refreshText()); } catch (ParseException ignore) { }
-                }
-            });
+            addMouseListener(FrameService.getMouseListenerPopupCalendarDialog(this, val -> updateData(), () -> {}));
         }};
         panel.add(dateToText);
-
-        userSelect = new JComboBox<CheckBoxListService.CheckComboValue>() {
-            public void setPopupVisible(boolean v) { }
-            {
-                setModel(CheckBoxListService.getModel(ApplicationService.getInstance().getSortedUsers()));
-                setBounds(5, 160, 240, 30);
-                setRenderer(new CheckBoxListService.CheckComboRenderer());
-                addActionListener(new CheckBoxListService.CheckBoxList());
-            }
-        };
-        panel.add(userSelect);
 
         labelSumPrice = new JLabel() {{
             setBounds(250, 195, 240, 20);
@@ -266,11 +188,13 @@ public class MainFrame extends JFrame implements Serializable {
         }};
         panel.add(buttonEditDesiredPurchase);
 
-        refreshText();
+        updateData();
     }
 
-
-    public void refreshText() {
+    /**
+     * Обновляем данные
+     */
+    public void updateData() {
         text.setText(ApplicationService.getInstance().getTextPayObjects(getPayObjectWithCurrentFilters()));
         labelSumPrice.setText(PREFIX_LABEL_SUM_PRICE + " "  + ApplicationService.getInstance().getSumPrice(getPayObjectWithCurrentFilters()));
         if (graphicsFrame != null)
@@ -279,25 +203,28 @@ public class MainFrame extends JFrame implements Serializable {
             editFrame.updatePayObjectTable();
     }
 
+    /**
+     * По выбранным фильтрам отбирает покупки
+     *
+     * @return список покупок по заданным фильтрам
+     */
     public List<PayObject> getPayObjectWithCurrentFilters() {
-        Integer priceFrom = null;
-        Integer priceTo = null;
-        Date dateFrom;
-        Date dateTo;
         String term = null;
         if (!TERM_INPUT_DEFAULT_TEXT.equals(termInput.getText()) && StringUtils.isNotBlank(termInput.getText()))
             term = termInput.getText();
-        dateFrom = DateUtils.truncate((Date) dateFromText.getValue(), Calendar.DATE);
+
+        Date dateFrom = DateUtils.truncate((Date) dateFromText.getValue(), Calendar.DATE);
         Calendar calendarTo = Calendar.getInstance();
         calendarTo.setTime(DateUtils.truncate((Date) dateToText.getValue(), Calendar.DATE));
         calendarTo.add(Calendar.DATE, 1);
-        dateTo = calendarTo.getTime();
-        try {
-            if (StringUtils.isNotBlank(priceFromText.getText()))
-                priceFrom = Integer.parseInt(priceFromText.getText());
-            if (StringUtils.isNotBlank(priceToText.getText()))
-                priceTo = Integer.parseInt(priceToText.getText());
-        } catch (Exception ignore) {}
+        Date dateTo = calendarTo.getTime();
+
+        Integer priceFrom = null;
+        Integer priceTo = null;
+        if (StringUtils.isNotBlank(priceFromText.getText().replaceAll("[^0-9]", "")))
+            priceFrom = Integer.parseInt(priceFromText.getText().replaceAll("[^0-9]", ""));
+        if (StringUtils.isNotBlank(priceToText.getText().replaceAll("[^0-9]", "")))
+            priceTo = Integer.parseInt(priceToText.getText().replaceAll("[^0-9]", ""));
 
         List<TypeValue> selectedPayTypes = getSelectedValues((DefaultComboBoxModel) payTypeSelect.getModel());
         List<TypeValue> selectedImportanceTypes = getSelectedValues((DefaultComboBoxModel) importanceSelect.getModel());
@@ -307,6 +234,10 @@ public class MainFrame extends JFrame implements Serializable {
                 priceTo, selectedImportanceTypes, selectedPayTypes, selectedUsers);
     }
 
+    /**
+     * @param defaultModel модель списка из которого нужно отобрать выбранные значения
+     * @return список выбранных значений
+     */
     private List<TypeValue> getSelectedValues(DefaultComboBoxModel defaultModel) {
         List<TypeValue> selected = new ArrayList<>();
         for (int i = 0; i < defaultModel.getSize(); i++) {
@@ -318,18 +249,46 @@ public class MainFrame extends JFrame implements Serializable {
         return selected;
     }
 
+    /**
+     * Выбирает указанное значение в списке типов покупки
+     *
+     * @param name          наименование значения
+     * @param graphicValues список наименований значений отображаемых на графике пирожок (необходимо при выборе значения {PieService.ANOTHER_BLOCK_NAME}).
+     */
     void selectPayTypeValue(String name, List graphicValues) {
         selectType(name, ApplicationService.getInstance().getPayTypes(), (DefaultComboBoxModel) payTypeSelect.getModel(), graphicValues);
     }
 
+    /**
+     * Выбирает указанное значение в списке уровней важности
+     *
+     * @param name          наименование значения
+     * @param graphicValues список наименований значений отображаемых на графике пирожок (необходимо при выборе значения {PieService.ANOTHER_BLOCK_NAME}).
+     */
     void selectImportanceValue(String name, List graphicValues) {
         selectType(name, ApplicationService.getInstance().getImportanceTypes(), (DefaultComboBoxModel) importanceSelect.getModel(), graphicValues);
     }
 
+    /**
+     * Выбирает указанное значение в списке пользователей
+     *
+     * @param name          наименование значения
+     * @param graphicValues список наименований значений отображаемых на графике пирожок (необходимо при выборе значения {PieService.ANOTHER_BLOCK_NAME}).
+     */
     void selectUserValue(String name, List graphicValues) {
         selectType(name, ApplicationService.getInstance().getUsers(), (DefaultComboBoxModel) userSelect.getModel(), graphicValues);
     }
 
+    /**
+     * Выбирает указанное значение в списке. Если значение {name} равно {PieService.ANOTHER_BLOCK_NAME}, то будут выбраны
+     * те значения, которые не отображаются на графике пирожок
+     *
+     * @param name          Наименование значения
+     * @param types         Список значений типов
+     * @param model         Модель списка из которого нужно отобрать выбранные значения
+     * @param graphicValues Список наименований значений отображаемых на графике пирожок (необходимо при выборе значения {PieService.ANOTHER_BLOCK_NAME}).
+     * @param <T>           Тип списка
+     */
     private <T> void selectType(String name, List<T> types, DefaultComboBoxModel model, List graphicValues) {
         if (PieService.ANOTHER_BLOCK_NAME.equals(name)) {
             if (getSelectedValues(model).isEmpty()) {
@@ -347,7 +306,6 @@ public class MainFrame extends JFrame implements Serializable {
         }
         selectAllValues(model, false);
 
-
         T type = null;
         for (T payType : types) {
             if (((TypeValue) payType).getName().equals(name)) {
@@ -358,6 +316,28 @@ public class MainFrame extends JFrame implements Serializable {
         selectValue(model, (TypeValue) type);
     }
 
+    /**
+     * Выбирает указанное значение в списке
+     *
+     * @param model      Модель списка из которого нужно отобрать выбранные значения
+     * @param typeValue  Значение определённого атрибута
+     */
+    private void selectValue(DefaultComboBoxModel model, TypeValue typeValue) {
+        for (int i = 0; i < model.getSize(); i++) {
+            CheckBoxListService.CheckComboValue value = (CheckBoxListService.CheckComboValue) model.getElementAt(i);
+            if (value.getType().equals(typeValue)) {
+                model.setSelectedItem(value);
+                value.setState(true);
+            }
+        }
+    }
+
+    /**
+     * Устанавливает все значения из списка в положение {state}
+     *
+     * @param model Модель списка из которого нужно отобрать выбранные значения
+     * @param state При {true} все значения из списка будут выбраны
+     */
     private void selectAllValues(DefaultComboBoxModel model, boolean state) {
         for (int i = 0; i < model.getSize(); i++) {
             CheckBoxListService.CheckComboValue value = (CheckBoxListService.CheckComboValue) model.getElementAt(i);
@@ -365,28 +345,28 @@ public class MainFrame extends JFrame implements Serializable {
         }
     }
 
-    private void selectValue(DefaultComboBoxModel defaultModel, TypeValue typeValue) {
-        for (int i = 0; i < defaultModel.getSize(); i++) {
-            CheckBoxListService.CheckComboValue value = (CheckBoxListService.CheckComboValue) defaultModel.getElementAt(i);
-            if (value.getType().equals(typeValue)) {
-                defaultModel.setSelectedItem(value);
-                value.setState(true);
-            }
-        }
-    }
-
-    public boolean isUsePayType() {
+    /**
+     * @return {true}, если не выбрано ни одно значение из списка типов покупок
+     */
+    boolean isNotUsePayType() {
         List<TypeValue> selectedPayTypes = getSelectedValues((DefaultComboBoxModel) payTypeSelect.getModel());
         return selectedPayTypes.isEmpty() ||
                 (selectedPayTypes.size() == 1 && ApplicationProperties.EMPTY.equals(selectedPayTypes.get(0).getCode()));
     }
 
-    public boolean isUseImportant() {
+    /**
+     * @return {true}, если не выбрано ни одно значение из списка уровней важности
+     */
+    boolean isNotUseImportant() {
         List<TypeValue> selectedPayTypes = getSelectedValues((DefaultComboBoxModel) importanceSelect.getModel());
         return selectedPayTypes.isEmpty() ||
                 (selectedPayTypes.size() == 1 && ApplicationProperties.EMPTY.equals(selectedPayTypes.get(0).getCode()));
     }
-    public boolean isUseUser() {
+
+    /**
+     * @return {true}, если не выбрано ни одно значение из списка пользователей
+     */
+    boolean isNotUseUser() {
         List<TypeValue> selectedPayTypes = getSelectedValues((DefaultComboBoxModel) userSelect.getModel());
         return selectedPayTypes.isEmpty() ||
                 (selectedPayTypes.size() == 1 && ApplicationProperties.EMPTY.equals(selectedPayTypes.get(0).getCode()));
@@ -396,7 +376,7 @@ public class MainFrame extends JFrame implements Serializable {
      * Добавляет переданное значение нового типа покупки в список типов.
      * По классу определяет в какой список добавить
      *
-     * @param item      новое значение
+     * @param item  новое значение
      */
     void addSelectElement(Object item) {
         if (item instanceof PayType)
@@ -407,25 +387,33 @@ public class MainFrame extends JFrame implements Serializable {
             userSelect.addItem(new CheckBoxListService.CheckComboValue((Users) item, false));
     }
 
-    void removeSelectElement(Object item) {
+    /**
+     * Удаляет значение {item} из списка
+     */
+    public void removeSelectElement(Object item) {
+        JComboBox select = null;
         if (item instanceof PayType) {
-            CheckBoxListService.CheckComboValue value = getSelectValue((TypeValue) item, payTypeSelect);
-            if (value != null) {
-                payTypeSelect.removeItem(value);
-            }
+            select = payTypeSelect;
         } else if (item instanceof ImportanceType) {
-            CheckBoxListService.CheckComboValue value = getSelectValue((TypeValue) item, importanceSelect);
-            if (value != null) {
-                importanceSelect.removeItem(value);
-            }
+            select = importanceSelect;
         } else if (item instanceof Users) {
-            CheckBoxListService.CheckComboValue value = getSelectValue((TypeValue) item, userSelect);
+            select = userSelect;
+        }
+        if (select != null) {
+            CheckBoxListService.CheckComboValue value = getSelectValue((TypeValue) item, select);
             if (value != null) {
-                userSelect.removeItem(value);
+                select.removeItem(value);
             }
         }
     }
 
+    /**
+     * Находит значение во множественном списке
+     *
+     * @param value    значение
+     * @param comboBox список в котором нужно искать значение {value}
+     * @return объект {CheckBoxListService.CheckComboValue} соответствующий переданному значению
+     */
     private CheckBoxListService.CheckComboValue getSelectValue(TypeValue value, JComboBox comboBox) {
         for (int i = 0; i < comboBox.getItemCount(); i++) {
             CheckBoxListService.CheckComboValue comboValue = (CheckBoxListService.CheckComboValue) comboBox.getItemAt(i);
@@ -433,5 +421,13 @@ public class MainFrame extends JFrame implements Serializable {
                 return comboValue;
         }
         return null;
+    }
+
+    void setDateFromText(Date date) {
+        this.dateFromText.setValue(date);
+    }
+
+    void setDateToText(Date date) {
+        this.dateToText.setValue(date);
     }
 }

@@ -11,7 +11,7 @@ import javax.swing.*;
 import java.awt.*;
 
 /**
- * Фрейм для добавления нового типа покупки
+ * Фрейм для добавления нового атрибута
  */
 class FrameAddPropertyValues extends JFrame {
 

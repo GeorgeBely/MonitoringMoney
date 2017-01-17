@@ -71,8 +71,6 @@ public class ApplicationService implements Serializable {
     public static ApplicationService getInstance() {
         if (instance == null) {
             instance = new ApplicationService();
-        }
-        if (instance.importanceTypes.isEmpty() && instance.payTypes.isEmpty() && instance.users.isEmpty()) {
             instance.initDefaultProperties();
         }
         return instance;
@@ -152,7 +150,7 @@ public class ApplicationService implements Serializable {
         updateFrequencyUse(payObject);
 
         ApplicationService.writeData();
-        MonitoringMoney.mainFrame.refreshText();
+        MonitoringMoney.mainFrame.updateData();
     }
 
     /**
@@ -304,7 +302,7 @@ public class ApplicationService implements Serializable {
      *
      * @return уникальный код
      */
-    public String getNewUniqueCode() {
+    public synchronized String getNewUniqueCode() {
         if (uniqueId == null)
             uniqueId = 0;
         uniqueId++;
@@ -312,9 +310,9 @@ public class ApplicationService implements Serializable {
     }
 
     /**
-     * Добавляет новый тип покупки или уровень важности или платильщика
+     * Добавляет новое значение определённого атрибута
      *
-     * @param name      наименование нового типа
+     * @param name      наименование нового значения атрибута
      * @param className объект класса, новый тип которого нужно создать
      * @return новый объект переданного класса <code>className</code>
      */
@@ -333,6 +331,49 @@ public class ApplicationService implements Serializable {
 
         writeData();
         return newValue;
+    }
+
+    /**
+     * Удаляет переданные значения атрибутов. Если данное значение есть хотябы у одной покупки, то оно не будет удалено
+     *
+     * @param removeList Список значений атрибутов, которые нужно удалить.
+     */
+    public void removeTypes(List<TypeValue> removeList) {
+        if (removeList == null || removeList.isEmpty())
+            return;
+
+        Set<TypeValue> useRemoveTypeSet = new HashSet<>();
+        if (!(removeList.get(0) instanceof DesiredPurchase))
+        for (PayObject payObject : payObjects) {
+            if (removeList.contains(payObject.getImportance()) && !useRemoveTypeSet.contains(payObject.getImportance()))
+                useRemoveTypeSet.add(payObject.getImportance());
+            if (removeList.contains(payObject.getPayType()) && !useRemoveTypeSet.contains(payObject.getPayType()))
+                useRemoveTypeSet.add(payObject.getPayType());
+            if (removeList.contains(payObject.getUser()) && !useRemoveTypeSet.contains(payObject.getUser()))
+                useRemoveTypeSet.add(payObject.getUser());
+        }
+
+        removeList.stream()
+                .filter(importanceType -> !useRemoveTypeSet.contains(importanceType))
+                .forEach(value -> {
+                    MonitoringMoney.addFrame.removeSelectElement(value);
+                    MonitoringMoney.mainFrame.removeSelectElement(value);
+
+                    if (value instanceof PayType) {
+                        if (payTypes.contains(value))
+                            payTypes.remove(value);
+                    } else if (value instanceof ImportanceType) {
+                        if (importanceTypes.contains(value))
+                            importanceTypes.remove(value);
+                    } else if (value instanceof Users) {
+                        if (users.contains(value))
+                            users.remove(value);
+                    } else if (value instanceof DesiredPurchase) {
+                        if (desiredPurchases.contains(value))
+                            desiredPurchases.remove(value);
+                    }
+                });
+        removeList.clear();
     }
 
     /**
@@ -398,7 +439,7 @@ public class ApplicationService implements Serializable {
      * @param className объект класса, позицию фрейма которого нужно перезаписать
      * @param position  координата фрейма
      */
-    public void updateLocationWindow(Class className, Point position) {
+    void updateLocationWindow(Class className, Point position) {
         locationWindows.put(className, position);
 
         //Запысываем положение основного фрейма, так как при его закрытии происходит остановка приложения
@@ -413,7 +454,7 @@ public class ApplicationService implements Serializable {
      * @param className объект класса, размер фрейма которого нужно перезаписать
      * @param size      размер фрейма
      */
-    public void updateSizeWindow(Class className, Dimension size) {
+    void updateSizeWindow(Class className, Dimension size) {
         sizeWindows.put(className, size);
 
         //Запысываем размер основного фрейма, так как при его закрытии происходит остановка приложения

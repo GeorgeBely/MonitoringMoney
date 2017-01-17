@@ -122,14 +122,10 @@ public class TableService {
         JButtonCellEditor.ButtonClickFunction buttonClickFunction = (value, jTable, row) -> {
             if (value instanceof PayObject)
                 MonitoringMoney.mainFrame.editFrame.removePayObjectList.add((PayObject) value);
-            else if (value instanceof ImportanceType)
-                MonitoringMoney.mainFrame.editFrame.removeImportanceList.add((ImportanceType) value);
-            else if (value instanceof PayType)
-                MonitoringMoney.mainFrame.editFrame.removePayTypeList.add((PayType) value);
-            else if (value instanceof Users)
-                MonitoringMoney.mainFrame.editFrame.removeUserList.add((Users) value);
             else if (value instanceof DesiredPurchase)
                 MonitoringMoney.mainFrame.desiredPurchaseFrame.removeDesiredPurchases.add((DesiredPurchase) value);
+            else
+                MonitoringMoney.mainFrame.editFrame.removeList.add((TypeValue) value);
 
             ((DefaultTableModel) jTable.getModel()).removeRow(row);
         };
