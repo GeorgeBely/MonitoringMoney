@@ -32,6 +32,11 @@ public class ImageService {
         return getImage("edit.png");
     }
 
+    /** @return изображение иконки лимитов. */
+    public static Image getLimitImage() {
+        return getImage("limit.png");
+    }
+
     /** @return иконку для кнопки добавления типов. */
     public static ImageIcon getPlusButtonIcon() {
         return getIcon("plus.png");
@@ -53,8 +58,13 @@ public class ImageService {
     }
 
     /** @return иконку для кнопки списка желаемых покупок */
-    public static ImageIcon getDesiredPurchase() {
+    public static ImageIcon getDesiredPurchaseIcon() {
         return getIcon("desiredPurchase.png");
+    }
+
+    /** @return иконку для кнопки лимитов */
+    public static ImageIcon getLimitIcon() {
+        return getIcon("limit.png");
     }
 
     /** @return иконку для кнопки удаления покупки. */

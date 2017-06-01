@@ -37,10 +37,11 @@ public class ApplicationProperties {
     /** Карта со значениями размера фрейма по умолчанию. Ключ объект класса фрейма, значение размер фрейма */
     public static final Map<Class, Dimension> DEFAULT_FRAME_SIZE = new HashMap<Class, Dimension>() {{
         put(AddFrame.class, new Dimension(250, 320));
-        put(MainFrame.class, new Dimension(545, 260));
+        put(MainFrame.class, new Dimension(580, 260));
         put(GraphicsFrame.class, new Dimension(515, 335));
         put(EditFrame.class, new Dimension(660, 390));
         put(DesiredPurchaseFrame.class, new Dimension(300, 400));
+        put(LimitFrame.class, new Dimension(250, 320));
     }};
 
 

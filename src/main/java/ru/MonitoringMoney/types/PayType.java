@@ -1,6 +1,7 @@
 package ru.MonitoringMoney.types;
 
 import org.apache.commons.lang.StringUtils;
+import ru.MonitoringMoney.services.ApplicationService;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -16,6 +17,10 @@ public class PayType implements TypeValue, Serializable {
     private String code;
     private String name;
 
+
+    public PayType() {
+        this(ApplicationService.getInstance().getNewUniqueCode(), "");
+    }
 
     public PayType(String code, String name) {
         this.code = code;

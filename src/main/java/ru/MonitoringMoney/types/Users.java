@@ -1,6 +1,7 @@
 package ru.MonitoringMoney.types;
 
 import org.apache.commons.lang.StringUtils;
+import ru.MonitoringMoney.services.ApplicationService;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -16,6 +17,10 @@ public class Users implements TypeValue, Serializable {
     private String code;
     private String name;
 
+
+    public Users() {
+        this(ApplicationService.getInstance().getNewUniqueCode(), "");
+    }
 
     public Users(String code, String name) {
         this.code = code;

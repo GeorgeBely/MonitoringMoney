@@ -427,9 +427,9 @@ public class ApplicationService implements Serializable {
         if (sizeWindows == null)
             sizeWindows = new HashMap<>();
 
-        if (!sizeWindows.containsKey(className)) {
+//        if (!sizeWindows.containsKey(className)) {
             sizeWindows.put(className, ApplicationProperties.DEFAULT_FRAME_SIZE.get(className));
-        }
+//        }
         return sizeWindows.get(className);
     }
 

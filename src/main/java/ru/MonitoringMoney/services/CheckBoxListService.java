@@ -58,9 +58,14 @@ public class CheckBoxListService {
 
             if (ApplicationProperties.EMPTY.equals(store.getType().getCode())) {
                 DefaultComboBoxModel defaultModel = (DefaultComboBoxModel) cb.getModel();
+                boolean state = true;
+                for (int i = 0; i < defaultModel.getSize(); i++) {
+                    if (((CheckBoxListService.CheckComboValue) defaultModel.getElementAt(i)).isSelected())
+                        state = false;
+                }
                 for (int i = 0; i < defaultModel.getSize(); i++) {
                     CheckBoxListService.CheckComboValue value = (CheckBoxListService.CheckComboValue) defaultModel.getElementAt(i);
-                    value.setState(false);
+                    value.setState(state);
                 }
             } else {
                 ccr.checkBox.setSelected((store.state = !store.state));

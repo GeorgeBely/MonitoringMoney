@@ -55,6 +55,7 @@ public class MainFrame extends JFrame implements Serializable {
     private GraphicsFrame graphicsFrame;
     public EditFrame editFrame;
     public DesiredPurchaseFrame desiredPurchaseFrame;
+    private LimitFrame limitFrame;
 
 
     public MainFrame() {
@@ -73,7 +74,7 @@ public class MainFrame extends JFrame implements Serializable {
         }};
         add(panel);
 
-        text = FrameService.createJTextArea(panel, new Rectangle(250, 5, 285, 186), () -> {});
+        text = FrameService.createJTextArea(panel, new Rectangle(250, 5, 320, 186), () -> {});
 
         termInput = new JTextField() {{
             setBounds(5, 5, 240, 30);
@@ -184,9 +185,17 @@ public class MainFrame extends JFrame implements Serializable {
             setBorder(null);
             setBounds(505, 195, 30, 30);
             addActionListener(e -> EventQueue.invokeLater(() -> desiredPurchaseFrame = new DesiredPurchaseFrame()));
-            setIcon(ImageService.getDesiredPurchase());
+            setIcon(ImageService.getDesiredPurchaseIcon());
         }};
         panel.add(buttonEditDesiredPurchase);
+
+        JButton buttonLimit = new JButton() {{
+            setBorder(null);
+            setBounds(540, 195, 30, 30);
+            addActionListener(e -> EventQueue.invokeLater(() -> limitFrame = new LimitFrame()));
+            setIcon(ImageService.getLimitIcon());
+        }};
+        panel.add(buttonLimit);
 
         updateData();
     }
