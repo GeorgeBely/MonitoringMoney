@@ -40,12 +40,12 @@ public class AddFrame extends JFrame implements Serializable {
 
 
     public AddFrame() {
-        setLocation(ApplicationService.getInstance().getWindowLocation(AddFrame.class));
-        setSize(ApplicationService.getInstance().getWindowSize(AddFrame.class));
         setResizable(false);
         setTitle(FRAME_NAME);
-        setIconImage(ImageService.getPlusImage());
         toFront();
+        setIconImage(ImageService.PLUS_IMAGE);
+        setLocation(ApplicationService.getInstance().getWindowLocation(this));
+        setSize(ApplicationService.getInstance().getWindowSize(this));
         addComponentListener(FrameService.addComponentListener(AddFrame.class, getSize(), getLocation(), () -> {}));
 
         JPanel panel = new JPanel() {{
@@ -104,31 +104,23 @@ public class AddFrame extends JFrame implements Serializable {
         panel.add(cancelButton);
     }
 
-
-    private PopupDialog createErrorDialog(String title, JComponent select) {
-        JLabel label = new JLabel("<html><font color=\"red\">" + title + "</font></html>") {{
-            setBounds(10, 0, title.length() * 8, 30);
-        }};
-        return new PopupDialog(select, new Dimension(title.length() * 8, 40), new Component[]{label}, true, false);
-    }
-
     private void addPayObject() {
         boolean checkParams = true;
         disposePopup();
-        if (ApplicationProperties.EMPTY.equals(((ImportanceType) importanceSelect.getSelectedItem()).getCode())) {
-            importanceErrorPopup = createErrorDialog("Необходимо выбрать уровень важности", importanceSelect);
+        if (ApplicationProperties.EMPTY.equals(importanceSelect.getSelectedItem() != null ? ((ImportanceType) importanceSelect.getSelectedItem()).getCode() : null)) {
+            importanceErrorPopup = FrameService.createErrorDialog("Необходимо выбрать уровень важности", importanceSelect);
             checkParams = false;
         }
-        if (ApplicationProperties.EMPTY.equals(((PayType) payTypeSelect.getSelectedItem()).getCode())) {
-            payTypeErrorPopup = createErrorDialog("Необходимо выбрать тип покупки", payTypeSelect);
+        if (ApplicationProperties.EMPTY.equals(payTypeSelect.getSelectedItem() != null ? ((PayType) payTypeSelect.getSelectedItem()).getCode() : null)) {
+            payTypeErrorPopup = FrameService.createErrorDialog("Необходимо выбрать тип покупки", payTypeSelect);
             checkParams = false;
         }
-        if (ApplicationProperties.EMPTY.equals(((Users) userSelect.getSelectedItem()).getCode())) {
-            userErrorPopup = createErrorDialog("Необходимо выбрать пользователя", userSelect);
+        if (ApplicationProperties.EMPTY.equals(userSelect.getSelectedItem() != null ? ((Users) userSelect.getSelectedItem()).getCode() : null)) {
+            userErrorPopup = FrameService.createErrorDialog("Необходимо выбрать пользователя", userSelect);
             checkParams = false;
         }
         if (StringUtils.isBlank(priceText.getText())) {
-            priceErrorPopup = createErrorDialog("Необходимо указать цену", priceText);
+            priceErrorPopup = FrameService.createErrorDialog("Необходимо указать цену", priceText);
             checkParams = false;
         }
 

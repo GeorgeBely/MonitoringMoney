@@ -3,34 +3,32 @@ package ru.MonitoringMoney.frame;
 
 import ru.MonitoringMoney.main.MonitoringMoney;
 import ru.MonitoringMoney.services.ApplicationService;
+import ru.MonitoringMoney.services.ImageService;
 import ru.MonitoringMoney.types.ImportanceType;
 import ru.MonitoringMoney.types.PayType;
 import ru.MonitoringMoney.types.Users;
 
 import javax.swing.*;
-import java.awt.*;
+import java.io.Serializable;
 
 /**
  * Фрейм для добавления нового атрибута
  */
-class FrameAddPropertyValues extends JFrame {
+public class FrameAddPropertyValues extends JFrame implements Serializable {
 
-    /** Ширина фрейма */
-    private static final int FRAME_WIDTH = 250;
+    private static final long serialVersionUID = -3452342341234123428L;
 
-    /** Высота фрейма */
-    private static final int FRAME_HEIGHT = 130;
 
     private static final String FRAME_NAME = "Добавление нового значения";
 
 
     FrameAddPropertyValues(Class className) {
-        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        setLocation(screenSize.width / 2 - FRAME_WIDTH / 2, screenSize.height / 2 - FRAME_HEIGHT / 2);
-        setSize(FRAME_WIDTH, FRAME_HEIGHT);
         setResizable(false);
         setVisible(true);
         setTitle(FRAME_NAME);
+        setIconImage(ImageService.PLUS_IMAGE);
+        setLocation(ApplicationService.getInstance().getWindowLocation(this));
+        setSize(ApplicationService.getInstance().getWindowSize(this));
 
         JPanel panel = new JPanel() {{
             setFocusable(true);
@@ -60,8 +58,8 @@ class FrameAddPropertyValues extends JFrame {
             addActionListener(e -> {
                 Object newValue = ApplicationService.getInstance().addPropertyValue(valueNameText.getText(), className);
                 if (newValue != null) {
-                    MonitoringMoney.addFrame.addSelectElement(newValue);
-                    MonitoringMoney.mainFrame.addSelectElement(newValue);
+                    MonitoringMoney.getFrame(AddFrame.class).addSelectElement(newValue);
+                    MonitoringMoney.getFrame(MainFrame.class).addSelectElement(newValue);
                 }
                 dispose();
             });

@@ -58,13 +58,13 @@ public class MainFrame extends JFrame implements Serializable {
 
 
     public MainFrame() {
-        setLocation(ApplicationService.getInstance().getWindowLocation(MainFrame.class));
-        setSize(ApplicationService.getInstance().getWindowSize(MainFrame.class));
-        setResizable(false);
-        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setVisible(true);
+        setResizable(false);
+        setIconImage(ImageService.MONEY_IMAGE);
         setTitle(FRAME_NAME + "_" + MonitoringMoney.VERSION);
-        setIconImage(ImageService.getMoneyImage());
+        setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        setLocation(ApplicationService.getInstance().getWindowLocation(this));
+        setSize(ApplicationService.getInstance().getWindowSize(this));
         addComponentListener(FrameService.addComponentListener(MainFrame.class, getSize(), getLocation(), () -> {}));
 
         JPanel panel = new JPanel(){{
@@ -73,7 +73,7 @@ public class MainFrame extends JFrame implements Serializable {
         }};
         add(panel);
 
-        text = FrameService.createJTextArea(panel, new Rectangle(250, 5, 285, 186), () -> {});
+        text = FrameService.createJTextArea(panel, new Rectangle(250, 5, 320, 186), () -> {});
 
         termInput = new JTextField() {{
             setBounds(5, 5, 240, 30);
@@ -160,7 +160,7 @@ public class MainFrame extends JFrame implements Serializable {
 
         JButton buttonAdd = new JButton("Добавить покупку") {{
             setBounds(5, 195, 240, 30);
-            addActionListener(e -> MonitoringMoney.addFrame.showFrame());
+            addActionListener(e -> MonitoringMoney.getFrame(AddFrame.class).showFrame());
         }};
         panel.add(buttonAdd);
 
@@ -168,7 +168,7 @@ public class MainFrame extends JFrame implements Serializable {
             setBorder(null);
             setBounds(470, 195, 30, 30);
             addActionListener(e -> EventQueue.invokeLater(() -> graphicsFrame = new GraphicsFrame()));
-            setIcon(ImageService.getGraphicsButtonIcon());
+            setIcon(ImageService.GRAPHICS_ICON);
         }};
         panel.add(buttonGraphics);
 
@@ -176,17 +176,25 @@ public class MainFrame extends JFrame implements Serializable {
             setBorder(null);
             setBounds(435, 195, 30, 30);
             addActionListener(e -> EventQueue.invokeLater(() -> editFrame = new EditFrame()));
-            setIcon(ImageService.getEditButtonIcon());
+            setIcon(ImageService.EDIT_ICON);
         }};
         panel.add(buttonEditPays);
 
         JButton buttonEditDesiredPurchase = new JButton() {{
             setBorder(null);
             setBounds(505, 195, 30, 30);
-            addActionListener(e -> EventQueue.invokeLater(() -> desiredPurchaseFrame = new DesiredPurchaseFrame()));
-            setIcon(ImageService.getDesiredPurchase());
+            addActionListener(e -> EventQueue.invokeLater(() -> MonitoringMoney.getFrame(DesiredPurchaseFrame.class).showFrame()));
+            setIcon(ImageService.DESIRED_PURCHASE_ICON);
         }};
         panel.add(buttonEditDesiredPurchase);
+
+        JButton buttonAddIncomeFrame = new JButton() {{
+            setBorder(null);
+            setBounds(540, 195, 30, 30);
+            addActionListener(e -> EventQueue.invokeLater(() -> MonitoringMoney.getFrame(AddIncomeFrame.class).showFrame()));
+            setIcon(ImageService.ADD_INCOME_ICON);
+        }};
+        panel.add(buttonAddIncomeFrame);
 
         updateData();
     }
@@ -213,11 +221,8 @@ public class MainFrame extends JFrame implements Serializable {
         if (!TERM_INPUT_DEFAULT_TEXT.equals(termInput.getText()) && StringUtils.isNotBlank(termInput.getText()))
             term = termInput.getText();
 
-        Date dateFrom = DateUtils.truncate((Date) dateFromText.getValue(), Calendar.DATE);
-        Calendar calendarTo = Calendar.getInstance();
-        calendarTo.setTime(DateUtils.truncate((Date) dateToText.getValue(), Calendar.DATE));
-        calendarTo.add(Calendar.DATE, 1);
-        Date dateTo = calendarTo.getTime();
+        Date dateFrom = getDateFrom();
+        Date dateTo = getDateTo();
 
         Integer priceFrom = null;
         Integer priceTo = null;
@@ -421,6 +426,17 @@ public class MainFrame extends JFrame implements Serializable {
                 return comboValue;
         }
         return null;
+    }
+
+    public Date getDateFrom() {
+        return DateUtils.truncate((Date) dateFromText.getValue(), Calendar.DATE);
+    }
+
+    public Date getDateTo() {
+        Calendar calendarTo = Calendar.getInstance();
+        calendarTo.setTime(DateUtils.truncate((Date) dateToText.getValue(), Calendar.DATE));
+        calendarTo.add(Calendar.DATE, 1);
+        return calendarTo.getTime();
     }
 
     void setDateFromText(Date date) {

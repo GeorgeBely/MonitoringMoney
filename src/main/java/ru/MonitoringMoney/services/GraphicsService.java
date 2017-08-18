@@ -9,6 +9,7 @@ import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
 import ru.MonitoringMoney.ApplicationProperties;
 import ru.MonitoringMoney.PayObject;
+import ru.MonitoringMoney.income.Income;
 import ru.mangeorge.swing.service.PieService;
 
 import java.util.*;
@@ -21,11 +22,43 @@ public class GraphicsService {
     public static final String ALL_COAST = "Всего затрат";
 
     /** Данные отображающиеся в выпадающем списке выбора графика */
-    public static final String[] GRAPHICS_NAMES = new String[]{"Процентное соотношение покупок", "График затрат по времени", "Суммарные затраты по времени"};
+    public static final String[] GRAPHICS_NAMES = new String[]{"Процентное соотношение покупок", "График затрат по времени",
+            "Суммарные затраты по времени", "Доходы/Расходы"};
 
     /** Данные отображающиеся в выпадающем списке выбора данных по типу */
     public static final String[] VIEW_DATA_NAMES = new String[]{"", "Тип покупки", "Уровень важности", "Платильщик"};
 
+
+    public static TimeSeriesCollection getIncomeChartData() {
+        if (ApplicationService.getInstance().incomes == null) {
+            return new TimeSeriesCollection();
+        }
+
+        Map<Date, Integer> incomeMap = new TreeMap<>(Date::compareTo);
+        for (Income income : ApplicationService.getIncomes()) {
+            Date month = DateUtils.truncate(income.getDate(), Calendar.MONTH);
+            if (incomeMap.containsKey(month)) {
+                incomeMap.put(month, incomeMap.get(month) + income.getAmountMoney());
+            } else {
+                incomeMap.put(month, income.getAmountMoney());
+            }
+        }
+
+        Map<Date, Integer> consumptionMap = new TreeMap<>(Date::compareTo);
+        for (PayObject payObject : ApplicationService.getPayObjects()) {
+            Date month = DateUtils.truncate(payObject.getDate(), Calendar.MONTH);
+            if (consumptionMap.containsKey(month)) {
+                consumptionMap.put(month, consumptionMap.get(month) + payObject.getPrice());
+            } else {
+                consumptionMap.put(month, payObject.getPrice());
+            }
+        }
+
+        Map<String, Map<Date, Integer>> valueMap = new HashMap<>();
+        valueMap.put("Доход", incomeMap);
+        valueMap.put("Расход", consumptionMap);
+        return createTimeSeriesCollection(valueMap);
+    }
 
     /**
      * Подготавливает данные для графика "Категории", по заданному типу.
@@ -102,16 +135,7 @@ public class GraphicsService {
             }
         }
 
-        TimeSeriesCollection dataSet = new TimeSeriesCollection();
-        for (Map.Entry<String, Map<Date, Integer>> value : valueMap.entrySet()) {
-            TimeSeries series = new TimeSeries(value.getKey());
-            for (Map.Entry<Date, Integer> dateCoast : value.getValue().entrySet()) {
-                series.add(new Minute(dateCoast.getKey()), dateCoast.getValue());
-            }
-            dataSet.addSeries(series);
-        }
-
-        return dataSet;
+        return createTimeSeriesCollection(valueMap);
     }
 
     /**
@@ -152,4 +176,16 @@ public class GraphicsService {
         }
     }
 
+    private static TimeSeriesCollection createTimeSeriesCollection(Map<String, Map<Date, Integer>> valueMap) {
+        TimeSeriesCollection dataSet = new TimeSeriesCollection();
+        for (Map.Entry<String, Map<Date, Integer>> value : valueMap.entrySet()) {
+            TimeSeries series = new TimeSeries(value.getKey());
+            for (Map.Entry<Date, Integer> dateCoast : value.getValue().entrySet()) {
+                series.add(new Minute(dateCoast.getKey()), dateCoast.getValue());
+            }
+            dataSet.addSeries(series);
+        }
+
+        return dataSet;
+    }
 }

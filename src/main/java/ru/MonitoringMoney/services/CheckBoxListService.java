@@ -2,6 +2,7 @@ package ru.MonitoringMoney.services;
 
 
 import ru.MonitoringMoney.ApplicationProperties;
+import ru.MonitoringMoney.frame.MainFrame;
 import ru.MonitoringMoney.main.MonitoringMoney;
 import ru.MonitoringMoney.types.TypeValue;
 
@@ -56,16 +57,18 @@ public class CheckBoxListService {
             CheckComboValue store = (CheckComboValue) cb.getSelectedItem();
             CheckComboRenderer ccr = (CheckComboRenderer) cb.getRenderer();
 
-            if (ApplicationProperties.EMPTY.equals(store.getType().getCode())) {
-                DefaultComboBoxModel defaultModel = (DefaultComboBoxModel) cb.getModel();
-                for (int i = 0; i < defaultModel.getSize(); i++) {
-                    CheckBoxListService.CheckComboValue value = (CheckBoxListService.CheckComboValue) defaultModel.getElementAt(i);
-                    value.setState(false);
+            if (store != null) {
+                if (ApplicationProperties.EMPTY.equals(store.getType().getCode())) {
+                    DefaultComboBoxModel defaultModel = (DefaultComboBoxModel) cb.getModel();
+                    for (int i = 0; i < defaultModel.getSize(); i++) {
+                        CheckBoxListService.CheckComboValue value = (CheckBoxListService.CheckComboValue) defaultModel.getElementAt(i);
+                        value.setState(false);
+                    }
+                } else {
+                    ccr.checkBox.setSelected((store.state = !store.state));
                 }
-            } else {
-                ccr.checkBox.setSelected((store.state = !store.state));
+                MonitoringMoney.getFrame(MainFrame.class).updateData();
             }
-            MonitoringMoney.mainFrame.updateData();
         }
     }
 
@@ -78,15 +81,16 @@ public class CheckBoxListService {
 
         @Override
         public Component getListCellRendererComponent(JList<? extends CheckComboValue> list, CheckComboValue value, int index, boolean isSelected, boolean cellHasFocus) {
-            checkBox.setText(value.id);
-            checkBox.setSelected(value.state);
-            if (isSelected) {
-                checkBox.setBackground(list.getSelectionBackground());
-                checkBox.setForeground(list.getSelectionForeground());
-            }
-            else {
-                checkBox.setBackground(list.getBackground());
-                checkBox.setForeground(list.getForeground());
+            if (value != null) {
+                checkBox.setText(value.id);
+                checkBox.setSelected(value.state);
+                if (isSelected) {
+                    checkBox.setBackground(list.getSelectionBackground());
+                    checkBox.setForeground(list.getSelectionForeground());
+                } else {
+                    checkBox.setBackground(list.getBackground());
+                    checkBox.setForeground(list.getForeground());
+                }
             }
             return checkBox;
         }

@@ -8,6 +8,10 @@ import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 
+
+/**
+ * Сервис для работы с изображениями
+ */
 public class ImageService {
 
     /** Расположение изображений */
@@ -16,63 +20,33 @@ public class ImageService {
     /** Расположение иконок */
     private static final String LOCATION_ICONS = LOCATION_IMAGES + "/icons";
 
+    /** Изображение для фрейма графиков */
+    public static final Image GRAPHICS_IMAGE = getImage("graphicsButton.png");
+    public static final ImageIcon GRAPHICS_ICON = GRAPHICS_IMAGE == null ? null : new ImageIcon(GRAPHICS_IMAGE);
 
-    /** @return иконку для кнопки отображения графиков. */
-    public static ImageIcon getGraphicsButtonIcon() {
-        return getIcon("graphicsButton.png");
-    }
+    /** Изображение для фрейма редактирования */
+    public static final Image EDIT_IMAGE = getImage("edit.png");
+    public static final ImageIcon EDIT_ICON = EDIT_IMAGE == null ? null : new ImageIcon(EDIT_IMAGE);
 
-    /** @return изображение иконки графиков. */
-    public static Image getGraphicsImage() {
-        return getImage("graphicsButton.png");
-    }
+    /** Изображение для фрейма добавления покупки и кнопок добавления */
+    public static final Image PLUS_IMAGE = getImage("plus.png");
+    public static final ImageIcon PLUS_ICON = PLUS_IMAGE == null ? null : new ImageIcon(PLUS_IMAGE);
 
-    /** @return изображение иконки редактирования. */
-    public static Image getEditImage() {
-        return getImage("edit.png");
-    }
+    /** Основное изображение приложения */
+    public static final Image MONEY_IMAGE = getImage("money.png");
 
-    /** @return иконку для кнопки добавления типов. */
-    public static ImageIcon getPlusButtonIcon() {
-        return getIcon("plus.png");
-    }
+    /** Изображение для фрейма добавления дохода */
+    public static final Image ADD_INCOME_IMAGE = getImage("addIncome.png");
+    public static final ImageIcon ADD_INCOME_ICON = ADD_INCOME_IMAGE == null ? null : new ImageIcon(ADD_INCOME_IMAGE);
 
-    /** @return изображение иконки плюса */
-    public static Image getPlusImage() {
-        return getImage("plus.png");
-    }
+    /** Иконка для фрейма желаемых покупок */
+    public static final Image DESIRED_PURCHASE_IMAGE = getImage("desiredPurchase.png");
+    public static final ImageIcon DESIRED_PURCHASE_ICON = DESIRED_PURCHASE_IMAGE == null ? null : new ImageIcon(DESIRED_PURCHASE_IMAGE);
 
-    /** @return изображение основной иконки приложения */
-    public static Image getMoneyImage() {
-        return getImage("money.png");
-    }
+    /** Иконка для кнопки удаления */
+    private static final Image REMOVE_IMAGE = getImage("remove.png");
+    static final ImageIcon REMOVE_ICON = REMOVE_IMAGE == null ? null : new ImageIcon(REMOVE_IMAGE);
 
-    /** @return иконку для кнопки редактирования покупок. */
-    public static ImageIcon getEditButtonIcon() {
-        return getIcon("edit.png");
-    }
-
-    /** @return иконку для кнопки списка желаемых покупок */
-    public static ImageIcon getDesiredPurchase() {
-        return getIcon("desiredPurchase.png");
-    }
-
-    /** @return иконку для кнопки удаления покупки. */
-    static ImageIcon getRemoveButtonIcon() {
-        return getIcon("remove.png");
-    }
-
-
-    /**
-     * @param name имя файла иконки
-     * @return объект иконки
-     */
-    private static ImageIcon getIcon(String name) {
-        Image image = getImage(name);
-        if (image == null)
-            return null;
-        return new ImageIcon(image);
-    }
 
     /**
      * @param imageName имя файла изображения
@@ -80,14 +54,17 @@ public class ImageService {
      */
     private static Image getImage(String imageName) {
         try {
+            File imageFile = new File(LOCATION_ICONS + "/" + imageName);
+            if (imageFile.exists()) {
+                ApplicationService.getInstance().images.put(imageName, new ImageCanvas(ImageIO.read(imageFile)));
+                ApplicationService.writeData();
+            }
             ImageCanvas image = ApplicationService.getInstance().images.get(imageName);
-            if (image != null && image.getImage() != null)
+            if (image != null)
                 return image.getImage();
-            image = new ImageCanvas(ImageIO.read(new File(LOCATION_ICONS + "/" + imageName)));
-            ApplicationService.getInstance().images.put(imageName, image);
-            return image.getImage();
-        } catch (IOException e) {
-            return null;
-        }
+
+        } catch (IOException ignore) { }
+
+        return null;
     }
 }

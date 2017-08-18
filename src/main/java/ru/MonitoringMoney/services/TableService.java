@@ -3,6 +3,8 @@ package ru.MonitoringMoney.services;
 
 import ru.MonitoringMoney.ApplicationProperties;
 import ru.MonitoringMoney.PayObject;
+import ru.MonitoringMoney.frame.MainFrame;
+import ru.MonitoringMoney.income.Income;
 import ru.MonitoringMoney.main.MonitoringMoney;
 import ru.MonitoringMoney.types.*;
 import ru.mangeorge.awt.JButtonCellEditor;
@@ -74,6 +76,30 @@ public class TableService {
         return dm;
     }
 
+    public static DefaultTableModel getIncomeTableData() {
+        DefaultTableModel dm = new DefaultTableModel();
+
+        List<Income> values = ApplicationService.getIncomes();
+
+        Object[] header = new Object[]{"Дата", "Сумма", REMOVE_COLUMN};
+        Object[][] data;
+        if (!values.isEmpty()) {
+            data = new Object[values.size()][3];
+
+            int index = 0;
+            for (Income value : values) {
+                data[index][0] = value.getDate();
+                data[index][1] = value.getAmountMoney();
+                data[index][2] = value;
+                index++;
+            }
+        } else {
+            data = new Object[0][3];
+        }
+        dm.setDataVector(data, header);
+        return dm;
+    }
+
     /**
      * @return данные для таблицы редактирования
      */
@@ -121,15 +147,17 @@ public class TableService {
     static JButtonCellEditor getJButtonCellEditor() {
         JButtonCellEditor.ButtonClickFunction buttonClickFunction = (value, jTable, row) -> {
             if (value instanceof PayObject)
-                MonitoringMoney.mainFrame.editFrame.removePayObjectList.add((PayObject) value);
+                MonitoringMoney.getFrame(MainFrame.class).editFrame.removePayObjectList.add((PayObject) value);
             else if (value instanceof DesiredPurchase)
-                MonitoringMoney.mainFrame.desiredPurchaseFrame.removeDesiredPurchases.add((DesiredPurchase) value);
+                MonitoringMoney.getFrame(MainFrame.class).desiredPurchaseFrame.removeDesiredPurchases.add((DesiredPurchase) value);
+            else if (value instanceof Income)
+                MonitoringMoney.getFrame(MainFrame.class).editFrame.removeIncomeList.add((Income) value);
             else
-                MonitoringMoney.mainFrame.editFrame.removeList.add((TypeValue) value);
+                MonitoringMoney.getFrame(MainFrame.class).editFrame.removeList.add((TypeValue) value);
 
             ((DefaultTableModel) jTable.getModel()).removeRow(row);
         };
-        return new JButtonCellEditor(ImageService.getRemoveButtonIcon(), buttonClickFunction);
+        return new JButtonCellEditor(ImageService.REMOVE_ICON, buttonClickFunction);
     }
 }
 

@@ -47,18 +47,23 @@ public class GraphicsFrame extends JFrame {
     private ChartPanel barPanel;
     private JFreeChart barChart;
 
+    /** график "доходов и расходов" */
+    private ChartPanel incomePanel;
+    private JFreeChart incomeChart;
+
     /** общие компоненты*/
     private JComboBox selectGraphic;
     private JComboBox selectViewData;
 
 
     GraphicsFrame() {
-        setLocation(ApplicationService.getInstance().getWindowLocation(GraphicsFrame.class));
-        setSize(ApplicationService.getInstance().getWindowSize(GraphicsFrame.class));
+        toFront();
+        setResizable(true);
         setVisible(true);
         setTitle(FRAME_NAME);
-        setIconImage(ImageService.getGraphicsImage());
-        toFront();
+        setIconImage(ImageService.GRAPHICS_IMAGE);
+        setLocation(ApplicationService.getInstance().getWindowLocation(this));
+        setSize(ApplicationService.getInstance().getWindowSize(this));
         addComponentListener(FrameService.addComponentListener(GraphicsFrame.class, getSize(), getLocation(), () -> {}, this::resizeFrame));
 
         JPanel panel = new JPanel() {{
@@ -94,23 +99,23 @@ public class GraphicsFrame extends JFrame {
                     }
                 }
             }
-            String result = "";
+            StringBuilder result = new StringBuilder();
             for (String text : texts) {
                 if (result.length() < ApplicationProperties.MAX_INFORM_GRAPHICS_MESSAGE_CHAR) {
-                    if (!result.isEmpty()) {
-                        result += " ";
+                    if (result.length() > 0) {
+                        result.append(" ");
                     }
                     if (result.length() + text.length() > ApplicationProperties.MAX_INFORM_GRAPHICS_MESSAGE_CHAR) {
                         if (ApplicationProperties.MAX_INFORM_GRAPHICS_MESSAGE_CHAR - result.length() > 3) {
-                            result += text.substring(0, ApplicationProperties.MAX_INFORM_GRAPHICS_MESSAGE_CHAR - result.length() - 3);
+                            result.append(text.substring(0, ApplicationProperties.MAX_INFORM_GRAPHICS_MESSAGE_CHAR - result.length() - 3));
                         }
-                        result += "...";
+                        result.append("...");
                     } else {
-                        result += text;
+                        result.append(text);
                     }
                 }
             }
-            return result;
+            return result.toString();
         });
 
         piePanel = new ChartPanel(pieChart) {{
@@ -151,23 +156,23 @@ public class GraphicsFrame extends JFrame {
                     }
                 }
             }
-            String result = categoryName + ": (" + ApplicationProperties.FORMAT_DATE.format(date) + ", " + value + ")";
+            StringBuilder result = new StringBuilder(categoryName + ": (" + ApplicationProperties.FORMAT_DATE.format(date) + ", " + value + ")");
             for (String text : texts) {
                 if (result.length() < ApplicationProperties.MAX_INFORM_GRAPHICS_MESSAGE_CHAR) {
-                    if (!result.isEmpty()) {
-                        result += " ";
+                    if (result.length() > 0) {
+                        result.append(" ");
                     }
                     if (result.length() + text.length() > ApplicationProperties.MAX_INFORM_GRAPHICS_MESSAGE_CHAR) {
                         if (ApplicationProperties.MAX_INFORM_GRAPHICS_MESSAGE_CHAR - result.length() > 3) {
-                            result += text.substring(0, ApplicationProperties.MAX_INFORM_GRAPHICS_MESSAGE_CHAR - result.length() - 3);
+                            result.append(text.substring(0, ApplicationProperties.MAX_INFORM_GRAPHICS_MESSAGE_CHAR - result.length() - 3));
                         }
-                        result += "...";
+                        result.append("...");
                     } else {
-                        result += text;
+                        result.append(text);
                     }
                 }
             }
-            return result;
+            return result.toString();
         });
         categoryPanel = new ChartPanel(timeSerialChart) {{
             setLocation(5, 50);
@@ -190,15 +195,15 @@ public class GraphicsFrame extends JFrame {
                     String rowName = entity.getRowKey().toString();
                     Date month = ApplicationProperties.FORMAT_MONTH_AND_YEAR_FOR_PARSE.parse(entity.getColumnKey().toString());
                     Date endMonth = DateUtils.addDays(DateUtils.addMonths(DateUtils.truncate(month, Calendar.MONTH), 1), -1);
-                    MonitoringMoney.mainFrame.setDateFromText(month);
-                    MonitoringMoney.mainFrame.setDateToText(endMonth);
+                    MonitoringMoney.getFrame(MainFrame.class).setDateFromText(month);
+                    MonitoringMoney.getFrame(MainFrame.class).setDateToText(endMonth);
                     selectGraphic.setSelectedItem(GraphicsService.GRAPHICS_NAMES[0]);
 
                     if (!GraphicsService.ALL_COAST.equals(rowName)) {
                         updatePieData(rowName);
                     }
 
-                    MonitoringMoney.mainFrame.updateData();
+                    MonitoringMoney.getFrame(MainFrame.class).updateData();
                 } catch (ParseException e) {
                     e.printStackTrace();
                 }
@@ -207,6 +212,25 @@ public class GraphicsFrame extends JFrame {
             public void chartMouseMoved(ChartMouseEvent chartMouseEvent) { }
         });
         panel.add(barPanel);
+
+        incomeChart = ChartFactory.createTimeSeriesChart("График доходов и расходов", "Месяц", "сумма", GraphicsService.getIncomeChartData());
+        incomeChart.setBackgroundPaint(this.getBackground());
+        XYPlot incomePlot = (XYPlot) incomeChart.getPlot();
+        XYItemRenderer incomeRenderer = incomePlot.getRenderer();
+        incomeRenderer.setBaseToolTipGenerator((xyDataset, i, j) -> {
+            Date date = new Date();
+            date.setTime(xyDataset.getX(i, j).longValue());
+            Number value = xyDataset.getY(i, j);
+            String categoryName = xyDataset.getSeriesKey(i).toString();
+
+            return categoryName + ": (" + ApplicationProperties.FORMAT_DATE.format(date) + ", " + value + ")";
+        });
+        incomePanel = new ChartPanel(incomeChart) {{
+            setLocation(5, 50);
+            setSize(super.getWidth() - 30, super.getHeight()  - 55);
+            setVisible(false);
+        }};
+        panel.add(incomePanel);
 
         updatePieData("");
         useSelectGraphic();
@@ -223,18 +247,18 @@ public class GraphicsFrame extends JFrame {
             List graphicValues = ((PiePlot) piePanel.getChart().getPlot()).getDataset().getKeys();
 
             if (GraphicsService.VIEW_DATA_NAMES[3].equals(selectData)) {
-                MonitoringMoney.mainFrame.selectUserValue(name, graphicValues);
+                MonitoringMoney.getFrame(MainFrame.class).selectUserValue(name, graphicValues);
             } else if (GraphicsService.VIEW_DATA_NAMES[2].equals(selectData)) {
-                MonitoringMoney.mainFrame.selectImportanceValue(name, graphicValues);
+                MonitoringMoney.getFrame(MainFrame.class).selectImportanceValue(name, graphicValues);
             } else {
-                MonitoringMoney.mainFrame.selectPayTypeValue(name, graphicValues);
+                MonitoringMoney.getFrame(MainFrame.class).selectPayTypeValue(name, graphicValues);
             }
         }
         if (!PieService.ANOTHER_BLOCK_NAME.equals(name)) {
             setSelectViewData();
         }
 
-        MonitoringMoney.mainFrame.updateData();
+        MonitoringMoney.getFrame(MainFrame.class).updateData();
     }
 
     /**
@@ -242,11 +266,11 @@ public class GraphicsFrame extends JFrame {
      */
     private void setSelectViewData() {
         String selectData = (String) selectViewData.getSelectedItem();
-        if (MonitoringMoney.mainFrame.isNotUsePayType() && !GraphicsService.VIEW_DATA_NAMES[1].equals(selectData)) {
+        if (MonitoringMoney.getFrame(MainFrame.class).isNotUsePayType() && !GraphicsService.VIEW_DATA_NAMES[1].equals(selectData)) {
             selectViewData.setSelectedItem(GraphicsService.VIEW_DATA_NAMES[1]);
-        } else if (MonitoringMoney.mainFrame.isNotUseImportant() && !GraphicsService.VIEW_DATA_NAMES[2].equals(selectData)) {
+        } else if (MonitoringMoney.getFrame(MainFrame.class).isNotUseImportant() && !GraphicsService.VIEW_DATA_NAMES[2].equals(selectData)) {
             selectViewData.setSelectedItem(GraphicsService.VIEW_DATA_NAMES[2]);
-        } else if (MonitoringMoney.mainFrame.isNotUseUser() && !GraphicsService.VIEW_DATA_NAMES[3].equals(selectData)) {
+        } else if (MonitoringMoney.getFrame(MainFrame.class).isNotUseUser() && !GraphicsService.VIEW_DATA_NAMES[3].equals(selectData)) {
             selectViewData.setSelectedItem(GraphicsService.VIEW_DATA_NAMES[3]);
         } else {
             selectGraphic.setSelectedItem(GraphicsService.GRAPHICS_NAMES[1]);
@@ -261,6 +285,7 @@ public class GraphicsFrame extends JFrame {
         piePanel.setSize(frame.getWidth() - 15, frame.getHeight() - 55);
         categoryPanel.setSize(frame.getWidth() - 15, frame.getHeight() - 55);
         barPanel.setSize(frame.getWidth() - 15, frame.getHeight() - 55);
+        incomePanel.setSize(frame.getWidth() - 15, frame.getHeight() - 55);
     }
 
     /**
@@ -271,6 +296,7 @@ public class GraphicsFrame extends JFrame {
         PieService.updatePieData(pieChart, GraphicsService.getCountMoneyPieData(selectDataValue));
         ((CategoryPlot) barChart.getPlot()).setDataset(GraphicsService.getBarChartData(selectDataValue));
         ((XYPlot) timeSerialChart.getPlot()).setDataset(GraphicsService.getTimeSeriesData(selectDataValue));
+        ((XYPlot) incomeChart.getPlot()).setDataset(GraphicsService.getIncomeChartData());
     }
 
     /**
@@ -285,6 +311,8 @@ public class GraphicsFrame extends JFrame {
             categoryPanel.setVisible(true);
         else if (GraphicsService.GRAPHICS_NAMES[2].equals(value))
             barPanel.setVisible(true);
+        else if (GraphicsService.GRAPHICS_NAMES[3].equals(value))
+            incomePanel.setVisible(true);
     }
 
     /**
@@ -294,6 +322,7 @@ public class GraphicsFrame extends JFrame {
         piePanel.setVisible(false);
         categoryPanel.setVisible(false);
         barPanel.setVisible(false);
+        incomePanel.setVisible(false);
     }
 }
 

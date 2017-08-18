@@ -13,6 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
 
+
 /**
  * Фрейм для добавления и отображения желаемых покупок
  */
@@ -27,12 +28,13 @@ public class DesiredPurchaseFrame extends JFrame {
     public List<DesiredPurchase> removeDesiredPurchases = new ArrayList<>();
 
 
-    DesiredPurchaseFrame() {
-        setLocation(ApplicationService.getInstance().getWindowLocation(DesiredPurchaseFrame.class));
-        setSize(ApplicationService.getInstance().getWindowSize(DesiredPurchaseFrame.class));
+    public DesiredPurchaseFrame() {
         setResizable(false);
-        setVisible(true);
+        setVisible(false);
         setTitle(FRAME_NAME);
+        setIconImage(ImageService.DESIRED_PURCHASE_IMAGE);
+        setLocation(ApplicationService.getInstance().getWindowLocation(this));
+        setSize(ApplicationService.getInstance().getWindowSize(this));
         addComponentListener(FrameService.addComponentListener(DesiredPurchaseFrame.class, getSize(), getLocation(), () -> {}));
 
         JPanel panel = new JPanel() {{
@@ -54,7 +56,7 @@ public class DesiredPurchaseFrame extends JFrame {
                 DesiredPurchase type = new DesiredPurchase(ApplicationService.getInstance().getNewUniqueCode(), "");
                 ((DefaultTableModel) desiredPurchaseTable.getModel()).addRow(new Object[]{"", type});
             });
-            setIcon(ImageService.getPlusButtonIcon());
+            setIcon(ImageService.PLUS_ICON);
         }};
         panel.add(addButton);
 
@@ -62,14 +64,14 @@ public class DesiredPurchaseFrame extends JFrame {
             setBounds(5, 335, 115, 30);
             addActionListener(e -> {
                 updateData();
-                dispose();
+                hideFrame();
             });
         }};
         panel.add(okButton);
 
         JButton cancelButton = new JButton("Отмена") {{
             setBounds(175, 335, 115, 30);
-            addActionListener(e -> dispose());
+            addActionListener(e -> hideFrame());
         }};
         panel.add(cancelButton);
 
@@ -95,5 +97,13 @@ public class DesiredPurchaseFrame extends JFrame {
     private void updateTypeValueTable() {
         desiredPurchaseTable.setModel(TableService.getTypeValueTableData(DesiredPurchase.class));
         FrameService.addRemoveColumnView(desiredPurchaseTable);
+    }
+
+    void showFrame() {
+        setVisible(true);
+    }
+
+    private void hideFrame() {
+        setVisible(false);
     }
 }

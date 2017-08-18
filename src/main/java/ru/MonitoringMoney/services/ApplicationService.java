@@ -3,7 +3,9 @@ package ru.MonitoringMoney.services;
 import ru.MonitoringMoney.ApplicationProperties;
 import ru.MonitoringMoney.ImageCanvas;
 import ru.MonitoringMoney.PayObject;
+import ru.MonitoringMoney.frame.AddFrame;
 import ru.MonitoringMoney.frame.MainFrame;
+import ru.MonitoringMoney.income.Income;
 import ru.MonitoringMoney.main.MonitoringMoney;
 import ru.MonitoringMoney.types.*;
 import org.apache.commons.lang.StringUtils;
@@ -60,6 +62,9 @@ public class ApplicationService implements Serializable {
 
     /** Список покупок, которые отображются в данный момент */
     public static List<PayObject> viewPayObjects = new ArrayList<>();
+
+    /** Список доходов */
+    public List<Income> incomes = new ArrayList<>();
 
 
     /**
@@ -150,7 +155,15 @@ public class ApplicationService implements Serializable {
         updateFrequencyUse(payObject);
 
         ApplicationService.writeData();
-        MonitoringMoney.mainFrame.updateData();
+        MonitoringMoney.getFrame(MainFrame.class).updateData();
+    }
+
+    /** Добавляет новый доход */
+    public void addIncome(Income income) {
+        if (incomes == null) {
+            incomes = new ArrayList<>();
+        }
+        incomes.add(income);
     }
 
     /**
@@ -356,8 +369,8 @@ public class ApplicationService implements Serializable {
         removeList.stream()
                 .filter(importanceType -> !useRemoveTypeSet.contains(importanceType))
                 .forEach(value -> {
-                    MonitoringMoney.addFrame.removeSelectElement(value);
-                    MonitoringMoney.mainFrame.removeSelectElement(value);
+                    MonitoringMoney.getFrame(AddFrame.class).removeSelectElement(value);
+                    MonitoringMoney.getFrame(MainFrame.class).removeSelectElement(value);
 
                     if (value instanceof PayType) {
                         if (payTypes.contains(value))
@@ -382,7 +395,7 @@ public class ApplicationService implements Serializable {
      * @return все покупки по выбранным фильтрам в основном окне <code>MainFrame</code>
      */
     static List<PayObject> getPayObjects() {
-        List<PayObject> payObjects = MonitoringMoney.mainFrame.getPayObjectWithCurrentFilters();
+        List<PayObject> payObjects = MonitoringMoney.getFrame(MainFrame.class).getPayObjectWithCurrentFilters();
         if (payObjects.isEmpty()) {
             payObjects = ApplicationService.getInstance().getPayObjectsWithFilters(null, null, null, null, null, null, null,null);
         }
@@ -390,47 +403,67 @@ public class ApplicationService implements Serializable {
         return payObjects;
     }
 
+    /**
+     * @return все доходы в течении выбранного времени в основном окне <code>MainFrame</code>
+     */
+    public static List<Income> getIncomes() {
+        if (instance.incomes == null) {
+            instance.incomes = new ArrayList<>();
+        }
+
+        Date dateFrom = MonitoringMoney.getFrame(MainFrame.class).getDateFrom();
+        Date dateTo = MonitoringMoney.getFrame(MainFrame.class).getDateTo();
+
+        return instance.incomes.stream()
+                .filter(obj -> dateFrom == null || obj.getDate().equals(dateFrom) || obj.getDate().after(dateFrom))
+                .filter(obj -> dateTo == null || obj.getDate().before(dateTo))
+                .collect(Collectors.toList());
+    }
 
     /**
-     * @param className объект класса, позицию фрейма которого нужно получить
+     * @param frame фрейм для которого нужно получить расположение
      * @return координату фрейма
      */
-    public Point getWindowLocation(Class className) {
+    public Point getWindowLocation(Frame frame) {
         if (locationWindows == null)
             locationWindows = new HashMap<>();
 
         Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
-        Dimension frameSize = getWindowSize(className);
-        if (!locationWindows.containsKey(className)) {
+        Dimension frameSize = getWindowSize(frame);
+        if (!locationWindows.containsKey(frame.getClass())) {
             Integer x = (int) (screenSize.width / 2 - frameSize.getWidth() / 2);
             Integer y = (int) (screenSize.height / 2 - frameSize.getHeight() / 2);
-            locationWindows.put(className, new Point(x, y));
+            locationWindows.put(frame.getClass(), new Point(x, y));
         }
 
-        Point point = locationWindows.get(className);
+        Point point = locationWindows.get(frame.getClass());
         if (screenSize.getWidth() < point.getX() + frameSize.getWidth()
                 || screenSize.getHeight() < point.getY() + frameSize.getHeight()) {
             Integer x = (int) (screenSize.width / 2 - frameSize.getWidth() / 2);
             Integer y = (int) (screenSize.height / 2 - frameSize.getHeight() / 2);
             point = new Point(x, y);
-            locationWindows.put(className, point);
+            locationWindows.put(frame.getClass(), point);
         }
 
         return point;
     }
 
     /**
-     * @param className объект класса, размер фрейма которого нужно получить
+     * @param frame фрейма для которого нужно получить размер
      * @return размер фрейма
      */
-    public Dimension getWindowSize(Class className) {
+    public Dimension getWindowSize(Frame frame) {
         if (sizeWindows == null)
             sizeWindows = new HashMap<>();
 
-        if (!sizeWindows.containsKey(className)) {
-            sizeWindows.put(className, ApplicationProperties.DEFAULT_FRAME_SIZE.get(className));
+        if (!frame.isResizable()) {
+            return ApplicationProperties.DEFAULT_FRAME_SIZE.get(frame.getClass());
         }
-        return sizeWindows.get(className);
+
+        if (!sizeWindows.containsKey(frame.getClass())) {
+            sizeWindows.put(frame.getClass(), ApplicationProperties.DEFAULT_FRAME_SIZE.get(frame.getClass()));
+        }
+        return sizeWindows.get(frame.getClass());
     }
 
     /**
@@ -443,7 +476,7 @@ public class ApplicationService implements Serializable {
         locationWindows.put(className, position);
 
         //Запысываем положение основного фрейма, так как при его закрытии происходит остановка приложения
-        locationWindows.put(MainFrame.class, MonitoringMoney.mainFrame.getLocation());
+        locationWindows.put(MainFrame.class, MonitoringMoney.getFrame(MainFrame.class).getLocation());
 
         writeData();
     }
@@ -458,7 +491,7 @@ public class ApplicationService implements Serializable {
         sizeWindows.put(className, size);
 
         //Запысываем размер основного фрейма, так как при его закрытии происходит остановка приложения
-        sizeWindows.put(MainFrame.class, MonitoringMoney.mainFrame.getSize());
+        sizeWindows.put(MainFrame.class, MonitoringMoney.getFrame(MainFrame.class).getSize());
 
         writeData();
     }

@@ -2,6 +2,7 @@ package ru.MonitoringMoney.frame;
 
 import ru.MonitoringMoney.ApplicationProperties;
 import ru.MonitoringMoney.PayObject;
+import ru.MonitoringMoney.income.Income;
 import ru.MonitoringMoney.main.MonitoringMoney;
 import ru.MonitoringMoney.services.ApplicationService;
 import ru.MonitoringMoney.services.FrameService;
@@ -47,18 +48,26 @@ public class EditFrame extends JFrame implements Serializable {
     private JTable editUserTable;
     private Container editTypeValueContainer;
 
+    /** Компоненты окна редактирования оходов */
+    private JButton editIncomeButton;
+    private JLabel editIncomeLabel;
+    private Container editIncomeContainer;
+    private JTable editIncomeTable;
+
+
     /** Списки объектов, которые пользователь удаляет (Будут удалены только после того, как пользователь нажмёт кнопку применить) */
     public List<PayObject> removePayObjectList = new ArrayList<>();
     public List<TypeValue> removeList = new ArrayList<>();
+    public List<Income> removeIncomeList = new ArrayList<>();
 
 
     EditFrame() {
-        setLocation(ApplicationService.getInstance().getWindowLocation(EditFrame.class));
-        setSize(ApplicationService.getInstance().getWindowSize(EditFrame.class));
         setResizable(false);
         setVisible(true);
         setTitle(FRAME_NAME);
-        setIconImage(ImageService.getEditImage());
+        setIconImage(ImageService.EDIT_IMAGE);
+        setLocation(ApplicationService.getInstance().getWindowLocation(this));
+        setSize(ApplicationService.getInstance().getWindowSize(this));
         addComponentListener(FrameService.addComponentListener(EditFrame.class, getSize(), getLocation(), () -> {}));
 
         JPanel panel = new JPanel() {{
@@ -69,42 +78,58 @@ public class EditFrame extends JFrame implements Serializable {
 
 
         editPayObjectLabel = new JLabel("Редактор покупок") {{
-            setBounds(161, 0, 200, 30);
+            setBounds(58, 0, 170, 30);
         }};
         panel.add(editPayObjectLabel);
 
         editPayObjectButton = new JButton("Редактор покупок") {{
-            setBounds(128, 0, 170, 30);
+            setBounds(25, 0, 170, 30);
             setVisible(false);
             addActionListener(e -> {
+                hideAllElements();
                 setVisible(false);
                 editTypeValueButton.setVisible(true);
                 editPayObjectLabel.setVisible(true);
-                editTypeValueLabel.setVisible(false);
                 editPayObjectScrollPane.setVisible(true);
-                editTypeValueContainer.setVisible(false);
             });
         }};
         panel.add(editPayObjectButton);
 
         editTypeValueLabel = new JLabel("Редактирование типов") {{
-            setBounds(400, 0, 200, 30);
+            setBounds(239, 0, 200, 30);
             setVisible(false);
         }};
         panel.add(editTypeValueLabel);
 
         editTypeValueButton = new JButton("Редактирование типов") {{
-            setBounds(381, 0, 170, 30);
+            setBounds(220, 0, 170, 30);
             addActionListener(e -> {
+                hideAllElements();
                 setVisible(false);
                 editPayObjectButton.setVisible(true);
-                editPayObjectLabel.setVisible(false);
                 editTypeValueLabel.setVisible(true);
-                editPayObjectScrollPane.setVisible(false);
                 editTypeValueContainer.setVisible(true);
             });
         }};
         panel.add(editTypeValueButton);
+
+        editIncomeLabel = new JLabel("Редактирование доходов") {{
+            setBounds(450, 0, 220, 30);
+            setVisible(false);
+        }};
+        panel.add(editIncomeLabel);
+
+        editIncomeButton = new JButton("Редактирование доходов") {{
+            setBounds(415, 0, 220, 30);
+            addActionListener(e -> {
+                hideAllElements();
+                setVisible(false);
+                editPayObjectButton.setVisible(true);
+                editIncomeLabel.setVisible(true);
+                editIncomeContainer.setVisible(true);
+            });
+        }};
+        panel.add(editIncomeButton);
 
         editPayObjectTable = new JTable();
         updatePayObjectTable();
@@ -130,6 +155,21 @@ public class EditFrame extends JFrame implements Serializable {
         editImportanceTable = FrameService.createJTableTypeValue(editTypeValuePanel, new Rectangle(5, 5, 200, 240), ImportanceType.class);
         editPayTypeTable = FrameService.createJTableTypeValue(editTypeValuePanel, new Rectangle(225, 5, 200, 240), PayType.class);
         editUserTable = FrameService.createJTableTypeValue(editTypeValuePanel, new Rectangle(445, 5, 200, 240), Users.class);
+
+        editIncomeContainer = new Container() {{
+            setBounds(5, 30, 645, 290);
+            setVisible(false);
+        }};
+        panel.add(editIncomeContainer);
+
+        JPanel editIncomePanel = new JPanel() {{
+            setBounds(0, 0, 645, 290);
+            setFocusable(true);
+            setLayout(null);
+        }};
+        editIncomeContainer.add(editIncomePanel);
+
+        editIncomeTable = FrameService.createJTableIncomes(editIncomePanel, new Rectangle(5, 5, 200, 240));
 
         JButton okButton = new JButton("Применить") {{
             setBounds(45, 325, 115, 30);
@@ -157,6 +197,8 @@ public class EditFrame extends JFrame implements Serializable {
     private void updateData() throws ParseException {
         ApplicationService.getInstance().payObjects.removeAll(removePayObjectList);
         removePayObjectList.clear();
+        ApplicationService.getInstance().incomes.removeAll(removeIncomeList);
+        removeIncomeList.clear();
 
         for (Object obj : ((DefaultTableModel) editPayObjectTable.getModel()).getDataVector()) {
             Vector vector = (Vector) obj;
@@ -177,10 +219,12 @@ public class EditFrame extends JFrame implements Serializable {
         updateTypes((DefaultTableModel) editPayTypeTable.getModel(), ApplicationService.getInstance().payTypes);
         updateTypes((DefaultTableModel) editUserTable.getModel(), ApplicationService.getInstance().users);
 
+        updateIncomes();
+
         ApplicationService.getInstance().removeTypes(removeList);
 
         ApplicationService.getInstance().updateAllFrequencyUse();
-        MonitoringMoney.mainFrame.updateData();
+        MonitoringMoney.getFrame(MainFrame.class).updateData();
         ApplicationService.writeData();
     }
 
@@ -200,8 +244,25 @@ public class EditFrame extends JFrame implements Serializable {
             type.setName((String) vector.get(0));
             if (!types.contains(type)) {
                 types.add(type);
-                MonitoringMoney.addFrame.addSelectElement(type);
-                MonitoringMoney.mainFrame.addSelectElement(type);
+                MonitoringMoney.getFrame(AddFrame.class).addSelectElement(type);
+                MonitoringMoney.getFrame(MainFrame.class).addSelectElement(type);
+            }
+        }
+    }
+
+    private void updateIncomes() throws ParseException {
+        for (Object obj : ((DefaultTableModel)editIncomeTable.getModel()).getDataVector()) {
+            Vector vector = (Vector) obj;
+
+            Income income = (Income) vector.get(2);
+            if (vector.get(0) instanceof String) {
+                income.setDate(ApplicationProperties.FORMAT_DATE.parse((String) vector.get(0)));
+            }
+            if (vector.get(1) instanceof String) {
+                income.setAmountMoney(Integer.parseInt((String) vector.get(1)));
+            }
+            if (!ApplicationService.getIncomes().contains(income)) {
+                ApplicationService.getInstance().addIncome(income);
             }
         }
     }
@@ -218,5 +279,17 @@ public class EditFrame extends JFrame implements Serializable {
         editPayObjectTable.getColumn(TableService.USER_COLUMN).setCellEditor(new SelectCellEditor(new JComboBox<>(), TableService.getFieldsByColumn(TableService.USER_COLUMN)));
         editPayObjectTable.getColumn(TableService.IMPORTANCE_COLUMN).setCellEditor(new SelectCellEditor(new JComboBox<>(), TableService.getFieldsByColumn(TableService.IMPORTANCE_COLUMN)));
         editPayObjectTable.getColumn(TableService.PAY_TYPE_COLUMN).setCellEditor(new SelectCellEditor(new JComboBox<>(), TableService.getFieldsByColumn(TableService.PAY_TYPE_COLUMN)));
+    }
+
+    private void hideAllElements() {
+        editPayObjectLabel.setVisible(false);
+        editPayObjectButton.setVisible(true);
+        editPayObjectScrollPane.setVisible(false);
+        editTypeValueLabel.setVisible(false);
+        editTypeValueButton.setVisible(true);
+        editTypeValueContainer.setVisible(false);
+        editIncomeButton.setVisible(true);
+        editIncomeLabel.setVisible(false);
+        editIncomeContainer.setVisible(false);
     }
 }
