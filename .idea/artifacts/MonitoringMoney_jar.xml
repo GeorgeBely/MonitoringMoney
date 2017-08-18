@@ -2,6 +2,9 @@
   <artifact type="jar" name="MonitoringMoney:jar">
     <output-path>$PROJECT_DIR$/out/artifacts/MonitoringMoney_jar</output-path>
     <root id="archive" name="MonitoringMoney.jar">
+      <element id="directory" name="META-INF">
+        <element id="file-copy" path="$PROJECT_DIR$/src/main/resource/META-INF/MANIFEST.MF" />
+      </element>
       <element id="module-output" name="MonitoringMoney" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/jcommon-1.0.23.jar" path-in-jar="/" />
       <element id="extracted-dir" path="$PROJECT_DIR$/lib/commons-lang-2.6.jar" path-in-jar="/" />
