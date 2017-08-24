@@ -237,7 +237,8 @@ public class ApplicationService implements Serializable {
         incomes.add(income);
         updateIncomeFrequencyUse(income);
         ApplicationService.writeData();
-        MonitoringMoney.getFrame(MainFrame.class).graphicsFrame.updateData();
+        if (MonitoringMoney.getFrame(MainFrame.class).graphicsFrame != null)
+            MonitoringMoney.getFrame(MainFrame.class).graphicsFrame.updateData();
     }
 
     /**
