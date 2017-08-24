@@ -1,6 +1,6 @@
 package ru.MonitoringMoney.services;
 
-import ru.MonitoringMoney.ImageCanvas;
+import ru.MonitoringMoney.types.ImageCanvas;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -56,10 +56,10 @@ public class ImageService {
         try {
             File imageFile = new File(LOCATION_ICONS + "/" + imageName);
             if (imageFile.exists()) {
-                ApplicationService.getInstance().images.put(imageName, new ImageCanvas(ImageIO.read(imageFile)));
+                ApplicationService.getInstance().getImages().put(imageName, new ImageCanvas(ImageIO.read(imageFile)));
                 ApplicationService.writeData();
             }
-            ImageCanvas image = ApplicationService.getInstance().images.get(imageName);
+            ImageCanvas image = ApplicationService.getInstance().getImages().get(imageName);
             if (image != null)
                 return image.getImage();
 

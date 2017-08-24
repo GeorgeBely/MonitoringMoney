@@ -1,36 +1,19 @@
 package ru.MonitoringMoney.types;
 
-import java.io.Serializable;
-
 
 /**
  * Объект желаемой покупки
  */
-public class DesiredPurchase implements TypeValue, Serializable {
+public class DesiredPurchase extends TypeValue {
 
     private static final long serialVersionUID = 7416866525278684935L;
 
-
-    private String code;
-    private String name;
-
-    public DesiredPurchase(String value, String code) {
-        this.name = value;
-        this.code = code;
+    public DesiredPurchase() {
+        super();
     }
 
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    @Override
-    public String getCode() {
-        return code;
+    public DesiredPurchase(String code, String name) {
+        super(code, name);
     }
 
 }

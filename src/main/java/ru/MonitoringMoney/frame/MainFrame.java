@@ -1,7 +1,7 @@
 package ru.MonitoringMoney.frame;
 
-import ru.MonitoringMoney.ApplicationProperties;
-import ru.MonitoringMoney.PayObject;
+import ru.MonitoringMoney.main.ApplicationProperties;
+import ru.MonitoringMoney.types.PayObject;
 import ru.MonitoringMoney.main.MonitoringMoney;
 import ru.MonitoringMoney.services.ApplicationService;
 import ru.MonitoringMoney.services.CheckBoxListService;
@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+
 
 /**
  * Основной фрейм приложения
@@ -203,55 +204,61 @@ public class MainFrame extends JFrame implements Serializable {
      * Обновляем данные
      */
     public void updateData() {
-        text.setText(ApplicationService.getInstance().getTextPayObjects(getPayObjectWithCurrentFilters()));
-        labelSumPrice.setText(PREFIX_LABEL_SUM_PRICE + " "  + ApplicationService.getInstance().getSumPrice(getPayObjectWithCurrentFilters()));
+        ApplicationService.viewPayObjects = getPayObjectWithCurrentFilters();
+        text.setText(ApplicationService.getInstance().getTextPayObjects(ApplicationService.viewPayObjects));
+        labelSumPrice.setText(PREFIX_LABEL_SUM_PRICE + " "  + ApplicationService.getInstance().getSumPrice(ApplicationService.viewPayObjects));
         if (graphicsFrame != null)
             graphicsFrame.updateData();
-        if (editFrame != null)
+        if (editFrame != null) {
             editFrame.updatePayObjectTable();
+            editFrame.updateIncomeTable();
+        }
     }
 
     /**
-     * По выбранным фильтрам отбирает покупки
-     *
-     * @return список покупок по заданным фильтрам
+     * Удаляет значение {item} из списка
      */
-    public List<PayObject> getPayObjectWithCurrentFilters() {
-        String term = null;
-        if (!TERM_INPUT_DEFAULT_TEXT.equals(termInput.getText()) && StringUtils.isNotBlank(termInput.getText()))
-            term = termInput.getText();
-
-        Date dateFrom = getDateFrom();
-        Date dateTo = getDateTo();
-
-        Integer priceFrom = null;
-        Integer priceTo = null;
-        if (StringUtils.isNotBlank(priceFromText.getText().replaceAll("[^0-9]", "")))
-            priceFrom = Integer.parseInt(priceFromText.getText().replaceAll("[^0-9]", ""));
-        if (StringUtils.isNotBlank(priceToText.getText().replaceAll("[^0-9]", "")))
-            priceTo = Integer.parseInt(priceToText.getText().replaceAll("[^0-9]", ""));
-
-        List<TypeValue> selectedPayTypes = getSelectedValues((DefaultComboBoxModel) payTypeSelect.getModel());
-        List<TypeValue> selectedImportanceTypes = getSelectedValues((DefaultComboBoxModel) importanceSelect.getModel());
-        List<TypeValue> selectedUsers = getSelectedValues((DefaultComboBoxModel) userSelect.getModel());
-
-        return ApplicationService.getInstance().getPayObjectsWithFilters(term, dateFrom, dateTo, priceFrom,
-                priceTo, selectedImportanceTypes, selectedPayTypes, selectedUsers);
-    }
-
-    /**
-     * @param defaultModel модель списка из которого нужно отобрать выбранные значения
-     * @return список выбранных значений
-     */
-    private List<TypeValue> getSelectedValues(DefaultComboBoxModel defaultModel) {
-        List<TypeValue> selected = new ArrayList<>();
-        for (int i = 0; i < defaultModel.getSize(); i++) {
-            CheckBoxListService.CheckComboValue value = (CheckBoxListService.CheckComboValue) defaultModel.getElementAt(i);
-            if (value.isSelected()) {
-                selected.add(value.getType());
+    public void removeSelectElement(Object item) {
+        JComboBox select = null;
+        if (item instanceof PayType) {
+            select = payTypeSelect;
+        } else if (item instanceof ImportanceType) {
+            select = importanceSelect;
+        } else if (item instanceof Users) {
+            select = userSelect;
+        }
+        if (select != null) {
+            CheckBoxListService.CheckComboValue value = getSelectValue((TypeValue) item, select);
+            if (value != null) {
+                select.removeItem(value);
             }
         }
-        return selected;
+    }
+
+    /**
+     * @param className класс, которому должен соответствовать список
+     *
+     * @return {true}, если не выбрано ни одно значение из списка соответствующего класса
+     */
+    boolean isNotUse(Class<? extends TypeValue> className) {
+        JComboBox<CheckBoxListService.CheckComboValue> checkBox = PayType.class.equals(className) ? payTypeSelect : ImportanceType.class.equals(className) ? importanceSelect : userSelect;
+        List<TypeValue> selected = getSelectedValues(((DefaultComboBoxModel) checkBox.getModel()));
+        return selected.isEmpty() || (selected.size() == 1 && TypeValue.EMPTY.equals(selected.get(0).getCode()));
+    }
+
+    /**
+     * Добавляет переданное значение нового типа покупки в список типов.
+     * По классу определяет в какой список добавить
+     *
+     * @param item  новое значение
+     */
+    void addSelectElement(Object item) {
+        if (item instanceof PayType)
+            payTypeSelect.addItem(new CheckBoxListService.CheckComboValue((PayType) item, false));
+        else if (item instanceof ImportanceType)
+            importanceSelect.addItem(new CheckBoxListService.CheckComboValue((ImportanceType) item, false));
+        else if (item instanceof Users)
+            userSelect.addItem(new CheckBoxListService.CheckComboValue((Users) item, false));
     }
 
     /**
@@ -282,6 +289,46 @@ public class MainFrame extends JFrame implements Serializable {
      */
     void selectUserValue(String name, List graphicValues) {
         selectType(name, ApplicationService.getInstance().getUsers(), (DefaultComboBoxModel) userSelect.getModel(), graphicValues);
+    }
+
+    /**
+     * По выбранным фильтрам отбирает покупки
+     *
+     * @return список покупок по заданным фильтрам
+     */
+    private List<PayObject> getPayObjectWithCurrentFilters() {
+        String term = null;
+        if (StringUtils.isNotBlank(termInput.getText()) && !TERM_INPUT_DEFAULT_TEXT.equals(termInput.getText()))
+            term = termInput.getText();
+
+        Integer priceFrom = null;
+        Integer priceTo = null;
+        if (StringUtils.isNotBlank(priceFromText.getText().replaceAll("[^0-9]", "")))
+            priceFrom = Integer.parseInt(priceFromText.getText().replaceAll("[^0-9]", ""));
+        if (StringUtils.isNotBlank(priceToText.getText().replaceAll("[^0-9]", "")))
+            priceTo = Integer.parseInt(priceToText.getText().replaceAll("[^0-9]", ""));
+
+        List<TypeValue> selectedPayTypes = getSelectedValues((DefaultComboBoxModel) payTypeSelect.getModel());
+        List<TypeValue> selectedImportanceTypes = getSelectedValues((DefaultComboBoxModel) importanceSelect.getModel());
+        List<TypeValue> selectedUsers = getSelectedValues((DefaultComboBoxModel) userSelect.getModel());
+
+        return ApplicationService.getInstance().getPayObjectsWithFilters(term, getDateFrom(), getDateTo(), priceFrom,
+                priceTo, selectedImportanceTypes, selectedPayTypes, selectedUsers);
+    }
+
+    /**
+     * @param defaultModel модель списка из которого нужно отобрать выбранные значения
+     * @return список выбранных значений
+     */
+    private List<TypeValue> getSelectedValues(DefaultComboBoxModel defaultModel) {
+        List<TypeValue> selected = new ArrayList<>();
+        for (int i = 0; i < defaultModel.getSize(); i++) {
+            CheckBoxListService.CheckComboValue value = (CheckBoxListService.CheckComboValue) defaultModel.getElementAt(i);
+            if (value.isSelected()) {
+                selected.add(value.getType());
+            }
+        }
+        return selected;
     }
 
     /**
@@ -347,68 +394,6 @@ public class MainFrame extends JFrame implements Serializable {
         for (int i = 0; i < model.getSize(); i++) {
             CheckBoxListService.CheckComboValue value = (CheckBoxListService.CheckComboValue) model.getElementAt(i);
             value.setState(state);
-        }
-    }
-
-    /**
-     * @return {true}, если не выбрано ни одно значение из списка типов покупок
-     */
-    boolean isNotUsePayType() {
-        List<TypeValue> selectedPayTypes = getSelectedValues((DefaultComboBoxModel) payTypeSelect.getModel());
-        return selectedPayTypes.isEmpty() ||
-                (selectedPayTypes.size() == 1 && ApplicationProperties.EMPTY.equals(selectedPayTypes.get(0).getCode()));
-    }
-
-    /**
-     * @return {true}, если не выбрано ни одно значение из списка уровней важности
-     */
-    boolean isNotUseImportant() {
-        List<TypeValue> selectedPayTypes = getSelectedValues((DefaultComboBoxModel) importanceSelect.getModel());
-        return selectedPayTypes.isEmpty() ||
-                (selectedPayTypes.size() == 1 && ApplicationProperties.EMPTY.equals(selectedPayTypes.get(0).getCode()));
-    }
-
-    /**
-     * @return {true}, если не выбрано ни одно значение из списка пользователей
-     */
-    boolean isNotUseUser() {
-        List<TypeValue> selectedPayTypes = getSelectedValues((DefaultComboBoxModel) userSelect.getModel());
-        return selectedPayTypes.isEmpty() ||
-                (selectedPayTypes.size() == 1 && ApplicationProperties.EMPTY.equals(selectedPayTypes.get(0).getCode()));
-    }
-
-    /**
-     * Добавляет переданное значение нового типа покупки в список типов.
-     * По классу определяет в какой список добавить
-     *
-     * @param item  новое значение
-     */
-    void addSelectElement(Object item) {
-        if (item instanceof PayType)
-            payTypeSelect.addItem(new CheckBoxListService.CheckComboValue((PayType) item, false));
-        else if (item instanceof ImportanceType)
-            importanceSelect.addItem(new CheckBoxListService.CheckComboValue((ImportanceType) item, false));
-        else if (item instanceof Users)
-            userSelect.addItem(new CheckBoxListService.CheckComboValue((Users) item, false));
-    }
-
-    /**
-     * Удаляет значение {item} из списка
-     */
-    public void removeSelectElement(Object item) {
-        JComboBox select = null;
-        if (item instanceof PayType) {
-            select = payTypeSelect;
-        } else if (item instanceof ImportanceType) {
-            select = importanceSelect;
-        } else if (item instanceof Users) {
-            select = userSelect;
-        }
-        if (select != null) {
-            CheckBoxListService.CheckComboValue value = getSelectValue((TypeValue) item, select);
-            if (value != null) {
-                select.removeItem(value);
-            }
         }
     }
 

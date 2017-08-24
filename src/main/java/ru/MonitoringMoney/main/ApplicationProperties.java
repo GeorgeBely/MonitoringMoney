@@ -1,8 +1,10 @@
-package ru.MonitoringMoney;
+package ru.MonitoringMoney.main;
 
 import ru.MonitoringMoney.frame.*;
 import ru.MonitoringMoney.types.ImportanceType;
+import ru.MonitoringMoney.types.IncomeType;
 import ru.MonitoringMoney.types.PayType;
+import ru.MonitoringMoney.types.TypeValue;
 
 import java.awt.*;
 import java.io.File;
@@ -21,9 +23,6 @@ public class ApplicationProperties {
     /** Максимальное колличество символов во всплывающей информацие на графиках */
     public static final Integer MAX_INFORM_GRAPHICS_MESSAGE_CHAR = 100;
 
-    /** Код пустого поля свойства покупки */
-    public static final String EMPTY = "empty";
-
     /** Файл с данными о покупках */
     public static final File BUY_FILE = new File("MoneyData.mm");
 
@@ -41,16 +40,13 @@ public class ApplicationProperties {
         put(GraphicsFrame.class, new Dimension(515, 335));
         put(EditFrame.class, new Dimension(660, 390));
         put(DesiredPurchaseFrame.class, new Dimension(300, 400));
-        put(AddIncomeFrame.class, new Dimension(250, 120));
+        put(AddIncomeFrame.class, new Dimension(250, 285));
         put(FrameAddPropertyValues.class, new Dimension(250, 130));
     }};
 
-
-    /**
-     * Список уровней вкажности по умолчанию
-     */
+    /** Список уровней важности по умолчанию */
     public static final List<ImportanceType> DEFAULT_IMPORTANCE = new ArrayList<ImportanceType>() {{
-        add(new ImportanceType(EMPTY, ""));
+        add(new ImportanceType(TypeValue.EMPTY, ""));
         add(new ImportanceType("very_important", "Необходимо"));
         add(new ImportanceType("important", "Нужно"));
         add(new ImportanceType("medium", "Полезное"));
@@ -58,16 +54,21 @@ public class ApplicationProperties {
         add(new ImportanceType("very_low", "Бесполезное"));
     }};
 
-    /**
-     * Список типов покупки по умолчанию
-     */
+    /** Список типов покупки по умолчанию */
     public static final List<PayType> DEFAULT_PAY_TYPES = new ArrayList<PayType>() {{
-        add(new PayType(EMPTY, ""));
+        add(new PayType(TypeValue.EMPTY, ""));
         add(new PayType("buz", "Транспорт"));
         add(new PayType("dining_room", "Столовая"));
         add(new PayType("delicacy", "Вкусности"));
         add(new PayType("duty", "Пошлина"));
         add(new PayType("fast_food", "Фаст фуд"));
         add(new PayType("medicine", "Лекарства/здоровье"));
+    }};
+
+    /** Список типов покупки по умолчанию */
+    public static final List<IncomeType> DEFAULT_INCOME_TYPES = new ArrayList<IncomeType>() {{
+        add(new IncomeType(TypeValue.EMPTY, ""));
+        add(new IncomeType("salary", "Зарплата"));
+        add(new IncomeType("prepaid_expense", "Аванс"));
     }};
 }

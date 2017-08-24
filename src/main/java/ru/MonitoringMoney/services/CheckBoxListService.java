@@ -1,7 +1,6 @@
 package ru.MonitoringMoney.services;
 
 
-import ru.MonitoringMoney.ApplicationProperties;
 import ru.MonitoringMoney.frame.MainFrame;
 import ru.MonitoringMoney.main.MonitoringMoney;
 import ru.MonitoringMoney.types.TypeValue;
@@ -58,7 +57,7 @@ public class CheckBoxListService {
             CheckComboRenderer ccr = (CheckComboRenderer) cb.getRenderer();
 
             if (store != null) {
-                if (ApplicationProperties.EMPTY.equals(store.getType().getCode())) {
+                if (TypeValue.EMPTY.equals(store.getType().getCode())) {
                     DefaultComboBoxModel defaultModel = (DefaultComboBoxModel) cb.getModel();
                     for (int i = 0; i < defaultModel.getSize(); i++) {
                         CheckBoxListService.CheckComboValue value = (CheckBoxListService.CheckComboValue) defaultModel.getElementAt(i);

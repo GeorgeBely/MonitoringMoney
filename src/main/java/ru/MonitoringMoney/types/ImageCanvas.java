@@ -1,5 +1,4 @@
-package ru.MonitoringMoney;
-
+package ru.MonitoringMoney.types;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;

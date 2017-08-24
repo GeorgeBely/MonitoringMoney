@@ -7,12 +7,13 @@ import org.jfree.data.general.PieDataset;
 import org.jfree.data.time.Minute;
 import org.jfree.data.time.TimeSeries;
 import org.jfree.data.time.TimeSeriesCollection;
-import ru.MonitoringMoney.ApplicationProperties;
-import ru.MonitoringMoney.PayObject;
-import ru.MonitoringMoney.income.Income;
+import ru.MonitoringMoney.main.ApplicationProperties;
+import ru.MonitoringMoney.types.PayObject;
+import ru.MonitoringMoney.types.Income;
 import ru.mangeorge.swing.service.PieService;
 
 import java.util.*;
+
 
 /**
  * Сервис для работы с компонентами графиков.
@@ -21,42 +22,37 @@ public class GraphicsService {
 
     public static final String ALL_COAST = "Всего затрат";
 
+    public static final String NO_DATA_MESSAGE = Locale.getDefault().equals(new Locale("ru", "RU")) ? "Нет данных" : "No data available";
+
     /** Данные отображающиеся в выпадающем списке выбора графика */
     public static final String[] GRAPHICS_NAMES = new String[]{"Процентное соотношение покупок", "График затрат по времени",
             "Суммарные затраты по времени", "Доходы/Расходы"};
 
     /** Данные отображающиеся в выпадающем списке выбора данных по типу */
-    public static final String[] VIEW_DATA_NAMES = new String[]{"", "Тип покупки", "Уровень важности", "Платильщик"};
+    public static final String[] VIEW_DATA_NAMES = new String[]{"", "Тип покупки", "Уровень важности", "Платильщик", "Тип дохода"};
 
 
-    public static TimeSeriesCollection getIncomeChartData() {
-        if (ApplicationService.getInstance().incomes == null) {
-            return new TimeSeriesCollection();
-        }
-
-        Map<Date, Integer> incomeMap = new TreeMap<>(Date::compareTo);
-        for (Income income : ApplicationService.getIncomes()) {
-            Date month = DateUtils.truncate(income.getDate(), Calendar.MONTH);
-            if (incomeMap.containsKey(month)) {
-                incomeMap.put(month, incomeMap.get(month) + income.getAmountMoney());
-            } else {
-                incomeMap.put(month, income.getAmountMoney());
-            }
-        }
-
-        Map<Date, Integer> consumptionMap = new TreeMap<>(Date::compareTo);
-        for (PayObject payObject : ApplicationService.getPayObjects()) {
-            Date month = DateUtils.truncate(payObject.getDate(), Calendar.MONTH);
-            if (consumptionMap.containsKey(month)) {
-                consumptionMap.put(month, consumptionMap.get(month) + payObject.getPrice());
-            } else {
-                consumptionMap.put(month, payObject.getPrice());
-            }
-        }
-
+    public static TimeSeriesCollection getIncomeChartData(String selectData) {
         Map<String, Map<Date, Integer>> valueMap = new HashMap<>();
-        valueMap.put("Доход", incomeMap);
-        valueMap.put("Расход", consumptionMap);
+
+        for (Income income : ApplicationService.getInstance().getIncomes()) {
+            String name = "Доход " + getIncomeName(income, selectData);
+
+            Integer coast = income.getAmountMoney();
+            Date date = DateUtils.truncate(income.getDate(), Calendar.MONTH);
+
+            addToValueMap(valueMap, name, coast, date);
+        }
+
+        for (PayObject payObject : ApplicationService.viewPayObjects) {
+            String name = "Расход " + getPayObjectName(payObject, selectData);
+
+            Integer coast = payObject.getPrice();
+            Date date = DateUtils.truncate(payObject.getDate(), Calendar.MONTH);
+
+            addToValueMap(valueMap, name, coast, date);
+        }
+
         return createTimeSeriesCollection(valueMap);
     }
 
@@ -70,7 +66,7 @@ public class GraphicsService {
         DefaultCategoryDataset dataSet = new DefaultCategoryDataset();
 
         Map<Date, Map<Object, Integer>> sortDataMap = new TreeMap<>(Date::compareTo);
-        for (PayObject payObject : ApplicationService.getPayObjects()) {
+        for (PayObject payObject : ApplicationService.viewPayObjects) {
             Date month = DateUtils.truncate(payObject.getDate(), Calendar.MONTH);
             Map<Object, Integer> monthValues = sortDataMap.get(month);
 
@@ -117,22 +113,12 @@ public class GraphicsService {
     public static TimeSeriesCollection getTimeSeriesData(String selectData) {
         Map<String, Map<Date, Integer>> valueMap = new HashMap<>();
 
-        for (PayObject payObject : ApplicationService.getPayObjects()) {
+        for (PayObject payObject : ApplicationService.viewPayObjects) {
             String name = getPayObjectName(payObject, selectData);
             Integer coast = payObject.getPrice();
             Date date = payObject.getDate();
 
-            if (valueMap.containsKey(name)) {
-                if (valueMap.get(name).containsKey(date)) {
-                    valueMap.get(name).put(date, valueMap.get(name).get(date) + coast);
-                } else {
-                    valueMap.get(name).put(date, coast);
-                }
-            } else {
-                Map<Date, Integer> coastMap = new HashMap<>();
-                coastMap.put(date, coast);
-                valueMap.put(name, coastMap);
-            }
+            addToValueMap(valueMap, name, coast, date);
         }
 
         return createTimeSeriesCollection(valueMap);
@@ -145,8 +131,11 @@ public class GraphicsService {
      * @return данные для графика "пирожок"
      */
     public static PieDataset getCountMoneyPieData(String selectData) {
+        if (VIEW_DATA_NAMES[0].equals(selectData))
+            selectData = VIEW_DATA_NAMES[1];
+
         Map<String, Number> valueMap = new HashMap<>();
-        for (PayObject payObject : ApplicationService.getPayObjects()) {
+        for (PayObject payObject : ApplicationService.viewPayObjects) {
             String name = getPayObjectName(payObject, selectData);
             Integer coast = payObject.getPrice();
 
@@ -171,15 +160,33 @@ public class GraphicsService {
             return payObject.getUser().toString();
         } else if (VIEW_DATA_NAMES[2].equals(selectData)) {
             return payObject.getImportance().toString();
-        } else {
+        } else if (VIEW_DATA_NAMES[1].equals(selectData)) {
             return payObject.getPayType().toString();
         }
+        return "";
+    }
+
+    /**
+     * Возвращает наименование значения заданного атрибута {selectData} у переданного дохода {income}
+     *
+     * @param income     доход
+     * @param selectData наименование данных, которые нужно отобразить. Берутся из массива {VIEW_DATA_NAMES}
+     * @return Наименование значения атрибута
+     */
+    private static String getIncomeName(Income income, String selectData) {
+        if (VIEW_DATA_NAMES[3].equals(selectData)) {
+            return income.getUser().toString();
+        } else if (VIEW_DATA_NAMES[4].equals(selectData)) {
+            return income.getType().toString();
+        }
+        return "";
     }
 
     private static TimeSeriesCollection createTimeSeriesCollection(Map<String, Map<Date, Integer>> valueMap) {
         TimeSeriesCollection dataSet = new TimeSeriesCollection();
         for (Map.Entry<String, Map<Date, Integer>> value : valueMap.entrySet()) {
-            TimeSeries series = new TimeSeries(value.getKey());
+            Integer sum = value.getValue().values().stream().reduce((i1, i2) -> i1 + i2).orElse(0);
+            TimeSeries series = new TimeSeries(value.getKey() + ": " + sum);
             for (Map.Entry<Date, Integer> dateCoast : value.getValue().entrySet()) {
                 series.add(new Minute(dateCoast.getKey()), dateCoast.getValue());
             }
@@ -187,5 +194,19 @@ public class GraphicsService {
         }
 
         return dataSet;
+    }
+
+    private static void addToValueMap(Map<String, Map<Date, Integer>> valueMap, String name, Integer coast, Date date) {
+        if (valueMap.containsKey(name)) {
+            if (valueMap.get(name).containsKey(date)) {
+                valueMap.get(name).put(date, valueMap.get(name).get(date) + coast);
+            } else {
+                valueMap.get(name).put(date, coast);
+            }
+        } else {
+            Map<Date, Integer> coastMap = new TreeMap<>(Date::compareTo);
+            coastMap.put(date, coast);
+            valueMap.put(name, coastMap);
+        }
     }
 }

@@ -10,13 +10,16 @@ import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PiePlot;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
-import ru.MonitoringMoney.ApplicationProperties;
-import ru.MonitoringMoney.PayObject;
+import ru.MonitoringMoney.main.ApplicationProperties;
+import ru.MonitoringMoney.types.ImportanceType;
+import ru.MonitoringMoney.types.PayObject;
 import ru.MonitoringMoney.main.MonitoringMoney;
 import ru.MonitoringMoney.services.ApplicationService;
 import ru.MonitoringMoney.services.FrameService;
 import ru.MonitoringMoney.services.GraphicsService;
 import ru.MonitoringMoney.services.ImageService;
+import ru.MonitoringMoney.types.PayType;
+import ru.MonitoringMoney.types.Users;
 import ru.mangeorge.swing.service.PieService;
 
 import javax.swing.*;
@@ -52,8 +55,8 @@ public class GraphicsFrame extends JFrame {
     private JFreeChart incomeChart;
 
     /** общие компоненты*/
-    private JComboBox selectGraphic;
-    private JComboBox selectViewData;
+    private JComboBox<String> selectGraphic;
+    private JComboBox<String> selectViewData;
 
 
     GraphicsFrame() {
@@ -72,13 +75,13 @@ public class GraphicsFrame extends JFrame {
         }};
         add(panel);
 
-        selectGraphic = new JComboBox<Object>(GraphicsService.GRAPHICS_NAMES) {{
+        selectGraphic = new JComboBox<String>(GraphicsService.GRAPHICS_NAMES) {{
             setBounds(40, 5, 240, 30);
-            addActionListener(e -> useSelectGraphic());
+            addActionListener(e -> selectGraphic());
         }};
         panel.add(selectGraphic);
 
-        selectViewData = new JComboBox<Object>(GraphicsService.VIEW_DATA_NAMES) {{
+        selectViewData = new JComboBox<String>() {{
             setBounds(290, 5, 150, 30);
             addActionListener(e -> updateData());
         }};
@@ -137,6 +140,7 @@ public class GraphicsFrame extends JFrame {
         timeSerialChart = ChartFactory.createTimeSeriesChart("График затрат по времени", "Дата покупок", "колличество", null);
         timeSerialChart.setBackgroundPaint(this.getBackground());
         XYPlot timeSerialPlot = (XYPlot) timeSerialChart.getPlot();
+        timeSerialPlot.setNoDataMessage(GraphicsService.NO_DATA_MESSAGE);
         XYItemRenderer renderer = timeSerialPlot.getRenderer();
         renderer.setBaseToolTipGenerator((xyDataset, i, j) -> {
             Date date = new Date();
@@ -183,6 +187,7 @@ public class GraphicsFrame extends JFrame {
 
         barChart = ChartFactory.createBarChart("Суммарные затраты по времени", "Месяц", "колличество", GraphicsService.getBarChartData(""));
         barChart.setBackgroundPaint(this.getBackground());
+        barChart.getPlot().setNoDataMessage(GraphicsService.NO_DATA_MESSAGE);
         barPanel = new ChartPanel(barChart) {{
             setLocation(5, 50);
             setSize(super.getWidth() - 30, super.getHeight()  - 55);
@@ -190,22 +195,24 @@ public class GraphicsFrame extends JFrame {
         }};
         barPanel.addChartMouseListener(new ChartMouseListener() {
             public void chartMouseClicked(ChartMouseEvent chartMouseEvent) {
-                try {
-                    CategoryItemEntity entity = (CategoryItemEntity) chartMouseEvent.getEntity();
-                    String rowName = entity.getRowKey().toString();
-                    Date month = ApplicationProperties.FORMAT_MONTH_AND_YEAR_FOR_PARSE.parse(entity.getColumnKey().toString());
-                    Date endMonth = DateUtils.addDays(DateUtils.addMonths(DateUtils.truncate(month, Calendar.MONTH), 1), -1);
-                    MonitoringMoney.getFrame(MainFrame.class).setDateFromText(month);
-                    MonitoringMoney.getFrame(MainFrame.class).setDateToText(endMonth);
-                    selectGraphic.setSelectedItem(GraphicsService.GRAPHICS_NAMES[0]);
+                if (chartMouseEvent.getEntity() instanceof CategoryItemEntity) {
+                    try {
+                        CategoryItemEntity entity = (CategoryItemEntity) chartMouseEvent.getEntity();
+                        String rowName = entity.getRowKey().toString();
+                        Date month = ApplicationProperties.FORMAT_MONTH_AND_YEAR_FOR_PARSE.parse(entity.getColumnKey().toString());
+                        Date endMonth = DateUtils.addDays(DateUtils.addMonths(DateUtils.truncate(month, Calendar.MONTH), 1), -1);
+                        MonitoringMoney.getFrame(MainFrame.class).setDateFromText(month);
+                        MonitoringMoney.getFrame(MainFrame.class).setDateToText(endMonth);
+                        selectGraphic.setSelectedItem(GraphicsService.GRAPHICS_NAMES[0]);
 
-                    if (!GraphicsService.ALL_COAST.equals(rowName)) {
-                        updatePieData(rowName);
+                        if (!GraphicsService.ALL_COAST.equals(rowName)) {
+                            updatePieData(rowName);
+                        }
+
+                        MonitoringMoney.getFrame(MainFrame.class).updateData();
+                    } catch (ParseException e) {
+                        e.printStackTrace();
                     }
-
-                    MonitoringMoney.getFrame(MainFrame.class).updateData();
-                } catch (ParseException e) {
-                    e.printStackTrace();
                 }
             }
 
@@ -213,9 +220,10 @@ public class GraphicsFrame extends JFrame {
         });
         panel.add(barPanel);
 
-        incomeChart = ChartFactory.createTimeSeriesChart("График доходов и расходов", "Месяц", "сумма", GraphicsService.getIncomeChartData());
+        incomeChart = ChartFactory.createTimeSeriesChart("График доходов и расходов", "Месяц", "сумма", GraphicsService.getIncomeChartData(""));
         incomeChart.setBackgroundPaint(this.getBackground());
         XYPlot incomePlot = (XYPlot) incomeChart.getPlot();
+        incomePlot.setNoDataMessage(GraphicsService.NO_DATA_MESSAGE);
         XYItemRenderer incomeRenderer = incomePlot.getRenderer();
         incomeRenderer.setBaseToolTipGenerator((xyDataset, i, j) -> {
             Date date = new Date();
@@ -233,7 +241,7 @@ public class GraphicsFrame extends JFrame {
         panel.add(incomePanel);
 
         updatePieData("");
-        useSelectGraphic();
+        selectGraphic();
     }
 
     /**
@@ -266,11 +274,11 @@ public class GraphicsFrame extends JFrame {
      */
     private void setSelectViewData() {
         String selectData = (String) selectViewData.getSelectedItem();
-        if (MonitoringMoney.getFrame(MainFrame.class).isNotUsePayType() && !GraphicsService.VIEW_DATA_NAMES[1].equals(selectData)) {
+        if (MonitoringMoney.getFrame(MainFrame.class).isNotUse(PayType.class) && !GraphicsService.VIEW_DATA_NAMES[1].equals(selectData)) {
             selectViewData.setSelectedItem(GraphicsService.VIEW_DATA_NAMES[1]);
-        } else if (MonitoringMoney.getFrame(MainFrame.class).isNotUseImportant() && !GraphicsService.VIEW_DATA_NAMES[2].equals(selectData)) {
+        } else if (MonitoringMoney.getFrame(MainFrame.class).isNotUse(ImportanceType.class) && !GraphicsService.VIEW_DATA_NAMES[2].equals(selectData)) {
             selectViewData.setSelectedItem(GraphicsService.VIEW_DATA_NAMES[2]);
-        } else if (MonitoringMoney.getFrame(MainFrame.class).isNotUseUser() && !GraphicsService.VIEW_DATA_NAMES[3].equals(selectData)) {
+        } else if (MonitoringMoney.getFrame(MainFrame.class).isNotUse(Users.class) && !GraphicsService.VIEW_DATA_NAMES[3].equals(selectData)) {
             selectViewData.setSelectedItem(GraphicsService.VIEW_DATA_NAMES[3]);
         } else {
             selectGraphic.setSelectedItem(GraphicsService.GRAPHICS_NAMES[1]);
@@ -291,18 +299,19 @@ public class GraphicsFrame extends JFrame {
     /**
      * Обновляет данные на графике
      */
-    void updateData() {
+    public void updateData() {
         String selectDataValue = (String) selectViewData.getSelectedItem();
         PieService.updatePieData(pieChart, GraphicsService.getCountMoneyPieData(selectDataValue));
         ((CategoryPlot) barChart.getPlot()).setDataset(GraphicsService.getBarChartData(selectDataValue));
         ((XYPlot) timeSerialChart.getPlot()).setDataset(GraphicsService.getTimeSeriesData(selectDataValue));
-        ((XYPlot) incomeChart.getPlot()).setDataset(GraphicsService.getIncomeChartData());
+        ((XYPlot) incomeChart.getPlot()).setDataset(GraphicsService.getIncomeChartData(selectDataValue));
     }
 
     /**
      * Выбор отображаемого графика
      */
-    private void useSelectGraphic() {
+    @SuppressWarnings("unchecked")
+    private void selectGraphic() {
         setNotVisibleAllGraphics();
         String value = (String) selectGraphic.getSelectedItem();
         if (GraphicsService.GRAPHICS_NAMES[0].equals(value))
@@ -313,6 +322,19 @@ public class GraphicsFrame extends JFrame {
             barPanel.setVisible(true);
         else if (GraphicsService.GRAPHICS_NAMES[3].equals(value))
             incomePanel.setVisible(true);
+
+        DefaultComboBoxModel<String> selectViewDataModel = (DefaultComboBoxModel<String>) selectViewData.getModel();
+        selectViewDataModel.removeAllElements();
+        if (GraphicsService.GRAPHICS_NAMES[3].equals(value)) {
+            selectViewDataModel.addElement(GraphicsService.VIEW_DATA_NAMES[0]);
+            selectViewDataModel.addElement(GraphicsService.VIEW_DATA_NAMES[3]);
+            selectViewDataModel.addElement(GraphicsService.VIEW_DATA_NAMES[4]);
+        } else {
+            selectViewDataModel.addElement(GraphicsService.VIEW_DATA_NAMES[0]);
+            selectViewDataModel.addElement(GraphicsService.VIEW_DATA_NAMES[1]);
+            selectViewDataModel.addElement(GraphicsService.VIEW_DATA_NAMES[2]);
+            selectViewDataModel.addElement(GraphicsService.VIEW_DATA_NAMES[3]);
+        }
     }
 
     /**

@@ -12,6 +12,7 @@ import javax.swing.table.DefaultTableModel;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Vector;
+import java.util.stream.Collectors;
 
 
 /**
@@ -79,9 +80,9 @@ public class DesiredPurchaseFrame extends JFrame {
     }
 
     private void updateData() {
-        removeDesiredPurchases.stream()
-                .filter(ApplicationService.getInstance().desiredPurchases::contains)
-                .forEach(ApplicationService.getInstance().desiredPurchases::remove);
+        ApplicationService.getInstance().getDesiredPurchases().removeAll(removeDesiredPurchases.stream()
+                .filter(ApplicationService.getInstance().getDesiredPurchases()::contains)
+                .collect(Collectors.toList()));
         removeDesiredPurchases.clear();
         for (Object obj : ((DefaultTableModel) desiredPurchaseTable.getModel()).getDataVector()) {
             Vector vector = (Vector) obj;

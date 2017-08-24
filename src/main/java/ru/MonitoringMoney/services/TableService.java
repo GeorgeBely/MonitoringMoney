@@ -1,10 +1,8 @@
 package ru.MonitoringMoney.services;
 
 
-import ru.MonitoringMoney.ApplicationProperties;
-import ru.MonitoringMoney.PayObject;
+import ru.MonitoringMoney.types.PayObject;
 import ru.MonitoringMoney.frame.MainFrame;
-import ru.MonitoringMoney.income.Income;
 import ru.MonitoringMoney.main.MonitoringMoney;
 import ru.MonitoringMoney.types.*;
 import ru.mangeorge.awt.JButtonCellEditor;
@@ -23,6 +21,7 @@ public class TableService {
     public static final String USER_COLUMN = "Платильщик";
     public static final String IMPORTANCE_COLUMN = "Уровень важности";
     public static final String PAY_TYPE_COLUMN = "Тип покупки";
+    public static final String INCOME_TYPE_COLUMN = "Тип дохода";
     private static final String PRICE_COLUMN = "Стоимость";
     public static final String DATE_COLUMN = "Дата";
     public static final String DESCRIPTION_COLUMN = "Описание";
@@ -51,6 +50,9 @@ public class TableService {
         } else if (className.equals(DesiredPurchase.class)) {
             values.addAll(ApplicationService.getInstance().getDesiredPurchases());
             columnName = DESIRED_PURCHASE_COLUMN;
+        } else if (className.equals(IncomeType.class)) {
+            values.addAll(ApplicationService.getInstance().getIncomeTypes());
+            columnName = INCOME_TYPE_COLUMN;
         }
 
         Object[] header = new Object[]{columnName, REMOVE_COLUMN};
@@ -63,7 +65,7 @@ public class TableService {
 
             int index = 0;
             for (TypeValue value : values) {
-                if (!ApplicationProperties.EMPTY.equals(value.getCode())) {
+                if (!TypeValue.EMPTY.equals(value.getCode())) {
                     data[index][0] = value.getName();
                     data[index][1] = value;
                     index++;
@@ -78,25 +80,23 @@ public class TableService {
 
     public static DefaultTableModel getIncomeTableData() {
         DefaultTableModel dm = new DefaultTableModel();
+        Object[] header = new Object[]{USER_COLUMN, INCOME_TYPE_COLUMN, PRICE_COLUMN, DATE_COLUMN, DESCRIPTION_COLUMN, REMOVE_COLUMN};
+        List<Income> values = ApplicationService.getInstance().getIncomes();
+        Object[][] data = new Object[values.size()][header.length];
 
-        List<Income> values = ApplicationService.getIncomes();
+        int index = 0;
+        for (Income value : values) {
+            data[index][0] = value.getUser();
+            data[index][1] = value.getType();
+            data[index][2] = value.getAmountMoney();
+            data[index][3] = value.getDate();
+            data[index][4] = value.getDescription();
+            data[index][5] = value;
 
-        Object[] header = new Object[]{"Дата", "Сумма", REMOVE_COLUMN};
-        Object[][] data;
-        if (!values.isEmpty()) {
-            data = new Object[values.size()][3];
-
-            int index = 0;
-            for (Income value : values) {
-                data[index][0] = value.getDate();
-                data[index][1] = value.getAmountMoney();
-                data[index][2] = value;
-                index++;
-            }
-        } else {
-            data = new Object[0][3];
+            index++;
         }
         dm.setDataVector(data, header);
+
         return dm;
     }
 
@@ -106,8 +106,8 @@ public class TableService {
     public static DefaultTableModel getPayObjectTableData() {
         DefaultTableModel dm = new DefaultTableModel();
         Object[] header = new Object[]{USER_COLUMN, IMPORTANCE_COLUMN, PAY_TYPE_COLUMN, PRICE_COLUMN, DATE_COLUMN, DESCRIPTION_COLUMN, REMOVE_COLUMN};
-        List<PayObject> payObjects = ApplicationService.getPayObjects();
-        Object[][] data = new Object[payObjects.size()][7];
+        List<PayObject> payObjects = ApplicationService.viewPayObjects;
+        Object[][] data = new Object[payObjects.size()][header.length];
 
         int index = 0;
         for (PayObject payObject : payObjects) {
@@ -137,6 +137,8 @@ public class TableService {
             return ApplicationService.getInstance().getSortedPayTypes();
         } else if (TableService.USER_COLUMN.equals(columnName)) {
             return ApplicationService.getInstance().getSortedUsers();
+        } else if (TableService.INCOME_TYPE_COLUMN.equals(columnName)) {
+            return ApplicationService.getInstance().getSortedIncomeTypes();
         }
         return new Object[0];
     }

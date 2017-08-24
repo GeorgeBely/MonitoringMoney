@@ -1,8 +1,8 @@
-package ru.MonitoringMoney;
+package ru.MonitoringMoney.types;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
-import ru.MonitoringMoney.types.*;
+import ru.MonitoringMoney.main.ApplicationProperties;
 
 import java.io.Serializable;
 import java.util.Calendar;

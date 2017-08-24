@@ -1,11 +1,8 @@
 package ru.MonitoringMoney.services;
 
 
-import ru.MonitoringMoney.ApplicationProperties;
-import ru.MonitoringMoney.income.Income;
-import ru.MonitoringMoney.types.TypeValue;
-import ru.mangeorge.awt.DateCellEditor;
-import ru.mangeorge.awt.DateCellRenderer;
+import ru.MonitoringMoney.main.ApplicationProperties;
+import ru.MonitoringMoney.types.*;
 import ru.mangeorge.awt.JButtonCellRenderer;
 import ru.mangeorge.awt.service.CalendarService;
 import ru.mangeorge.swing.graphics.PopupDialog;
@@ -15,7 +12,7 @@ import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.*;
 import java.text.ParseException;
-import java.util.Date;
+
 
 public class FrameService {
 
@@ -201,44 +198,6 @@ public class FrameService {
 
         return table;
     }
-
-    /**
-     * Создаёт таблицу доходов и добавляет её на панель
-     *
-     * @param panel   панель
-     * @param bonds   размеры списка и расположение
-     * @return сформированная таблица, с кнопкой добавления нового значения
-     */
-    public static JTable createJTableIncomes(JPanel panel, Rectangle bonds) {
-        JTable table = new JTable() {{
-            setModel(TableService.getIncomeTableData());
-            getColumn("Дата").setCellEditor(new DateCellEditor(new JTextField(), ApplicationProperties.FORMAT_DATE, null));
-            getColumn("Дата").setCellRenderer(new DateCellRenderer(ApplicationProperties.FORMAT_DATE));
-        }};
-        JScrollPane editScrollPane = new JScrollPane() {{
-            setViewportView(table);
-            setBounds(bonds);
-        }};
-
-        JButton button = new JButton("Добавить") {{
-            setBounds((int) bonds.getX() + 25, (int) (bonds.getHeight() + bonds.getY()) + 5, (int) bonds.getWidth() - 50, 30);
-            addActionListener(e -> {
-                try {
-                    Income income = new Income(new Date(), 0);
-                    ((DefaultTableModel) table.getModel()).addRow(new Object[]{income.getDate(), income.getAmountMoney(), income});
-                } catch (Exception ignore) {}
-            });
-            setIcon(ImageService.PLUS_ICON);
-        }};
-        panel.add(button);
-
-        panel.add(editScrollPane);
-
-        FrameService.addRemoveColumnView(table);
-
-        return table;
-    }
-
 
     public static PopupDialog createErrorDialog(String title, JComponent select) {
         JLabel label = new JLabel("<html><font color=\"red\">" + title + "</font></html>") {{

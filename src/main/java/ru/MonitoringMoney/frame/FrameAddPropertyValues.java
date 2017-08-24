@@ -5,6 +5,7 @@ import ru.MonitoringMoney.main.MonitoringMoney;
 import ru.MonitoringMoney.services.ApplicationService;
 import ru.MonitoringMoney.services.ImageService;
 import ru.MonitoringMoney.types.ImportanceType;
+import ru.MonitoringMoney.types.IncomeType;
 import ru.MonitoringMoney.types.PayType;
 import ru.MonitoringMoney.types.Users;
 
@@ -44,6 +45,8 @@ public class FrameAddPropertyValues extends JFrame implements Serializable {
                 setText("Добавить уровень важности");
             else if (Users.class.equals(className))
                 setText("Добавить пользователя");
+            else if (IncomeType.class.equals(className))
+                setText("Добавить тип дохода");
             setBounds(5, 0, 235, 30);
         }};
         panel.add(newValueLabel);
@@ -60,6 +63,7 @@ public class FrameAddPropertyValues extends JFrame implements Serializable {
                 if (newValue != null) {
                     MonitoringMoney.getFrame(AddFrame.class).addSelectElement(newValue);
                     MonitoringMoney.getFrame(MainFrame.class).addSelectElement(newValue);
+                    MonitoringMoney.getFrame(AddIncomeFrame.class).addSelectElement(newValue);
                 }
                 dispose();
             });

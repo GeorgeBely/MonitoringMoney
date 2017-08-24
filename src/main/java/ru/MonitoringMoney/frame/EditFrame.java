@@ -1,8 +1,7 @@
 package ru.MonitoringMoney.frame;
 
-import ru.MonitoringMoney.ApplicationProperties;
-import ru.MonitoringMoney.PayObject;
-import ru.MonitoringMoney.income.Income;
+import ru.MonitoringMoney.main.ApplicationProperties;
+import ru.MonitoringMoney.types.PayObject;
 import ru.MonitoringMoney.main.MonitoringMoney;
 import ru.MonitoringMoney.services.ApplicationService;
 import ru.MonitoringMoney.services.FrameService;
@@ -22,7 +21,7 @@ import java.util.List;
 
 
 /**
- * Фрейм для редактирования покупок
+ * Фрейм для редактирования данных
  */
 public class EditFrame extends JFrame implements Serializable {
 
@@ -48,11 +47,12 @@ public class EditFrame extends JFrame implements Serializable {
     private JTable editUserTable;
     private Container editTypeValueContainer;
 
-    /** Компоненты окна редактирования оходов */
+    /** Компоненты окна редактирования доходов */
     private JButton editIncomeButton;
     private JLabel editIncomeLabel;
     private Container editIncomeContainer;
     private JTable editIncomeTable;
+    private JTable editIncomeTypeTable;
 
 
     /** Списки объектов, которые пользователь удаляет (Будут удалены только после того, как пользователь нажмёт кнопку применить) */
@@ -135,7 +135,7 @@ public class EditFrame extends JFrame implements Serializable {
         updatePayObjectTable();
         editPayObjectScrollPane = new JScrollPane() {{
             setViewportView(editPayObjectTable);
-            setBounds(5, 30, 645, 290);
+            setBounds(5, 35, 645, 285);
         }};
         panel.add(editPayObjectScrollPane);
 
@@ -169,9 +169,17 @@ public class EditFrame extends JFrame implements Serializable {
         }};
         editIncomeContainer.add(editIncomePanel);
 
-        editIncomeTable = FrameService.createJTableIncomes(editIncomePanel, new Rectangle(5, 5, 200, 240));
+        editIncomeTable = new JTable();
+        updateIncomeTable();
+        JScrollPane editIncomeScrollPane = new JScrollPane() {{
+            setViewportView(editIncomeTable);
+            setBounds(5, 5, 435, 285);
+        }};
+        editIncomePanel.add(editIncomeScrollPane);
 
-        JButton okButton = new JButton("Применить") {{
+        editIncomeTypeTable = FrameService.createJTableTypeValue(editIncomePanel, new Rectangle(445, 5, 200, 240), IncomeType.class);
+
+        panel.add(new JButton("Применить") {{
             setBounds(45, 325, 115, 30);
             addActionListener(e -> {
                 try {
@@ -181,43 +189,29 @@ public class EditFrame extends JFrame implements Serializable {
                     e1.printStackTrace();
                 }
             });
-        }};
-        panel.add(okButton);
+        }});
 
-        JButton cancelButton = new JButton("Отмена") {{
+        panel.add(new JButton("Отмена") {{
             setBounds(500, 325, 115, 30);
             addActionListener(e -> dispose());
-        }};
-        panel.add(cancelButton);
+        }});
     }
 
     /**
      * Обновляет данные о покупках и типах
      */
     private void updateData() throws ParseException {
-        ApplicationService.getInstance().payObjects.removeAll(removePayObjectList);
+        ApplicationService.getInstance().removePayObjects(removePayObjectList);
         removePayObjectList.clear();
-        ApplicationService.getInstance().incomes.removeAll(removeIncomeList);
+        ApplicationService.getInstance().removeIncomes(removeIncomeList);
         removeIncomeList.clear();
 
-        for (Object obj : ((DefaultTableModel) editPayObjectTable.getModel()).getDataVector()) {
-            Vector vector = (Vector) obj;
-            PayObject payObject = (PayObject) vector.get(6);
-            payObject.setUser((Users) vector.get(0));
-            payObject.setImportance((ImportanceType) vector.get(1));
-            payObject.setPayType((PayType) vector.get(2));
-            if (vector.get(3) instanceof String) {
-                payObject.setPrice(Integer.parseInt((String) vector.get(3)));
-            }
-            if (vector.get(4) instanceof String) {
-                payObject.setDate(ApplicationProperties.FORMAT_DATE.parse((String) vector.get(4)));
-            }
-            payObject.setDescription((String) vector.get(5));
-        }
+        updatePayObjects();
 
-        updateTypes((DefaultTableModel) editImportanceTable.getModel(), ApplicationService.getInstance().importanceTypes);
-        updateTypes((DefaultTableModel) editPayTypeTable.getModel(), ApplicationService.getInstance().payTypes);
-        updateTypes((DefaultTableModel) editUserTable.getModel(), ApplicationService.getInstance().users);
+        updateTypes((DefaultTableModel) editImportanceTable.getModel(), ApplicationService.getInstance().getImportanceTypes());
+        updateTypes((DefaultTableModel) editIncomeTypeTable.getModel(), ApplicationService.getInstance().getIncomeTypes());
+        updateTypes((DefaultTableModel) editPayTypeTable.getModel(), ApplicationService.getInstance().getPayTypes());
+        updateTypes((DefaultTableModel) editUserTable.getModel(), ApplicationService.getInstance().getUsers());
 
         updateIncomes();
 
@@ -250,25 +244,42 @@ public class EditFrame extends JFrame implements Serializable {
         }
     }
 
+    private void updatePayObjects() throws ParseException {
+        for (Object obj : ((DefaultTableModel) editPayObjectTable.getModel()).getDataVector()) {
+            Vector vector = (Vector) obj;
+            PayObject payObject = (PayObject) vector.get(6);
+            payObject.setUser((Users) vector.get(0));
+            payObject.setImportance((ImportanceType) vector.get(1));
+            payObject.setPayType((PayType) vector.get(2));
+            if (vector.get(3) instanceof String) {
+                payObject.setPrice(Integer.parseInt((String) vector.get(3)));
+            }
+            if (vector.get(4) instanceof String) {
+                payObject.setDate(ApplicationProperties.FORMAT_DATE.parse((String) vector.get(4)));
+            }
+            payObject.setDescription((String) vector.get(5));
+        }
+    }
+
     private void updateIncomes() throws ParseException {
         for (Object obj : ((DefaultTableModel)editIncomeTable.getModel()).getDataVector()) {
             Vector vector = (Vector) obj;
 
-            Income income = (Income) vector.get(2);
-            if (vector.get(0) instanceof String) {
-                income.setDate(ApplicationProperties.FORMAT_DATE.parse((String) vector.get(0)));
+            Income income = (Income) vector.get(5);
+            income.setUser((Users) vector.get(0));
+            income.setType((IncomeType) vector.get(1));
+            if (vector.get(2) instanceof String) {
+                income.setAmountMoney(Integer.parseInt((String) vector.get(2)));
             }
-            if (vector.get(1) instanceof String) {
-                income.setAmountMoney(Integer.parseInt((String) vector.get(1)));
+            if (vector.get(3) instanceof String) {
+                income.setDate(ApplicationProperties.FORMAT_DATE.parse((String) vector.get(3)));
             }
-            if (!ApplicationService.getIncomes().contains(income)) {
-                ApplicationService.getInstance().addIncome(income);
-            }
+            income.setDescription((String) vector.get(4));
         }
     }
 
     /**
-     * Обновляет данные в таблице
+     * Обновляет данные в таблице покупок
      */
     void updatePayObjectTable() {
         editPayObjectTable.setModel(TableService.getPayObjectTableData());
@@ -279,6 +290,19 @@ public class EditFrame extends JFrame implements Serializable {
         editPayObjectTable.getColumn(TableService.USER_COLUMN).setCellEditor(new SelectCellEditor(new JComboBox<>(), TableService.getFieldsByColumn(TableService.USER_COLUMN)));
         editPayObjectTable.getColumn(TableService.IMPORTANCE_COLUMN).setCellEditor(new SelectCellEditor(new JComboBox<>(), TableService.getFieldsByColumn(TableService.IMPORTANCE_COLUMN)));
         editPayObjectTable.getColumn(TableService.PAY_TYPE_COLUMN).setCellEditor(new SelectCellEditor(new JComboBox<>(), TableService.getFieldsByColumn(TableService.PAY_TYPE_COLUMN)));
+    }
+
+    /**
+     * Обновляет данные в таблице доходов
+     */
+    void updateIncomeTable() {
+        editIncomeTable.setModel(TableService.getIncomeTableData());
+        FrameService.addRemoveColumnView(editIncomeTable);
+        editIncomeTable.getColumn(TableService.DESCRIPTION_COLUMN).setCellEditor(JTableService.getJTextAreaCellEditor(new Dimension(300, 110)));
+        editIncomeTable.getColumn(TableService.DATE_COLUMN).setCellEditor(new DateCellEditor(new JTextField(), ApplicationProperties.FORMAT_DATE, null));
+        editIncomeTable.getColumn(TableService.DATE_COLUMN).setCellRenderer(new DateCellRenderer(ApplicationProperties.FORMAT_DATE));
+        editIncomeTable.getColumn(TableService.USER_COLUMN).setCellEditor(new SelectCellEditor(new JComboBox<>(), TableService.getFieldsByColumn(TableService.USER_COLUMN)));
+        editIncomeTable.getColumn(TableService.INCOME_TYPE_COLUMN).setCellEditor(new SelectCellEditor(new JComboBox<>(), TableService.getFieldsByColumn(TableService.INCOME_TYPE_COLUMN)));
     }
 
     private void hideAllElements() {

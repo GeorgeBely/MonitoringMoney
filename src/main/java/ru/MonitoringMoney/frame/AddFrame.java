@@ -2,7 +2,7 @@ package ru.MonitoringMoney.frame;
 
 
 import org.apache.commons.lang.StringUtils;
-import ru.MonitoringMoney.*;
+import ru.MonitoringMoney.main.ApplicationProperties;
 import ru.MonitoringMoney.services.ApplicationService;
 import ru.MonitoringMoney.services.FrameService;
 import ru.MonitoringMoney.services.ImageService;
@@ -41,6 +41,7 @@ public class AddFrame extends JFrame implements Serializable {
 
     public AddFrame() {
         setResizable(false);
+        setVisible(false);
         setTitle(FRAME_NAME);
         toFront();
         setIconImage(ImageService.PLUS_IMAGE);
@@ -65,10 +66,9 @@ public class AddFrame extends JFrame implements Serializable {
                 ApplicationService.getInstance().getSortedUsers(), () -> { disposePopup(); new FrameAddPropertyValues(Users.class); },
                 AddFrame.this::disposePopup);
 
-        JLabel priceLabel = new JLabel("Стоимость покупки") {{
+        panel.add(new JLabel("Стоимость покупки") {{
             setBounds(5, 75, 140, 20);
-        }};
-        panel.add(priceLabel);
+        }});
 
         priceText = new JTextField() {{
             setBounds(145, 75, 90, 20);
@@ -77,10 +77,9 @@ public class AddFrame extends JFrame implements Serializable {
         }};
         panel.add(priceText);
 
-        JLabel labelFromDate = new JLabel("Дата покупки") {{
+        panel.add(new JLabel("Дата покупки") {{
             setBounds(5, 100, 140, 20);
-        }};
-        panel.add(labelFromDate);
+        }});
 
         dateText = new JFormattedTextField(ApplicationProperties.FORMAT_DATE) {{
             setBounds(145, 100, 90, 20);
@@ -91,31 +90,29 @@ public class AddFrame extends JFrame implements Serializable {
 
         textDescription = FrameService.createJTextArea(panel, new Rectangle(5, 130, 235, 80), this::disposePopup);
 
-        JButton okButton = new JButton("Добавить") {{
+        panel.add(new JButton("Добавить") {{
             setBounds(5, 255, 115, 30);
             addActionListener(e -> addPayObject());
-        }};
-        panel.add(okButton);
+        }});
 
-        JButton cancelButton = new JButton("Отмена") {{
+        panel.add(new JButton("Отмена") {{
             setBounds(125, 255, 115, 30);
             addActionListener(e -> hideFrame());
-        }};
-        panel.add(cancelButton);
+        }});
     }
 
     private void addPayObject() {
         boolean checkParams = true;
         disposePopup();
-        if (ApplicationProperties.EMPTY.equals(importanceSelect.getSelectedItem() != null ? ((ImportanceType) importanceSelect.getSelectedItem()).getCode() : null)) {
+        if (importanceSelect.getSelectedItem() == null || TypeValue.EMPTY.equals(((TypeValue) importanceSelect.getSelectedItem()).getCode())) {
             importanceErrorPopup = FrameService.createErrorDialog("Необходимо выбрать уровень важности", importanceSelect);
             checkParams = false;
         }
-        if (ApplicationProperties.EMPTY.equals(payTypeSelect.getSelectedItem() != null ? ((PayType) payTypeSelect.getSelectedItem()).getCode() : null)) {
+        if (payTypeSelect.getSelectedItem() == null || TypeValue.EMPTY.equals(((TypeValue) payTypeSelect.getSelectedItem()).getCode())) {
             payTypeErrorPopup = FrameService.createErrorDialog("Необходимо выбрать тип покупки", payTypeSelect);
             checkParams = false;
         }
-        if (ApplicationProperties.EMPTY.equals(userSelect.getSelectedItem() != null ? ((Users) userSelect.getSelectedItem()).getCode() : null)) {
+        if (userSelect.getSelectedItem() == null || TypeValue.EMPTY.equals(((TypeValue) userSelect.getSelectedItem()).getCode())) {
             userErrorPopup = FrameService.createErrorDialog("Необходимо выбрать пользователя", userSelect);
             checkParams = false;
         }
