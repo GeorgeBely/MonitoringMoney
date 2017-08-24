@@ -53,7 +53,7 @@ public class MainFrame extends JFrame implements Serializable {
     private JLabel labelSumPrice;
 
     /** Ссылка на другие окна приложения */
-    private GraphicsFrame graphicsFrame;
+    public GraphicsFrame graphicsFrame;
     public EditFrame editFrame;
     public DesiredPurchaseFrame desiredPurchaseFrame;
 
