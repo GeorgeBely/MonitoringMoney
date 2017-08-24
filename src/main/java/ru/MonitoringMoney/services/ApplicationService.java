@@ -153,19 +153,13 @@ public class ApplicationService implements Serializable {
         }
     }
 
-
-
-
-
-
-
-
     /** Обновляет все данные о частоте использования типов */
     public void updateAllFrequencyUse() {
         frequencyUsePayType = new HashMap<>();
         frequencyUseUser = new HashMap<>();
         frequencyUseImportance = new HashMap<>();
         payObjects.forEach(this::updateFrequencyUse);
+        incomes.forEach(this::updateIncomeFrequencyUse);
     }
 
     /**
