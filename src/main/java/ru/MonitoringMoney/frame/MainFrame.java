@@ -207,9 +207,9 @@ public class MainFrame extends JFrame implements Serializable {
         ApplicationService.viewPayObjects = getPayObjectWithCurrentFilters();
         text.setText(ApplicationService.getInstance().getTextPayObjects(ApplicationService.viewPayObjects));
         labelSumPrice.setText(PREFIX_LABEL_SUM_PRICE + " "  + ApplicationService.getInstance().getSumPrice(ApplicationService.viewPayObjects));
-        if (graphicsFrame != null)
+        if (graphicsFrame != null && graphicsFrame.isVisible())
             graphicsFrame.updateData();
-        if (editFrame != null) {
+        if (editFrame != null && editFrame.isVisible()) {
             editFrame.updatePayObjectTable();
             editFrame.updateIncomeTable();
         }

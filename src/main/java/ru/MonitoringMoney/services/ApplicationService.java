@@ -1,7 +1,6 @@
 package ru.MonitoringMoney.services;
 
 import ru.MonitoringMoney.frame.AddIncomeFrame;
-import ru.MonitoringMoney.frame.GraphicsFrame;
 import ru.MonitoringMoney.main.ApplicationProperties;
 import ru.MonitoringMoney.types.ImageCanvas;
 import ru.MonitoringMoney.types.PayObject;
