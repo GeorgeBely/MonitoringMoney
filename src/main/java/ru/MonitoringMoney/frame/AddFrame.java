@@ -38,6 +38,8 @@ public class AddFrame extends JFrame implements Serializable {
     private PopupDialog userErrorPopup;
     private PopupDialog priceErrorPopup;
 
+    private JCheckBox checkBox;
+
 
     public AddFrame() {
         setResizable(false);
@@ -99,6 +101,16 @@ public class AddFrame extends JFrame implements Serializable {
             setBounds(125, 255, 115, 30);
             addActionListener(e -> hideFrame());
         }});
+
+        checkBox = new JCheckBox() {{
+            setBounds(5, 290, 20, 20);
+            setSelected(true);
+        }};
+        panel.add(checkBox);
+        panel.add(new JLabel("Скрывать фрейм") {{
+            setBounds(25, 285, 100, 30);
+        }});
+
     }
 
     private void addPayObject() {
@@ -131,7 +143,9 @@ public class AddFrame extends JFrame implements Serializable {
             pay.setUser((Users) userSelect.getSelectedItem());
             ApplicationService.getInstance().addPayObject(pay);
 
-            hideFrame();
+            if (checkBox.isSelected()) {
+                hideFrame();
+            }
         }
     }
 
