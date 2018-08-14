@@ -47,6 +47,10 @@ public class ImageService {
     private static final Image REMOVE_IMAGE = getImage("remove.png");
     static final ImageIcon REMOVE_ICON = REMOVE_IMAGE == null ? null : new ImageIcon(REMOVE_IMAGE);
 
+    /** Иконка для кнопки счетов */
+    public static final Image ACCOUNTS_IMAGE = getImage("accountsButton.png");
+    public static final ImageIcon ACCOUNTS_ICON = ACCOUNTS_IMAGE == null ? null : new ImageIcon(ACCOUNTS_IMAGE);
+
 
     /**
      * @param imageName имя файла изображения

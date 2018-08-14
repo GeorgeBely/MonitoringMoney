@@ -64,6 +64,7 @@ public class FrameAddPropertyValues extends JFrame implements Serializable {
                     MonitoringMoney.getFrame(AddFrame.class).addSelectElement(newValue);
                     MonitoringMoney.getFrame(MainFrame.class).addSelectElement(newValue);
                     MonitoringMoney.getFrame(AddIncomeFrame.class).addSelectElement(newValue);
+                    MonitoringMoney.getFrame(AddAccountFrame.class).addSelectElement(newValue);
                 }
                 dispose();
             });

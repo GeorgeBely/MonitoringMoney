@@ -240,6 +240,8 @@ public class EditFrame extends JFrame implements Serializable {
                 types.add(type);
                 MonitoringMoney.getFrame(AddFrame.class).addSelectElement(type);
                 MonitoringMoney.getFrame(MainFrame.class).addSelectElement(type);
+                MonitoringMoney.getFrame(AddIncomeFrame.class).addSelectElement(type);
+                MonitoringMoney.getFrame(AddAccountFrame.class).addSelectElement(type);
             }
         }
     }

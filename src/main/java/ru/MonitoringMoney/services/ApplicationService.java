@@ -1,11 +1,9 @@
 package ru.MonitoringMoney.services;
 
-import ru.MonitoringMoney.frame.AddIncomeFrame;
+import ru.MonitoringMoney.frame.*;
 import ru.MonitoringMoney.main.ApplicationProperties;
 import ru.MonitoringMoney.types.ImageCanvas;
 import ru.MonitoringMoney.types.PayObject;
-import ru.MonitoringMoney.frame.AddFrame;
-import ru.MonitoringMoney.frame.MainFrame;
 import ru.MonitoringMoney.main.MonitoringMoney;
 import ru.MonitoringMoney.types.*;
 import org.apache.commons.lang.StringUtils;
@@ -72,6 +70,9 @@ public class ApplicationService implements Serializable {
 
     /** Список доходов */
     private List<Income> incomes = new ArrayList<>();
+
+    /** Список счетов */
+    private List<Account> accounts = new ArrayList<>();
 
 
     /**
@@ -228,6 +229,12 @@ public class ApplicationService implements Serializable {
         MonitoringMoney.getFrame(MainFrame.class).updateData();
     }
 
+    public void addAccount(Account account) {
+        accounts.add(account);
+        ApplicationService.writeData();
+        MonitoringMoney.getFrame(AccountsFrame.class).updateData();
+    }
+
     /** Добавляет новый доход */
     public void addIncome(Income income) {
         if (incomes == null) {
@@ -279,11 +286,11 @@ public class ApplicationService implements Serializable {
         Set<TypeValue> useRemoveTypeSet = new HashSet<>();
         if (!(removeList.get(0) instanceof DesiredPurchase))
         for (PayObject payObject : payObjects) {
-            if (removeList.contains(payObject.getImportance()) && !useRemoveTypeSet.contains(payObject.getImportance()))
+            if (removeList.contains(payObject.getImportance()))
                 useRemoveTypeSet.add(payObject.getImportance());
-            if (removeList.contains(payObject.getPayType()) && !useRemoveTypeSet.contains(payObject.getPayType()))
+            if (removeList.contains(payObject.getPayType()))
                 useRemoveTypeSet.add(payObject.getPayType());
-            if (removeList.contains(payObject.getUser()) && !useRemoveTypeSet.contains(payObject.getUser()))
+            if (removeList.contains(payObject.getUser()))
                 useRemoveTypeSet.add(payObject.getUser());
         }
 
@@ -293,19 +300,16 @@ public class ApplicationService implements Serializable {
                     MonitoringMoney.getFrame(AddFrame.class).removeSelectElement(value);
                     MonitoringMoney.getFrame(MainFrame.class).removeSelectElement(value);
                     MonitoringMoney.getFrame(AddIncomeFrame.class).removeSelectElement(value);
+                    MonitoringMoney.getFrame(AddAccountFrame.class).removeSelectElement(value);
 
                     if (value instanceof PayType) {
-                        if (payTypes.contains(value))
-                            payTypes.remove(value);
+                        payTypes.remove(value);
                     } else if (value instanceof ImportanceType) {
-                        if (importanceTypes.contains(value))
-                            importanceTypes.remove(value);
+                        importanceTypes.remove(value);
                     } else if (value instanceof Users) {
-                        if (users.contains(value))
-                            users.remove(value);
+                        users.remove(value);
                     } else if (value instanceof DesiredPurchase) {
-                        if (desiredPurchases.contains(value))
-                            desiredPurchases.remove(value);
+                        desiredPurchases.remove(value);
                     }
                 });
         removeList.clear();
@@ -392,18 +396,25 @@ public class ApplicationService implements Serializable {
                 .collect(Collectors.toList());
     }
 
+    public List<Account> getAccounts() {
+        if (accounts == null) {
+            accounts = new ArrayList<>();
+        }
+        return accounts;
+    }
+
     /**
      * @return все доходы в течении выбранного времени в основном окне <code>MainFrame</code>
      */
     List<Income> getIncomes() {
-        if (instance.incomes == null) {
-            instance.incomes = new ArrayList<>();
+        if (incomes == null) {
+            incomes = new ArrayList<>();
         }
 
         Date dateFrom = MonitoringMoney.getFrame(MainFrame.class).getDateFrom();
         Date dateTo = MonitoringMoney.getFrame(MainFrame.class).getDateTo();
 
-        return instance.incomes.stream()
+        return incomes.stream()
                 .filter(obj -> dateFrom == null || obj.getDate().equals(dateFrom) || obj.getDate().after(dateFrom))
                 .filter(obj -> dateTo == null || obj.getDate().before(dateTo))
                 .collect(Collectors.toList());

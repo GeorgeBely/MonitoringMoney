@@ -74,7 +74,7 @@ public class MainFrame extends JFrame implements Serializable {
         }};
         add(panel);
 
-        text = FrameService.createJTextArea(panel, new Rectangle(250, 5, 320, 186), () -> {});
+        text = FrameService.createJTextArea(panel, new Rectangle(250, 5, 355, 186), () -> {});
 
         termInput = new JTextField() {{
             setBounds(5, 5, 240, 30);
@@ -196,6 +196,14 @@ public class MainFrame extends JFrame implements Serializable {
             setIcon(ImageService.ADD_INCOME_ICON);
         }};
         panel.add(buttonAddIncomeFrame);
+
+        JButton buttonAccountsFrame = new JButton() {{
+            setBorder(null);
+            setBounds(575, 195, 30, 30);
+            addActionListener(e -> EventQueue.invokeLater(() -> MonitoringMoney.getFrame(AccountsFrame.class).showFrame()));
+            setIcon(ImageService.ACCOUNTS_ICON);
+        }};
+        panel.add(buttonAccountsFrame);
 
         updateData();
     }
@@ -320,7 +328,7 @@ public class MainFrame extends JFrame implements Serializable {
      * @param defaultModel модель списка из которого нужно отобрать выбранные значения
      * @return список выбранных значений
      */
-    private List<TypeValue> getSelectedValues(DefaultComboBoxModel defaultModel) {
+    public static List<TypeValue> getSelectedValues(DefaultComboBoxModel defaultModel) {
         List<TypeValue> selected = new ArrayList<>();
         for (int i = 0; i < defaultModel.getSize(); i++) {
             CheckBoxListService.CheckComboValue value = (CheckBoxListService.CheckComboValue) defaultModel.getElementAt(i);
@@ -341,7 +349,7 @@ public class MainFrame extends JFrame implements Serializable {
      * @param graphicValues Список наименований значений отображаемых на графике пирожок (необходимо при выборе значения {PieService.ANOTHER_BLOCK_NAME}).
      * @param <T>           Тип списка
      */
-    private <T> void selectType(String name, List<T> types, DefaultComboBoxModel model, List graphicValues) {
+    private static <T> void selectType(String name, List<T> types, DefaultComboBoxModel model, List graphicValues) {
         if (PieService.ANOTHER_BLOCK_NAME.equals(name)) {
             if (getSelectedValues(model).isEmpty()) {
                 selectAllValues(model, true);
@@ -374,7 +382,7 @@ public class MainFrame extends JFrame implements Serializable {
      * @param model      Модель списка из которого нужно отобрать выбранные значения
      * @param typeValue  Значение определённого атрибута
      */
-    private void selectValue(DefaultComboBoxModel model, TypeValue typeValue) {
+    private static void selectValue(DefaultComboBoxModel model, TypeValue typeValue) {
         for (int i = 0; i < model.getSize(); i++) {
             CheckBoxListService.CheckComboValue value = (CheckBoxListService.CheckComboValue) model.getElementAt(i);
             if (value.getType().equals(typeValue)) {
@@ -390,7 +398,7 @@ public class MainFrame extends JFrame implements Serializable {
      * @param model Модель списка из которого нужно отобрать выбранные значения
      * @param state При {true} все значения из списка будут выбраны
      */
-    private void selectAllValues(DefaultComboBoxModel model, boolean state) {
+    private static void selectAllValues(DefaultComboBoxModel model, boolean state) {
         for (int i = 0; i < model.getSize(); i++) {
             CheckBoxListService.CheckComboValue value = (CheckBoxListService.CheckComboValue) model.getElementAt(i);
             value.setState(state);
@@ -404,7 +412,7 @@ public class MainFrame extends JFrame implements Serializable {
      * @param comboBox список в котором нужно искать значение {value}
      * @return объект {CheckBoxListService.CheckComboValue} соответствующий переданному значению
      */
-    private CheckBoxListService.CheckComboValue getSelectValue(TypeValue value, JComboBox comboBox) {
+    static CheckBoxListService.CheckComboValue getSelectValue(TypeValue value, JComboBox comboBox) {
         for (int i = 0; i < comboBox.getItemCount(); i++) {
             CheckBoxListService.CheckComboValue comboValue = (CheckBoxListService.CheckComboValue) comboBox.getItemAt(i);
             if (comboValue.getType().equals(value))

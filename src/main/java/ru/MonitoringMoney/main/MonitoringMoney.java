@@ -18,7 +18,7 @@ public class MonitoringMoney implements Serializable {
     private static final long serialVersionUID = -2899149309177313402L;
 
     /** Версия приложения */
-    public static final String VERSION = "1.4.26";
+    public static final String VERSION = "1.5.0";
 
     /** Фреймы приложения */
     private static Map<Class<? extends JFrame>, JFrame> frames = new HashMap<>();
