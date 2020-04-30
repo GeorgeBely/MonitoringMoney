@@ -26,7 +26,7 @@ public class AddFrame extends JFrame implements Serializable {
     private static final String FRAME_NAME = "Добавление покупки";
 
     private JFormattedTextField dateText;
-    private JComboBox<ImportanceType> importanceSelect;
+//    private JComboBox<ImportanceType> importanceSelect;
     private JComboBox<PayType> payTypeSelect;
     private JComboBox<Users> userSelect;
     private JTextArea textDescription;
@@ -58,9 +58,9 @@ public class AddFrame extends JFrame implements Serializable {
         }};
         add(panel);
 
-        importanceSelect = FrameService.createSelectTypeValue(panel, new Rectangle(5, 5, 200, 30),
-                ApplicationService.getInstance().getSortedImportance(), () -> { disposePopup(); new FrameAddPropertyValues(ImportanceType.class); },
-                AddFrame.this::disposePopup);
+//        importanceSelect = FrameService.createSelectTypeValue(panel, new Rectangle(5, 5, 200, 30),
+//                ApplicationService.getInstance().getSortedImportance(), () -> { disposePopup(); new FrameAddPropertyValues(ImportanceType.class); },
+//                AddFrame.this::disposePopup);
         payTypeSelect = FrameService.createSelectTypeValue(panel, new Rectangle(5, 40, 200, 30),
                 ApplicationService.getInstance().getSortedPayTypes(), () -> { disposePopup(); new FrameAddPropertyValues(PayType.class); },
                 AddFrame.this::disposePopup);
@@ -116,10 +116,10 @@ public class AddFrame extends JFrame implements Serializable {
     private void addPayObject() {
         boolean checkParams = true;
         disposePopup();
-        if (importanceSelect.getSelectedItem() == null || TypeValue.EMPTY.equals(((TypeValue) importanceSelect.getSelectedItem()).getCode())) {
-            importanceErrorPopup = FrameService.createErrorDialog("Необходимо выбрать уровень важности", importanceSelect);
-            checkParams = false;
-        }
+//        if (importanceSelect.getSelectedItem() == null || TypeValue.EMPTY.equals(((TypeValue) importanceSelect.getSelectedItem()).getCode())) {
+//            importanceErrorPopup = FrameService.createErrorDialog("Необходимо выбрать уровень важности", importanceSelect);
+//            checkParams = false;
+//        }
         if (payTypeSelect.getSelectedItem() == null || TypeValue.EMPTY.equals(((TypeValue) payTypeSelect.getSelectedItem()).getCode())) {
             payTypeErrorPopup = FrameService.createErrorDialog("Необходимо выбрать тип покупки", payTypeSelect);
             checkParams = false;
@@ -137,7 +137,8 @@ public class AddFrame extends JFrame implements Serializable {
             PayObject pay = new PayObject();
             pay.setDate((Date) dateText.getValue());
             pay.setDescription(textDescription.getText());
-            pay.setImportance((ImportanceType) importanceSelect.getSelectedItem());
+//            pay.setImportance((ImportanceType) importanceSelect.getSelectedItem());
+            pay.setImportance(ApplicationService.getInstance().getImportanceTypes().get(1));
             pay.setPayType((PayType) payTypeSelect.getSelectedItem());
             pay.setPrice(Integer.parseInt(priceText.getText()));
             pay.setUser((Users) userSelect.getSelectedItem());
@@ -161,8 +162,8 @@ public class AddFrame extends JFrame implements Serializable {
             payTypeSelect.addItem((PayType) item);
             payTypeSelect.setSelectedItem(item);
         } else if (item instanceof ImportanceType) {
-            importanceSelect.addItem((ImportanceType) item);
-            importanceSelect.setSelectedItem(item);
+//            importanceSelect.addItem((ImportanceType) item);
+//            importanceSelect.setSelectedItem(item);
         } else if (item instanceof Users) {
             userSelect.addItem((Users) item);
             userSelect.setSelectedItem(item);
@@ -173,7 +174,7 @@ public class AddFrame extends JFrame implements Serializable {
         if (item instanceof PayType) {
             payTypeSelect.removeItem(item);
         } else if (item instanceof ImportanceType) {
-            importanceSelect.removeItem(item);
+//            importanceSelect.removeItem(item);
         } else if (item instanceof Users) {
             userSelect.removeItem(item);
         }

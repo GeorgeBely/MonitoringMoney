@@ -10,6 +10,8 @@ import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PiePlot;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
+import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
+import org.jfree.ui.RectangleInsets;
 import ru.MonitoringMoney.main.ApplicationProperties;
 import ru.MonitoringMoney.types.ImportanceType;
 import ru.MonitoringMoney.types.PayObject;
@@ -142,6 +144,7 @@ public class GraphicsFrame extends JFrame {
         XYPlot timeSerialPlot = (XYPlot) timeSerialChart.getPlot();
         timeSerialPlot.setNoDataMessage(GraphicsService.NO_DATA_MESSAGE);
         XYItemRenderer renderer = timeSerialPlot.getRenderer();
+        ((XYLineAndShapeRenderer) renderer).setBaseShapesVisible(true);
         renderer.setBaseToolTipGenerator((xyDataset, i, j) -> {
             Date date = new Date();
             date.setTime(xyDataset.getX(i, j).longValue());
