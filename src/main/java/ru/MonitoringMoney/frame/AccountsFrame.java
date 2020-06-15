@@ -120,18 +120,8 @@ public class AccountsFrame extends JFrame implements Serializable {
         totalSumResult.setText("Общий лимит: " + sumLimit + "   Потрачено: " + sumPrice);
 
         for (Map.Entry<Account, Map<String, Integer>> entry : sortDataMap.entrySet()) {
-            Integer limit = 0;
-            Integer price = 0;
             for (Map.Entry<String, Integer> value : entry.getValue().entrySet()) {
-                if ("Потрачено".equals(value.getKey())) {
-                    price = value.getValue();
-                } else {
-                    limit = value.getValue();
-                }
                 dataSet.addValue(value.getValue(), value.getKey(), entry.getKey().getName());
-            }
-            if (price > limit) {
-                dataSet.addValue(price - limit, "Потрачено", "Резерв");
             }
         }
         return dataSet;
