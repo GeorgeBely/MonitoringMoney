@@ -138,7 +138,7 @@ public class MainFrame extends JFrame implements Serializable {
         dateFromText = new JFormattedTextField(ApplicationProperties.FORMAT_DATE) {{
             setBounds(85, 135, 65, 20);
             setValue(DateUtils.truncate(new Date(), Calendar.MONTH));
-            addMouseListener(FrameService.getMouseListenerPopupCalendarDialog(this, val -> updateData(), () -> {}));
+            addMouseListener(FrameService.getMouseListenerPopupCalendarDialog(this, val -> updateDateFrom(val), () -> {}));
         }};
         panel.add(dateFromText);
 
@@ -150,7 +150,7 @@ public class MainFrame extends JFrame implements Serializable {
         dateToText = new JFormattedTextField(ApplicationProperties.FORMAT_DATE) {{
             setBounds(180, 135, 65, 20);
             setValue(DateUtils.addDays(DateUtils.addMonths(DateUtils.truncate(new Date(), Calendar.MONTH), 1), -1));
-            addMouseListener(FrameService.getMouseListenerPopupCalendarDialog(this, val -> updateData(), () -> {}));
+            addMouseListener(FrameService.getMouseListenerPopupCalendarDialog(this, val -> updateDateTo(val), () -> {}));
         }};
         panel.add(dateToText);
 
@@ -438,5 +438,21 @@ public class MainFrame extends JFrame implements Serializable {
 
     void setDateToText(Date date) {
         this.dateToText.setValue(date);
+    }
+
+    void updateDateFrom(Date dateFrom) {
+        Date dateTo = (Date) dateToText.getValue();
+        if (dateFrom.after(dateTo)) {
+            dateToText.setValue(dateFrom);
+        }
+        updateData();
+    }
+
+    void updateDateTo(Date dateTo) {
+        Date dateFrom = (Date) dateFromText.getValue();
+        if (dateTo.before(dateFrom)) {
+            dateFromText.setValue(dateTo);
+        }
+        updateData();
     }
 }
