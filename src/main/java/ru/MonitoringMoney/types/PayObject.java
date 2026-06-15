@@ -22,13 +22,10 @@ public class PayObject implements Serializable {
     private PayType payType;
     private ImportanceType importance;
     private String description;
-    private Users user;
 
 
     public String toString() {
         StringBuilder builder = new StringBuilder();
-        if (user != null)
-            builder.append(user.getName()).append(" ");
         if (price != null)
             builder.append(price).append("руб ");
         if (payType != null)
@@ -82,11 +79,4 @@ public class PayObject implements Serializable {
         this.description = description;
     }
 
-    public Users getUser() {
-        return user;
-    }
-
-    public void setUser(Users user) {
-        this.user = user;
-    }
 }

@@ -25,20 +25,16 @@ public class AddFrame extends JFrame implements Serializable {
     /** Заголовок фрейма */
     private static final String FRAME_NAME = "Добавление покупки";
 
-    private JFormattedTextField dateText;
-    private JComboBox<ImportanceType> importanceSelect;
-    private JComboBox<PayType> payTypeSelect;
-    private JComboBox<Users> userSelect;
-    private JTextArea textDescription;
-    private JTextField priceText;
+    private final JFormattedTextField dateText;
+    private final JComboBox<ImportanceType> importanceSelect;
+    private final JComboBox<PayType> payTypeSelect;
+    private final JTextArea textDescription;
+    private final JTextField priceText;
 
-    /** Всплывающие окна ошибок валидиции */
+    /** Всплывающие окна ошибок валидации */
     private PopupDialog importanceErrorPopup;
     private PopupDialog payTypeErrorPopup;
-    private PopupDialog userErrorPopup;
     private PopupDialog priceErrorPopup;
-
-    private JCheckBox checkBox;
 
 
     public AddFrame() {
@@ -64,9 +60,6 @@ public class AddFrame extends JFrame implements Serializable {
         payTypeSelect = FrameService.createSelectTypeValue(panel, new Rectangle(5, 40, 200, 30),
                 ApplicationService.getInstance().getSortedPayTypes(), () -> { disposePopup(); new FrameAddPropertyValues(PayType.class); },
                 AddFrame.this::disposePopup);
-        userSelect = FrameService.createSelectTypeValue(panel, new Rectangle(5, 220, 200, 30),
-                ApplicationService.getInstance().getSortedUsers(), () -> { disposePopup(); new FrameAddPropertyValues(Users.class); },
-                AddFrame.this::disposePopup);
 
         panel.add(new JLabel("Стоимость покупки") {{
             setBounds(5, 75, 140, 20);
@@ -90,7 +83,7 @@ public class AddFrame extends JFrame implements Serializable {
         }};
         panel.add(dateText);
 
-        textDescription = FrameService.createJTextArea(panel, new Rectangle(5, 130, 235, 80), this::disposePopup);
+        textDescription = FrameService.createJTextArea(panel, new Rectangle(5, 130, 235, 120), this::disposePopup);
 
         panel.add(new JButton("Добавить") {{
             setBounds(5, 255, 115, 30);
@@ -100,15 +93,6 @@ public class AddFrame extends JFrame implements Serializable {
         panel.add(new JButton("Отмена") {{
             setBounds(125, 255, 115, 30);
             addActionListener(e -> hideFrame());
-        }});
-
-        checkBox = new JCheckBox() {{
-            setBounds(5, 290, 20, 20);
-            setSelected(true);
-        }};
-        panel.add(checkBox);
-        panel.add(new JLabel("Скрывать фрейм") {{
-            setBounds(25, 285, 100, 30);
         }});
 
     }
@@ -124,10 +108,6 @@ public class AddFrame extends JFrame implements Serializable {
             payTypeErrorPopup = FrameService.createErrorDialog("Необходимо выбрать тип покупки", payTypeSelect);
             checkParams = false;
         }
-        if (userSelect.getSelectedItem() == null || TypeValue.EMPTY.equals(((TypeValue) userSelect.getSelectedItem()).getCode())) {
-            userErrorPopup = FrameService.createErrorDialog("Необходимо выбрать пользователя", userSelect);
-            checkParams = false;
-        }
         if (StringUtils.isBlank(priceText.getText())) {
             priceErrorPopup = FrameService.createErrorDialog("Необходимо указать цену", priceText);
             checkParams = false;
@@ -140,12 +120,7 @@ public class AddFrame extends JFrame implements Serializable {
             pay.setImportance((ImportanceType) importanceSelect.getSelectedItem());
             pay.setPayType((PayType) payTypeSelect.getSelectedItem());
             pay.setPrice(Integer.parseInt(priceText.getText()));
-            pay.setUser((Users) userSelect.getSelectedItem());
             ApplicationService.getInstance().addPayObject(pay);
-
-            if (checkBox.isSelected()) {
-                hideFrame();
-            }
         }
     }
 
@@ -163,9 +138,6 @@ public class AddFrame extends JFrame implements Serializable {
         } else if (item instanceof ImportanceType) {
             importanceSelect.addItem((ImportanceType) item);
             importanceSelect.setSelectedItem(item);
-        } else if (item instanceof Users) {
-            userSelect.addItem((Users) item);
-            userSelect.setSelectedItem(item);
         }
     }
 
@@ -174,8 +146,6 @@ public class AddFrame extends JFrame implements Serializable {
             payTypeSelect.removeItem(item);
         } else if (item instanceof ImportanceType) {
             importanceSelect.removeItem(item);
-        } else if (item instanceof Users) {
-            userSelect.removeItem(item);
         }
     }
 
@@ -195,9 +165,6 @@ public class AddFrame extends JFrame implements Serializable {
         }
         if (payTypeErrorPopup != null) {
             payTypeErrorPopup.closeDialog();
-        }
-        if (userErrorPopup != null) {
-            userErrorPopup.closeDialog();
         }
         if (priceErrorPopup != null) {
             priceErrorPopup.closeDialog();

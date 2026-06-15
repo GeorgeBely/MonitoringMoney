@@ -41,7 +41,7 @@ public class ApplicationService implements Serializable {
     /** Список желаемых покупок */
     private List<DesiredPurchase> desiredPurchases = new ArrayList<>();
 
-    /** Карта со значениями и колличеством использования уровней важности */
+    /** Карта со значениями и количеством использования уровней важности */
     private Map<ImportanceType, Integer> frequencyUseImportance = new HashMap<>();
 
     /** Карта со значениями и колличеством использования типов покупки */
@@ -123,12 +123,6 @@ public class ApplicationService implements Serializable {
             frequencyUseImportance.put(payObject.getImportance(), frequencyUseImportance.get(payObject.getImportance()) + 1);
         } else {
             frequencyUseImportance.put(payObject.getImportance(), 1);
-        }
-
-        if (frequencyUseUser.containsKey(payObject.getUser())) {
-            frequencyUseUser.put(payObject.getUser(), frequencyUseUser.get(payObject.getUser()) + 1);
-        } else {
-            frequencyUseUser.put(payObject.getUser(), 1);
         }
 
         if (frequencyUsePayType.containsKey(payObject.getPayType())) {
@@ -290,8 +284,6 @@ public class ApplicationService implements Serializable {
                 useRemoveTypeSet.add(payObject.getImportance());
             if (removeList.contains(payObject.getPayType()))
                 useRemoveTypeSet.add(payObject.getPayType());
-            if (removeList.contains(payObject.getUser()))
-                useRemoveTypeSet.add(payObject.getUser());
         }
 
         removeList.stream()
@@ -379,11 +371,10 @@ public class ApplicationService implements Serializable {
      * @param priseTo         фильтр по цене до
      * @param importanceTypes уровень важности
      * @param payTypes        тип покупки
-     * @param users           платильщик
      * @return список покупок по заданным фильтрам
      */
     public List<PayObject> getPayObjectsWithFilters(String term, Date dateFrom, Date dateTo, Integer priseFrom, Integer priseTo,
-                                                    List<TypeValue> importanceTypes, List<TypeValue> payTypes, List<TypeValue> users) {
+                                                    List<TypeValue> importanceTypes, List<TypeValue> payTypes) {
         return payObjects.stream()
                 .filter(obj -> StringUtils.isBlank(term) || obj.toString().toLowerCase().contains(term.toLowerCase()))
                 .filter(obj -> dateFrom == null || obj.getDate().equals(dateFrom) || obj.getDate().after(dateFrom))
@@ -392,7 +383,6 @@ public class ApplicationService implements Serializable {
                 .filter(obj -> priseTo == null || obj.getPrice() <= priseTo)
                 .filter(obj -> checkValue(obj.getImportance(), importanceTypes))
                 .filter(obj -> checkValue(obj.getPayType(), payTypes))
-                .filter(obj -> checkValue(obj.getUser(), users))
                 .collect(Collectors.toList());
     }
 

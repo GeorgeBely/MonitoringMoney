@@ -11,7 +11,6 @@ import org.jfree.chart.plot.PiePlot;
 import org.jfree.chart.plot.XYPlot;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
-import org.jfree.ui.RectangleInsets;
 import ru.MonitoringMoney.main.ApplicationProperties;
 import ru.MonitoringMoney.types.ImportanceType;
 import ru.MonitoringMoney.types.PayObject;
@@ -40,25 +39,25 @@ public class GraphicsFrame extends JFrame {
     private static final String FRAME_NAME = "Графики затрат";
 
 
-    /** график "пирожок" */
-    private ChartPanel piePanel;
-    private JFreeChart pieChart;
+    /** График "пирожок" */
+    private final ChartPanel piePanel;
+    private final JFreeChart pieChart;
 
-    /** график "временнные линии" */
-    private ChartPanel categoryPanel;
-    private JFreeChart timeSerialChart;
+    /** График "временные линии" */
+    private final ChartPanel categoryPanel;
+    private final JFreeChart timeSerialChart;
 
-    /** график "Категории" */
-    private ChartPanel barPanel;
-    private JFreeChart barChart;
+    /** График "Категории" */
+    private final ChartPanel barPanel;
+    private final JFreeChart barChart;
 
-    /** график "доходов и расходов" */
-    private ChartPanel incomePanel;
-    private JFreeChart incomeChart;
+    /** График "доходов и расходов" */
+    private final ChartPanel incomePanel;
+    private final JFreeChart incomeChart;
 
     /** общие компоненты*/
-    private JComboBox<String> selectGraphic;
-    private JComboBox<String> selectViewData;
+    private final JComboBox<String> selectGraphic;
+    private final JComboBox<String> selectViewData;
 
 
     GraphicsFrame() {
@@ -98,7 +97,6 @@ public class GraphicsFrame extends JFrame {
             for (PayObject payObject : ApplicationService.viewPayObjects) {
                 if (StringUtils.isNotBlank(payObject.getDescription()) && !texts.contains(payObject.getDescription())) {
                     if (payObject.getImportance().getName().equals(comparable)
-                        || payObject.getUser().getName().equals(comparable)
                         || payObject.getPayType().getName().equals(comparable)) {
                             texts.add(payObject.getDescription());
                     }
@@ -156,7 +154,6 @@ public class GraphicsFrame extends JFrame {
                 if (StringUtils.isNotBlank(payObject.getDescription()) && !texts.contains(payObject.getDescription())) {
                     if (ApplicationProperties.FORMAT_DATE.format(payObject.getDate()).equals(ApplicationProperties.FORMAT_DATE.format(date))) {
                         if (payObject.getImportance().getName().equals(categoryName)
-                                || payObject.getUser().getName().equals(categoryName)
                                 || payObject.getPayType().getName().equals(categoryName)) {
                             texts.add(payObject.getDescription());
                         }
@@ -171,7 +168,7 @@ public class GraphicsFrame extends JFrame {
                     }
                     if (result.length() + text.length() > ApplicationProperties.MAX_INFORM_GRAPHICS_MESSAGE_CHAR) {
                         if (ApplicationProperties.MAX_INFORM_GRAPHICS_MESSAGE_CHAR - result.length() > 3) {
-                            result.append(text.substring(0, ApplicationProperties.MAX_INFORM_GRAPHICS_MESSAGE_CHAR - result.length() - 3));
+                            result.append(text, 0, ApplicationProperties.MAX_INFORM_GRAPHICS_MESSAGE_CHAR - result.length() - 3);
                         }
                         result.append("...");
                     } else {
@@ -257,9 +254,7 @@ public class GraphicsFrame extends JFrame {
             String selectData = (String) selectViewData.getSelectedItem();
             List graphicValues = ((PiePlot) piePanel.getChart().getPlot()).getDataset().getKeys();
 
-            if (GraphicsService.VIEW_DATA_NAMES[3].equals(selectData)) {
-                MonitoringMoney.getFrame(MainFrame.class).selectUserValue(name, graphicValues);
-            } else if (GraphicsService.VIEW_DATA_NAMES[2].equals(selectData)) {
+            if (GraphicsService.VIEW_DATA_NAMES[2].equals(selectData)) {
                 MonitoringMoney.getFrame(MainFrame.class).selectImportanceValue(name, graphicValues);
             } else {
                 MonitoringMoney.getFrame(MainFrame.class).selectPayTypeValue(name, graphicValues);
@@ -281,8 +276,6 @@ public class GraphicsFrame extends JFrame {
             selectViewData.setSelectedItem(GraphicsService.VIEW_DATA_NAMES[1]);
         } else if (MonitoringMoney.getFrame(MainFrame.class).isNotUse(ImportanceType.class) && !GraphicsService.VIEW_DATA_NAMES[2].equals(selectData)) {
             selectViewData.setSelectedItem(GraphicsService.VIEW_DATA_NAMES[2]);
-        } else if (MonitoringMoney.getFrame(MainFrame.class).isNotUse(Users.class) && !GraphicsService.VIEW_DATA_NAMES[3].equals(selectData)) {
-            selectViewData.setSelectedItem(GraphicsService.VIEW_DATA_NAMES[3]);
         } else {
             selectGraphic.setSelectedItem(GraphicsService.GRAPHICS_NAMES[1]);
         }
@@ -313,7 +306,6 @@ public class GraphicsFrame extends JFrame {
     /**
      * Выбор отображаемого графика
      */
-    @SuppressWarnings("unchecked")
     private void selectGraphic() {
         setNotVisibleAllGraphics();
         String value = (String) selectGraphic.getSelectedItem();
@@ -331,12 +323,10 @@ public class GraphicsFrame extends JFrame {
         if (GraphicsService.GRAPHICS_NAMES[3].equals(value)) {
             selectViewDataModel.addElement(GraphicsService.VIEW_DATA_NAMES[0]);
             selectViewDataModel.addElement(GraphicsService.VIEW_DATA_NAMES[3]);
-            selectViewDataModel.addElement(GraphicsService.VIEW_DATA_NAMES[4]);
         } else {
             selectViewDataModel.addElement(GraphicsService.VIEW_DATA_NAMES[0]);
             selectViewDataModel.addElement(GraphicsService.VIEW_DATA_NAMES[1]);
             selectViewDataModel.addElement(GraphicsService.VIEW_DATA_NAMES[2]);
-            selectViewDataModel.addElement(GraphicsService.VIEW_DATA_NAMES[3]);
         }
     }
 

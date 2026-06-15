@@ -29,7 +29,7 @@ public class GraphicsService {
             "Суммарные затраты по времени", "Доходы/Расходы"};
 
     /** Данные отображающиеся в выпадающем списке выбора данных по типу */
-    public static final String[] VIEW_DATA_NAMES = new String[]{"", "Тип покупки", "Уровень важности", "Платильщик", "Тип дохода"};
+    public static final String[] VIEW_DATA_NAMES = new String[]{"", "Тип покупки", "Уровень важности", "Тип дохода"};
 
 
     public static TimeSeriesCollection getIncomeChartData(String selectData) {
@@ -75,8 +75,6 @@ public class GraphicsService {
                 selectValue = payObject.getPayType();
             } else if (VIEW_DATA_NAMES[2].equals(selectData)) {
                 selectValue = payObject.getImportance();
-            } else if (VIEW_DATA_NAMES[3].equals(selectData)) {
-                selectValue = payObject.getUser();
             } else {
                 selectValue = ALL_COAST;
             }
@@ -156,9 +154,7 @@ public class GraphicsService {
      * @return Наименование значения атрибута
      */
     private static String getPayObjectName(PayObject payObject, String selectData) {
-        if (VIEW_DATA_NAMES[3].equals(selectData)) {
-            return payObject.getUser().toString();
-        } else if (VIEW_DATA_NAMES[2].equals(selectData)) {
+        if (VIEW_DATA_NAMES[2].equals(selectData)) {
             return payObject.getImportance().toString();
         } else if (VIEW_DATA_NAMES[1].equals(selectData)) {
             return payObject.getPayType().toString();
@@ -175,8 +171,6 @@ public class GraphicsService {
      */
     private static String getIncomeName(Income income, String selectData) {
         if (VIEW_DATA_NAMES[3].equals(selectData)) {
-            return income.getUser().toString();
-        } else if (VIEW_DATA_NAMES[4].equals(selectData)) {
             return income.getType().toString();
         }
         return "";

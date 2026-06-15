@@ -34,25 +34,24 @@ public class EditFrame extends JFrame implements Serializable {
 
 
     /** Компоненты окна редактирования покупок */
-    private JTable editPayObjectTable;
-    private JLabel editPayObjectLabel;
-    private JButton editPayObjectButton;
+    private final JTable editPayObjectTable;
+    private final JLabel editPayObjectLabel;
+    private final JButton editPayObjectButton;
     private JScrollPane editPayObjectScrollPane;
 
     /** Компоненты окна редактирования типов */
-    private JLabel editTypeValueLabel;
+    private final JLabel editTypeValueLabel;
     private JButton editTypeValueButton;
-    private JTable editImportanceTable;
-    private JTable editPayTypeTable;
-    private JTable editUserTable;
+    private final JTable editImportanceTable;
+    private final JTable editPayTypeTable;
     private Container editTypeValueContainer;
 
     /** Компоненты окна редактирования доходов */
-    private JButton editIncomeButton;
-    private JLabel editIncomeLabel;
+    private final JButton editIncomeButton;
+    private final JLabel editIncomeLabel;
     private Container editIncomeContainer;
-    private JTable editIncomeTable;
-    private JTable editIncomeTypeTable;
+    private final JTable editIncomeTable;
+    private final JTable editIncomeTypeTable;
 
 
     /** Списки объектов, которые пользователь удаляет (Будут удалены только после того, как пользователь нажмёт кнопку применить) */
@@ -154,7 +153,6 @@ public class EditFrame extends JFrame implements Serializable {
 
         editImportanceTable = FrameService.createJTableTypeValue(editTypeValuePanel, new Rectangle(5, 5, 200, 240), ImportanceType.class);
         editPayTypeTable = FrameService.createJTableTypeValue(editTypeValuePanel, new Rectangle(225, 5, 200, 240), PayType.class);
-        editUserTable = FrameService.createJTableTypeValue(editTypeValuePanel, new Rectangle(445, 5, 200, 240), Users.class);
 
         editIncomeContainer = new Container() {{
             setBounds(5, 30, 645, 290);
@@ -211,7 +209,6 @@ public class EditFrame extends JFrame implements Serializable {
         updateTypes((DefaultTableModel) editImportanceTable.getModel(), ApplicationService.getInstance().getImportanceTypes());
         updateTypes((DefaultTableModel) editIncomeTypeTable.getModel(), ApplicationService.getInstance().getIncomeTypes());
         updateTypes((DefaultTableModel) editPayTypeTable.getModel(), ApplicationService.getInstance().getPayTypes());
-        updateTypes((DefaultTableModel) editUserTable.getModel(), ApplicationService.getInstance().getUsers());
 
         updateIncomes();
 
@@ -249,17 +246,16 @@ public class EditFrame extends JFrame implements Serializable {
     private void updatePayObjects() throws ParseException {
         for (Object obj : ((DefaultTableModel) editPayObjectTable.getModel()).getDataVector()) {
             Vector vector = (Vector) obj;
-            PayObject payObject = (PayObject) vector.get(6);
-            payObject.setUser((Users) vector.get(0));
-            payObject.setImportance((ImportanceType) vector.get(1));
-            payObject.setPayType((PayType) vector.get(2));
+            PayObject payObject = (PayObject) vector.get(5);
+            payObject.setImportance((ImportanceType) vector.get(0));
+            payObject.setPayType((PayType) vector.get(1));
+            if (vector.get(2) instanceof String) {
+                payObject.setPrice(Integer.parseInt((String) vector.get(2)));
+            }
             if (vector.get(3) instanceof String) {
-                payObject.setPrice(Integer.parseInt((String) vector.get(3)));
+                payObject.setDate(ApplicationProperties.FORMAT_DATE.parse((String) vector.get(3)));
             }
-            if (vector.get(4) instanceof String) {
-                payObject.setDate(ApplicationProperties.FORMAT_DATE.parse((String) vector.get(4)));
-            }
-            payObject.setDescription((String) vector.get(5));
+            payObject.setDescription((String) vector.get(4));
         }
     }
 
@@ -267,16 +263,15 @@ public class EditFrame extends JFrame implements Serializable {
         for (Object obj : ((DefaultTableModel)editIncomeTable.getModel()).getDataVector()) {
             Vector vector = (Vector) obj;
 
-            Income income = (Income) vector.get(5);
-            income.setUser((Users) vector.get(0));
-            income.setType((IncomeType) vector.get(1));
+            Income income = (Income) vector.get(4);
+            income.setType((IncomeType) vector.get(0));
+            if (vector.get(1) instanceof String) {
+                income.setAmountMoney(Integer.parseInt((String) vector.get(1)));
+            }
             if (vector.get(2) instanceof String) {
-                income.setAmountMoney(Integer.parseInt((String) vector.get(2)));
+                income.setDate(ApplicationProperties.FORMAT_DATE.parse((String) vector.get(2)));
             }
-            if (vector.get(3) instanceof String) {
-                income.setDate(ApplicationProperties.FORMAT_DATE.parse((String) vector.get(3)));
-            }
-            income.setDescription((String) vector.get(4));
+            income.setDescription((String) vector.get(3));
         }
     }
 
@@ -289,7 +284,6 @@ public class EditFrame extends JFrame implements Serializable {
         editPayObjectTable.getColumn(TableService.DESCRIPTION_COLUMN).setCellEditor(JTableService.getJTextAreaCellEditor(new Dimension(300, 110)));
         editPayObjectTable.getColumn(TableService.DATE_COLUMN).setCellEditor(new DateCellEditor(new JTextField(), ApplicationProperties.FORMAT_DATE, null));
         editPayObjectTable.getColumn(TableService.DATE_COLUMN).setCellRenderer(new DateCellRenderer(ApplicationProperties.FORMAT_DATE));
-        editPayObjectTable.getColumn(TableService.USER_COLUMN).setCellEditor(new SelectCellEditor(new JComboBox<>(), TableService.getFieldsByColumn(TableService.USER_COLUMN)));
         editPayObjectTable.getColumn(TableService.IMPORTANCE_COLUMN).setCellEditor(new SelectCellEditor(new JComboBox<>(), TableService.getFieldsByColumn(TableService.IMPORTANCE_COLUMN)));
         editPayObjectTable.getColumn(TableService.PAY_TYPE_COLUMN).setCellEditor(new SelectCellEditor(new JComboBox<>(), TableService.getFieldsByColumn(TableService.PAY_TYPE_COLUMN)));
     }
@@ -303,7 +297,6 @@ public class EditFrame extends JFrame implements Serializable {
         editIncomeTable.getColumn(TableService.DESCRIPTION_COLUMN).setCellEditor(JTableService.getJTextAreaCellEditor(new Dimension(300, 110)));
         editIncomeTable.getColumn(TableService.DATE_COLUMN).setCellEditor(new DateCellEditor(new JTextField(), ApplicationProperties.FORMAT_DATE, null));
         editIncomeTable.getColumn(TableService.DATE_COLUMN).setCellRenderer(new DateCellRenderer(ApplicationProperties.FORMAT_DATE));
-        editIncomeTable.getColumn(TableService.USER_COLUMN).setCellEditor(new SelectCellEditor(new JComboBox<>(), TableService.getFieldsByColumn(TableService.USER_COLUMN)));
         editIncomeTable.getColumn(TableService.INCOME_TYPE_COLUMN).setCellEditor(new SelectCellEditor(new JComboBox<>(), TableService.getFieldsByColumn(TableService.INCOME_TYPE_COLUMN)));
     }
 
